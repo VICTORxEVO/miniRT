@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "miniRT.h": "c",
+        "types.h": "c",
+        "fcntl.h": "c",
+        "math.h": "c",
+        "keysym.h": "c",
+        "unistd.h": "c",
+        "mlx.h": "c",
+        "string.h": "c"
+    }
+}
