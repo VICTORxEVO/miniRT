@@ -82,12 +82,12 @@ typedef struct s_camera
 
 typedef struct s_world
 {
-	t_node 	*lights;
-	t_node 	*planes;
-	t_node 	*cylinders;
-	t_node 	*spheres;
-	t_ambient	ambient;
-	t_camera cam;
+	t_node 		*lights;
+	t_node 		*planes;
+	t_node 		*cylinders;
+	t_node 		*spheres;
+	t_ambient	*ambient;
+	t_camera 	*cam;
 } t_world;
 
 typedef struct s_data
@@ -125,7 +125,6 @@ typedef struct s_pars
 {
 	bool	camera_exist;
 	bool	ambient_exist;
-	bool	light_exist; // in bonus accept more than one
 } t_pars;
 
 
@@ -177,6 +176,21 @@ void					*gc_realloc(t_data *d, void *ptr, size_t old_size,
 							size_t size);
 void	*ft_memcpy(void *dst, const void *src, size_t n);
 void	ft_bzero(void *s, size_t n);
+
+
+/*
+	shapes handling 
+*/
+bool    light_handled(t_data *d, char **args);
+bool    plane_handled(t_data *d, char **args);
+bool    cylinder_handled(t_data *d, char **args);
+bool    sphere_handled(t_data *d, char **args);
+bool    camera_handled(t_data *d, char **args);
+bool    ambient_handled(t_data *d, char **args);
+bool    color_struct_filled(t_color	*c, char  **args);
+bool    point_struct_filled(t_point	*p, char  **args);
+bool    vector_struct_filled(t_vector	*v, char  **args);
+bool    elem_added(t_data *d,char **args);
 
 
 int get_color_value(t_color c);
