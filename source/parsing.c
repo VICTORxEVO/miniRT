@@ -1,46 +1,63 @@
 #include "miniRT.h"
 
-int	ft_atoi(const char *s)
+bool s_is_whitespace(char	*s)
 {
-	long	res;
-	int		sign;
+	int	i;
 
+	i = 0;
+	while (s[i])
+	{
+		if (!((s[i] >= 9 && s[i] <= 13) || s[i] == 32))
+			return (false);
+		i++;
+	}
+	return (true);
+}
+
+bool between(float n, float min, float max)
+{
+	return (n >= min && n <= max);
+}
+
+float	ft_atof(const char *s, bool *err)
+{
+	float	res;
+	int		sign;
+	float	dot_pow;
+	dot_pow = 0;
 	res = 0;
 	sign = 1;
-	while (((*s <= 13 && *s >= 9) || *s == 32))
-		s++;
-	if (*s == '-' || *s == '+')
+	
+	if (*s == '-')
 	{
-		if (*s == '-')
-			sign *= -1;
-		s += 1;
-	}
-	while (*s >= '0' && *s <= '9')
-	{
-		res = res * 10 + (*s - '0');
+		sign *= -1;
 		s++;
 	}
-	return (res * sign);
-};
-
-int	ft_atou(const char *s)
-{
-	unsigned	res;
-	int		sign;
-
-	res = 0;
-	sign = 1;
-	while (((*s <= 13 && *s >= 9) || *s == 32))
-		s++;
-	if (*s == '-' || *s == '+')
+	while (*s)
 	{
-		if (*s == '-')
-			sign *= -1;
-		s += 1;
-	}
-	while (*s >= '0' && *s <= '9')
-	{
-		res = res * 10 + (*s - '0');
+		if (*s != '.' && (*s < '0' || *s > '9'))
+		{
+			*err = true;
+			return 0;
+		}
+		if (*s == '.')
+		{
+			if (dot_pow != 0)
+			{
+				*err = true;
+				return 0;
+			}
+			dot_pow++;
+			s++;
+			continue;
+		}
+		if (dot_pow)
+		{
+			res = res + (*s - '0') / powf(10.f, dot_pow);
+			dot_pow++;
+		}
+		else
+			res = (res * 10) + (*s - '0');
 		s++;
 	}
 	return (res * sign);
@@ -63,7 +80,7 @@ unsigned count_args(char   **args)
     unsigned i;
 
     i = 0;
-    while (args[i++])
-        ;
+    while (args[i])
+        i++;
     return i;
 }

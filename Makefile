@@ -2,7 +2,11 @@
 NAME = miniRT
 
 #cc compiler with all flags
-CCF = cc -Wall -Wextra -Werror
+CCF = cc -Wall -Wextra -Werror -lm # -O3 -flto
+
+LIBS =  -lm
+
+MLX_FLAGS = -Lmlx -lmlx -L/usr/lib/X11 -lXext -lX11
 
 # Directories
 SRC_DIR := source
@@ -14,13 +18,14 @@ OBJ := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 
 #include header
-INC= -I./includes
+INC = -I./includes -Imlx
 
+DEBUG = GDB
 #debuging
 ifeq ($(DEBUG), GDB)
-	CCF += -g
+	CCF += -g3
 else ifeq ($(DEBUG), ALL)
-	CCF += -g -fsanitize=address
+	CCF += -g3 -fsanitize=address
 endif
 
 .PHONY: all clean fclean re clear
@@ -29,7 +34,7 @@ all: $(NAME)
 
 
 $(NAME): $(OBJ)
-		@$(CCF) $(OBJ) $(INC) -o $@
+		@$(CCF) $(OBJ) $(INC) $(MLX_FLAGS) $(LIBS) -o $@
 		@echo "compiling"
 		@sleep 0.5
 		@echo "$(NAME) is ready"

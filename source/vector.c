@@ -116,21 +116,3 @@ inline t_vector normal_at(t_sphere s, t_point p)
 {
     return get_normalized(get_vector_2_pts(p, s.origin));
 }
-
-inline t_point get_point_from_matrix(float **matrix)
-{
-    t_point p;
-    p.x = matrix[0][0];
-    p.y = matrix[1][0];
-    p.z = matrix[2][0];
-    return p;
-}
-
-t_vector get_vector_from_matrix(float **matrix)
-{
-    t_vector v;
-    v.x = matrix[0][0];
-    v.y = matrix[1][0];
-    v.z = matrix[2][0];
-    return v;
-}

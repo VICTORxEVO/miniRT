@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: sgouzi <marvin@42.fr>                      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/29 13:26:52 by sgouzi            #+#    #+#             */
-/*   Updated: 2023/12/02 09:52:54 by sgouzi           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "miniRT.h"
 
@@ -26,7 +15,7 @@ int	we_have_a_problem(int fd, char **str)
 	return (0);
 }
 
-char	*get_next_line(int fd)
+char	*get_next_line(t_data *d, int fd)
 {
 	char		*t_line;
 	static char	*str;
@@ -35,9 +24,7 @@ char	*get_next_line(int fd)
 
 	if (we_have_a_problem(fd, &str))
 		return (NULL);
-	buff = malloc((100) * sizeof(char));
-	if (!buff)
-		return (free(buff), free(str), NULL);
+	buff = gc_malloc(d, (100) * sizeof(char));
 	bytes = 1;
 	while (!ft_strchr(str, '\n') && bytes != 0)
 	{
@@ -45,12 +32,11 @@ char	*get_next_line(int fd)
 		if (bytes == -1)
 			return (free(buff), free(str), NULL);
 		buff[bytes] = '\0';
-		str = ft_strjoin(str, buff);
+		str = ft_strjoin(d, str, buff);
 	}
-	free(buff);
 	if (!str)
 		return (free(str), NULL);
-	t_line = ft_get_line(str);
-	str = get_rest(str);
+	t_line = ft_get_line(d, str);
+	str = get_rest(d, str);
 	return (t_line);
 }

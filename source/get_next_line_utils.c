@@ -42,7 +42,7 @@ char	*ft_strchr(char *s, int c)
 	return (0);
 }
 
-char	*ft_strjoin(char *str, char *buff)
+char	*ft_strjoin(t_data *d, char *str, char *buff)
 {
 	size_t	i;
 	size_t	j;
@@ -50,12 +50,12 @@ char	*ft_strjoin(char *str, char *buff)
 
 	if (!str)
 	{
-		str = (char *)malloc(1 * sizeof(char));
+		str = (char *)gc_malloc(d, 1 * sizeof(char));
 		str[0] = '\0';
 	}
 	if (!buff)
 		return (free(str), free(buff), NULL);
-	res = malloc(sizeof(char) * ((ft_strlen(str) + ft_strlen(buff)) + 1));
+	res = gc_malloc(d, sizeof(char) * ((ft_strlen(str) + ft_strlen(buff)) + 1));
 	if (res == NULL)
 		return (NULL);
 	i = -1;
@@ -70,7 +70,7 @@ char	*ft_strjoin(char *str, char *buff)
 	return (res);
 }
 
-char	*ft_get_line(char *str)
+char	*ft_get_line(t_data *d, char *str)
 {
 	int		i;
 	char	*t_line;
@@ -80,24 +80,15 @@ char	*ft_get_line(char *str)
 		return (NULL);
 	while (str[i] && str[i] != '\n')
 		i++;
-	if (str[i] && str[i] == '\n')
-		i++;
-	t_line = (char *)malloc(sizeof(char) * (i + 1));
-	if (!t_line)
-		return (free(str), NULL);
+	t_line = (char *)gc_malloc(d, sizeof(char) * (i + 1));
 	i = -1;
 	while (++i >= 0 && str[i] && str[i] != '\n')
 		t_line[i] = str[i];
-	if (str[i] == '\n')
-	{
-		t_line[i] = str[i];
-		i++;
-	}
 	t_line[i] = '\0';
 	return (t_line);
 }
 
-char	*get_rest(char *str)
+char	*get_rest(t_data *d, char *str)
 {
 	int		i;
 	int		j;
@@ -107,18 +98,14 @@ char	*get_rest(char *str)
 	while (str[i] && str[i] != '\n')
 		i++;
 	if (!str[i])
-	{
-		free(str);
 		return (NULL);
-	}
-	buff = (char *)malloc(sizeof(char) * (ft_strlen(str) - i + 1));
+	buff = (char *)gc_malloc(d, sizeof(char) * (ft_strlen(str) - i + 1));
 	if (!buff)
-		return (free(buff), free(str), NULL);
+		return (NULL);
 	i++;
 	j = 0;
 	while (str[i])
 		buff[j++] = str[i++];
 	buff[j] = '\0';
-	free(str);
 	return (buff);
 }
