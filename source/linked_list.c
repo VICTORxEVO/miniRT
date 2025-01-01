@@ -42,8 +42,6 @@ void add_float_node_sorted(t_data *d, t_node **head, float value)
     current->next = new_node;
 }
 
-// Remove a node from the linked list using a user-defined comparison function
-// Returns 1 if removal was successful, 0 if data wasn't found
 int remove_node(t_data *d, t_node **head, void *data)
 {
     t_node *current = *head;
