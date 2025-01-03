@@ -9,7 +9,15 @@
 *.user
 *.userosscache
 *.sln.docstates
+.vscode/
+**/*.o
+objects/
+minishell
+**/*.tldr
+*.supp
+*.gdb
 
+test*.c
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
@@ -82,8 +90,6 @@ StyleCopReport.xml
 *.pgc
 *.pgd
 *.rsp
-# but not Directory.Build.rsp, as it configures directory-level build defaults
-!Directory.Build.rsp
 *.sbr
 *.tlb
 *.tli
