@@ -71,12 +71,6 @@ typedef struct s_world
 	t_camera 	*cam;
 } t_world;
 
-typedef struct s_data
-{
-	t_mlx m;
-	t_world *w;
-	t_gc	*gc;
-} t_data;
 
 typedef struct s_sphere
 {
@@ -108,6 +102,12 @@ typedef struct s_pars
 	bool	ambient_exist;
 } t_pars;
 
+typedef struct s_core
+{
+	t_mlx m;
+	t_world *w;
+	t_gc	*gc;
+} t_core;
 
 /**
  * @brief Returns global raytracing engine instance
