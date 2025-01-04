@@ -1,32 +1,13 @@
 #ifndef miniRT_H
 #define miniRT_H
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <sys/types.h>
-#include <fcntl.h>
-# include <stdlib.h>
-# include <stdio.h>
-# include <math.h>
-# include <unistd.h>
-#include "../mlx/mlx.h"
-#include <X11/keysym.h>
-#include "math_lib.h"
+#include "gc.h"
 
 typedef struct s_node
 {
     void *data;
     struct s_node *next;
 } t_node;
-
-typedef struct s_gc
-{
-	void				*ptr;
-	struct s_gc			*next;
-}						t_gc;
 
 typedef struct s_mlx
 {
@@ -128,29 +109,15 @@ typedef struct s_pars
 } t_pars;
 
 
-/*
-	parsing
-*/
+/**
+ * @brief Returns global raytracing engine instance
+ * @return t_core* Engine instance containing scene data and render settings
+ * @note Singleton pattern - single engine instance
+ */
+t_core			*getengine(void);
+
+/*                 >>>>>>>>>Parsing funtions<<<<<<<<<<       */
 int	we_have_a_problem(int fd, char **str);
-char	*get_next_line(t_data *d, int fd);
-
-size_t	ft_strlen(char *s);
-char	*ft_strchr(char *s, int c);
-char	*ft_strjoin(t_data *d, char *str, char *buff);
-char	*ft_get_line(t_data *d, char *str);
-char	*get_rest(t_data *d, char *str);
-
-/*
-	ft_split.c
-*/
-char	*ft_strdup(t_data *d, char *s1);
-char	*ft_substr(t_data *d, char *s, unsigned int start, size_t len_);
-int	count_words(char const *s1, char c);
-char	**ft_split(t_data *d, char *s, char c);
-
-
-
-int	ft_strcmp(const char *s1, const char *s2);
 unsigned count_args(char   **args);
 bool between(float n, float min, float max);
 float	 ft_atof(const char *s, bool *err);
@@ -163,19 +130,6 @@ t_node* create_node(t_data *d, void *t_data);
 void add_node(t_data *d, t_node **head, void *t_data);
 int remove_node(t_data *d, t_node **head, void *t_data);
 void add_float_node_sorted(t_data *d, t_node **head, float value);
-
-
-/*
-	gc
-*/
-
-void					*gc_malloc(t_data *d, size_t size);
-void					gc_free(t_data *d, void *ptr);
-void					gc_void(t_data *d);
-void					*gc_realloc(t_data *d, void *ptr, size_t old_size,
-							size_t size);
-void	*ft_memcpy(void *dst, const void *src, size_t n);
-void	ft_bzero(void *s, size_t n);
 
 
 /*
