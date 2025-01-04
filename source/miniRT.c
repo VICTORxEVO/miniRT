@@ -1,11 +1,9 @@
 #include "miniRT.h"
 
-int main()
+int main(int ac, char **av)
 {
-    //code
-
-
-
-
+    parsing(ac, av[1]);
+    rendering();
+    clear();
     return 0;
 }
