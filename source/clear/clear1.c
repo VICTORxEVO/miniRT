@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 11:44:25 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/03 12:44:20 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/01/04 10:36:44 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	clear_1data(void *data)
 {
 	t_gc	*list;
 
-	list = getcore()->gc;
+	list = getengine()->gc;
 	while (list)
 	{
 		if (list->data == data)
@@ -36,24 +36,10 @@ void	clear_1data(void *data)
 		}
 		list = list->next;
 	}
-	return (pexit(PTR_ERR, 101, EXIT));
-}
-
-static void	clear_t_vat(t_var *list)
-{
-	t_var	*tmp;
-
-	while (list)
-	{
-		tmp = list->next;
-		clear_1data(list);
-		list = tmp;
-	}
-	getcore()->var_list = NULL;
+	return (pexit(PTR_CLEAR_ERR, 101));
 }
 
 void	clear_1list(void *list, char *list_type)
 {
-	if (!ft_strncmp(list_type, "t_var", -1))
-		clear_t_vat((t_var *)list);
+	return ;
 }

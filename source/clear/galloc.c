@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 11:44:27 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/03 13:06:41 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/01/04 10:32:55 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,9 @@ inline void	gc_add_node(void *data)
 {
 	t_gc	*gc_list;
 
-	gc_list = get_engine()->gc;
+	gc_list = getengine()->gc;
 	if (!gc_list)
-		get_engine()->gc = gc_new(data);
+		getengine()->gc = gc_new(data);
 	else
 	{
 		while (gc_list->next)
