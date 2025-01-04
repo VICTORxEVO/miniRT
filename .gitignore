@@ -16,6 +16,7 @@ minishell
 **/*.tldr
 *.supp
 *.gdb
+miniRT
 
 test*.c
 # User-specific files (MonoDevelop/Xamarin Studio)
