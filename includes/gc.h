@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 16:10:32 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/04 10:07:16 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/01/04 11:22:21 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,16 +29,13 @@ typedef struct s_gc
 }						t_gc;
 
 /**
- * Cleans up allocated memory based on flag type
- * @param flag Cleanup mode:
- *        FREE_TEMP: Free temporary allocations used during command execution
- *        FREE_ALL: Free all allocations before program exit
+ * @brief clean up allocated memory
  */
 void					clear(void);
 
 /**
  * Gets reference to global engine state
- * @return Pointer to main engine state structure
+ * @return Pointer to main engine structure
  */
 extern t_core			*getengine(void);
 
