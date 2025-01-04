@@ -1,19 +1,5 @@
 #include "miniRT.h"
 
-bool s_is_whitespace(char	*s)
-{
-	int	i;
-
-	i = 0;
-	while (s[i])
-	{
-		if (!((s[i] >= 9 && s[i] <= 13) || s[i] == 32))
-			return (false);
-		i++;
-	}
-	return (true);
-}
-
 bool between(float n, float min, float max)
 {
 	return (n >= min && n <= max);
