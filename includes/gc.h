@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 16:10:32 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/04 11:22:21 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/01/04 18:32:14 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,13 +77,6 @@ void					safe_free(void **data);
  * @param data Pointer to memory to remove
  */
 void					clear_1data(void *data);
-
-/**
- * Clears entire linked list of specified type
- * @param list Pointer to list head
- * @param list_type String identifying list type
- */
-void					clear_1list(void *list, char *list_type);
 
 /**
  * Frees array of pointers and the array itself
