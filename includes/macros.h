@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 13:40:27 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/04 10:16:18 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/01/04 10:36:07 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@
 
 /** Program name displayed in error messages */
 # define PRGM_NAME "miniRT"
+
+# define PTR_CLEAR_ERR ":clear_1data(): data pointer not found !!"
+
 
 
 // Regular text colors
