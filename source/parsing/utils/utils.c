@@ -8,10 +8,10 @@ bool is_wspace(char *s)
 	while (s[i])
 	{
 		if (!((s[i] >= 9 && s[i] <= 13) || s[i] == 32))
-			return (false);
+			return (true);
 		i++;
 	}
-	return (true);
+	return (false);
 }
 
 bool    color_struct_filled(t_color	*c, char  **args)
@@ -72,17 +72,17 @@ bool    elem_added(t_core *d, char **args)
     bool	    good;
 
     good = false;
-    if (strcmp(args[0], "A") == 0)
+    if (ft_strncmp(args[0], "A", -1) == 0)
         good = ambient_handled(d, args);
-	else if (strcmp(args[0], "C") == 0)
+	else if (ft_strncmp(args[0], "C", -1) == 0)
 		good = camera_handled(d, args);
-	else if (strcmp(args[0], "L") == 0)
+	else if (ft_strncmp(args[0], "L", -1) == 0)
 		good = light_handled(d, args);
-	else if (strcmp(args[0], "pl") == 0)
+	else if (ft_strncmp(args[0], "pl", -1) == 0)
 		good = plane_handled(d, args);
-	else if (strcmp(args[0], "sp") == 0)
+	else if (ft_strncmp(args[0], "sp", -1) == 0)
 		good = sphere_handled(d, args);
-	else if (strcmp(args[0], "cy") == 0)
+	else if (ft_strncmp(args[0], "cy", -1) == 0)
 		good = cylinder_handled(d, args);
     return (good);
 }
@@ -107,7 +107,7 @@ bool    ambient_handled(t_core *d, char **args)
     {
         return (printf("Error\nambient color invalid\n"), false);
     }
-	ambient = gc_malloc(d, sizeof(t_ambient));
+	ambient = galloc(sizeof(t_ambient));
     ambient->ratio = ambient_ratio;
 	ambient->c = ambient_color;
 	d->w->ambient = ambient;
