@@ -117,11 +117,13 @@ typedef struct s_core
 t_core			*getengine(void);
 
 /*     >>>>>Parsing Funtions Section<<<<<     */
-bool parsing(int ac, char *filename);
+bool	 parsing(int ac, char *filename);
 unsigned count_args(char   **args);
-bool between(float n, float min, float max);
-float	 ft_atof(const char *s, bool *err);
-void    loadline(char *line, int n_line, char *filename);
+bool	between(float n, float min, float max);
+float	ft_atof(const char *s, bool *err);
+void	loadline(char *line, int n_line, char *filename);
+void	readfile(int fd, char *filename);
+int		check_file(char *filename);
 
 
 
