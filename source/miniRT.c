@@ -3,7 +3,7 @@
 bool validated_type(char *name, unsigned args_count)
 {
     if ((!ft_strcmp(name, "A") && args_count == e_ambient) || 
-    (!ft_strcmp(name, "C") && args_count == e_color) || 
+    (!ft_strcmp(name, "C") && args_count == e_camera) || 
     (!ft_strcmp(name, "L") && args_count == e_light) || 
     (!ft_strcmp(name, "pl") && args_count == e_plain) || 
     (!ft_strcmp(name, "sp") && args_count == e_sphere) || 
@@ -49,25 +49,27 @@ bool parsed(t_data *d, char *file)
     }
     if (!d->w->cam)
         return (printf("Error\nno camera found\n"), close(fd), false);
+    d->w->cam->aspect = (SCREEN_WIDTH / SCREEN_HEIGHT);
     close(fd);
     return (true);
 }
 
-bool    rendered(t_data *d)
-{
-    (void) d;
-    return (true);
-}
+
 
 int main(int ac, char **av)
 {
-    t_data d;
+    t_data	d;
+    t_img	img;
 
     if (ac != 2)
         return (printf("Error\ninvalid form, please enter ./miniRT map.rt\n"), 1);
     if (!parsed(&d, av[1])) /* parsing logic */
+		return (1);
+	if (!initialized(&d, &img))
         return (1);
-    rendered(&d); /* rendering logic */
+	rendered(&d, &img);
+	mlx_key_hook(d.m.win, input, &d);
+	mlx_loop(d.m.con);
     gc_void(&d); /* cleanup logic */
     return 0;
 }

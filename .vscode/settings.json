@@ -9,6 +9,9 @@
         "mlx.h": "c",
         "string.h": "c",
         "stdio.h": "c",
-        "math_lib.h": "c"
+        "math_lib.h": "c",
+        "render.h": "c",
+        "stdbool.h": "c",
+        "stdlib.h": "c"
     }
 }

@@ -14,11 +14,23 @@
 # include <unistd.h>
 #include "../mlx/mlx.h"
 #include <X11/keysym.h>
+#include "render.h"
 #include "math_lib.h"
+
+
+#define SCREEN_WIDTH 1500.f
+#define SCREEN_HEIGHT 1000.f
+#define AMB 1
+#define CAM 2
+#define LIG 3
+#define PLA 4
+#define SPE 5
+#define CYL 6
 
 typedef struct s_node
 {
     void *data;
+	char	type;
     struct s_node *next;
 } t_node;
 
@@ -28,17 +40,10 @@ typedef struct s_gc
 	struct s_gc			*next;
 }						t_gc;
 
-typedef struct s_mlx
-{
-	void *mlx;
-	void *win;
-}  t_mlx;
-
 enum e_types
 {
 	e_ambient = 3,
 	e_camera = 4,
-	e_color = 4,
 	e_light = 4,
 	e_sphere = 4,
 	e_plain = 4,
@@ -68,16 +73,13 @@ typedef struct s_light
 
 typedef struct s_camera
 {
-	t_ray cam_ray;
-	float hsize; // horizontal size in pixels of the canvas
-	float vsize; // vertical size in pixels of the canvas
-	float half_width; // in units
-	float half_height; // in units
-	float pixel_size;
+	t_point		origin;
+    t_vector	forward; // normalized
+    t_vector	right; // should be calculated
+    t_vector	up; // should be calculated
+	t_vector	direction;
 	unsigned  fov; // field of view angle (how much of the cam we can see) when fov is small view is zoomed in
-	float aspect; // 
-	float half_view; // 
-	float focal_len; // 
+	float		aspect;
 } t_camera;
 
 typedef struct s_world
@@ -88,6 +90,7 @@ typedef struct s_world
 	t_node 		*spheres;
 	t_ambient	*ambient;
 	t_camera 	*cam;
+	t_node		**objs;
 } t_world;
 
 typedef struct s_data
@@ -203,6 +206,6 @@ t_color zero_color();
 t_color scale_color(t_color v, float scale);
 void print_color(t_color c, bool newline);
 
-
+int input(int key, void *d);
 
 #endif

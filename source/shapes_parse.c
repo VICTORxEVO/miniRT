@@ -30,8 +30,8 @@ bool    camera_handled(t_data *d, char **args)
         return (printf("Error\nbad fov value for camera"), false);
     }
     d->w->cam = gc_malloc(d, sizeof(t_camera));
-	d->w->cam->cam_ray.direction = vec3d;
-	d->w->cam->cam_ray.origin = pcord;
+	d->w->cam->forward = get_normalized(vec3d);
+	d->w->cam->origin = pcord;
 	d->w->cam->fov = FOV;
 	return (true);
 }
@@ -60,7 +60,7 @@ bool    light_handled(t_data *d, char **args)
     light->brightness = light_value;
     light->c = light_color;
     light->p = light_cord;
-	add_node(d, &d->w->lights, create_node(d, light));
+	add_node(d, &d->w->lights, light);
 	return (true);
 }
 
@@ -87,7 +87,7 @@ bool    plane_handled(t_data *d, char **args)
     plane->c = plane_color;
     plane->origin = plane_cord;
     plane->normal = plane_norm;
-	add_node(d, &d->w->planes, create_node(d, plane));
+	add_node(d, &d->w->planes, plane);
 	return (true);
 }
 
@@ -127,7 +127,7 @@ bool    cylinder_handled(t_data *d, char **args)
     cylinder->normal = cylinder_norm;
     cylinder->diameter = diameter;
     cylinder->height = height;
-	add_node(d, &d->w->cylinders, create_node(d, cylinder));
+	add_node(d, &d->w->cylinders, cylinder);
 	return (true);
 }
 
@@ -146,6 +146,8 @@ bool    sphere_handled(t_data *d, char **args)
     if (count_args(cord) != 3 || !point_struct_filled(&sphere_cord, cord))
         return (printf("Error\nsphere point invalid\n"), false);
     diameter = ft_atof(args[2], &err);
+    printf("diameter: %f\n", diameter);
+    printf("radius: %f\n", diameter / 2.f);
     clrs = ft_split(d, args[3], ',');
     if (count_args(clrs) != 3 || !color_struct_filled(&sphere_color, clrs))
         return (printf("Error\nsphere color invalid\n"), false);
@@ -154,6 +156,12 @@ bool    sphere_handled(t_data *d, char **args)
     sphere->origin = sphere_cord;
     sphere->diameter = diameter;
 
-	add_node(d, &d->w->spheres, create_node(d, sphere));
+	add_node(d, &d->w->spheres, sphere);
+    t_sphere *verify = (t_sphere *)d->w->spheres->data;
+    printf("Verification after adding to list:\n");
+    printf("Sphere position: ");
+    print_point(verify->origin);
+    printf("Sphere diameter: %f\n", verify->diameter);
+    
 	return (true);
 }

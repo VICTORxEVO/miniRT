@@ -1,12 +1,42 @@
 #include "miniRT.h"
 
 // Create a new node
-t_node* create_node(t_data *d, void *data)
+t_node *create_node(t_data *d, void *data)
 {
-    t_node *new_node = (t_node *)gc_malloc(d, sizeof(t_node));
-    new_node->data = data;
-    new_node->next = NULL;
-    return new_node;
+    t_node *node;
+    t_sphere *original_sphere = (t_sphere *)data;
+    t_sphere *new_sphere;
+
+    // Debug print before copy
+    printf("Creating node with original sphere:\n");
+    printf("Position: ");
+    print_point(original_sphere->origin);
+    printf("Diameter: %f\n", original_sphere->diameter);
+
+    // Allocate node
+    node = gc_malloc(d, sizeof(t_node));
+    if (!node)
+        return NULL;
+
+    // Allocate new sphere and copy data
+    new_sphere = gc_malloc(d, sizeof(t_sphere));
+    if (!new_sphere)
+        return NULL;
+
+    // Deep copy the sphere data
+    *new_sphere = *original_sphere;  // Structure copy
+
+    // Set node data
+    node->data = new_sphere;
+    node->next = NULL;
+
+    // Verify copy
+    printf("After copy in new node:\n");
+    printf("Position: ");
+    print_point(new_sphere->origin);
+    printf("Diameter: %f\n", new_sphere->diameter);
+
+    return node;
 }
 
 void add_node(t_data *d, t_node **head, void *data)

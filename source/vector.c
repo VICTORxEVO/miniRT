@@ -1,4 +1,19 @@
 #include "../includes/miniRT.h"
+#include "../includes/math_lib.h"
+
+inline float deg_to_rad(float deg)
+{
+    return (deg * M_PI / 180);
+    // deg -> 180
+    // rad -> PIE
+}
+
+inline float rad_to_rad(float rad)
+{
+    return (rad * 180 / M_PI);
+    // deg -> 180
+    // rad -> PIE
+}
 
 inline t_vector add_vectors(t_vector v1, t_vector v2)
 {
@@ -21,14 +36,14 @@ inline t_vector sub_vectors(t_vector v1, t_vector v2)
     return res_v;
 }
 
-/* gives t_vector from p1 to p2 [p2 - p1]*/
-inline t_vector get_vector_2_pts(t_point p1, t_point p2)
+/* [p1 - p2]*/
+inline t_vector sub_points(t_point p1, t_point p2)
 {
     t_vector res_p;
 
-    res_p.x = p2.x - p1.x;
-    res_p.y = p2.y - p1.y;
-    res_p.z = p2.z - p1.z;
+    res_p.x = p1.x - p2.x;
+    res_p.y = p1.y - p2.y;
+    res_p.z = p1.z - p2.z;
     return res_p;
 }
 
@@ -75,6 +90,11 @@ inline void print_vector(t_vector v)
     printf("t_vector => {%f, %f, %f}\n", v.x, v.y, v.z);
 }
 
+inline void print_point(t_point p)
+{
+    printf("t_point => {%f, %f, %f}\n", p.x, p.y, p.z);
+}
+
 inline t_vector get_normalized(t_vector v)
 {
     t_vector normalized;
@@ -90,7 +110,7 @@ inline t_vector get_normalized(t_vector v)
 /*
     the dot product is commutive A x B = B x A
 */
-inline float dot_product(t_vector v1, t_vector v2)
+inline float dot(t_vector v1, t_vector v2)
 {
     float dot;
 
@@ -103,7 +123,7 @@ inline float dot_product(t_vector v1, t_vector v2)
     the plane defined by the two original vectors. 
 */
 /* this works for right hand only */
-inline t_vector cross_product(t_vector v1, t_vector v2)
+inline t_vector cross(t_vector v1, t_vector v2)
 {
     t_vector res;
     res.x = v1.y * v2.z - v1.z * v2.y;
@@ -114,5 +134,5 @@ inline t_vector cross_product(t_vector v1, t_vector v2)
 
 inline t_vector normal_at(t_sphere s, t_point p)
 {
-    return get_normalized(get_vector_2_pts(p, s.origin));
+    return get_normalized(sub_points(p, s.origin));
 }
