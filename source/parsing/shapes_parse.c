@@ -29,7 +29,7 @@ bool    camera_handled(t_core *d, char **args)
     {
         return (printf("Error\nbad fov value for camera"), false);
     }
-    d->w->cam = gc_malloc(d, sizeof(t_camera));
+    d->w->cam = galloc(sizeof(t_camera));
 	d->w->cam->cam_ray.direction = vec3d;
 	d->w->cam->cam_ray.origin = pcord;
 	d->w->cam->fov = FOV;
@@ -56,7 +56,7 @@ bool    light_handled(t_core *d, char **args)
     clrs = ft_split(args[3], ',');
     if (count_args(clrs) != 3 || !color_struct_filled(&light_color, clrs))
         return (printf("Error\nlight color invalid\n"), false);
-    light = gc_malloc(d, sizeof(t_light));
+    light = galloc(sizeof(t_light));
     light->brightness = light_value;
     light->c = light_color;
     light->p = light_cord;
@@ -83,7 +83,7 @@ bool    plane_handled(t_core *d, char **args)
     clrs = ft_split(args[3], ',');
     if (count_args(clrs) != 3 || !color_struct_filled(&plane_color, clrs))
         return (printf("bad plane color\n"), false);
-    plane = gc_malloc(d, sizeof(t_plane));
+    plane = galloc(sizeof(t_plane));
     plane->c = plane_color;
     plane->origin = plane_cord;
     plane->normal = plane_norm;
@@ -121,7 +121,7 @@ bool    cylinder_handled(t_core *d, char **args)
     clrs = ft_split(args[5], ',');
     if (count_args(clrs) != 3 || !color_struct_filled(&cylinder_color, clrs))
         return (printf("Error\ncylinder color invalid\n"), false);
-    cylinder = gc_malloc(d, sizeof(t_cylinder));
+    cylinder = galloc(sizeof(t_cylinder));
     cylinder->c = cylinder_color;
     cylinder->origin = cylinder_cord;
     cylinder->normal = cylinder_norm;
@@ -149,7 +149,7 @@ bool    sphere_handled(t_core *d, char **args)
     clrs = ft_split(args[3], ',');
     if (count_args(clrs) != 3 || !color_struct_filled(&sphere_color, clrs))
         return (printf("Error\nsphere color invalid\n"), false);
-    sphere = gc_malloc(d, sizeof(t_sphere));
+    sphere = galloc(sizeof(t_sphere));
     sphere->c = sphere_color;
     sphere->origin = sphere_cord;
     sphere->diameter = diameter;

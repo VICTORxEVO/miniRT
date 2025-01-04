@@ -17,12 +17,12 @@ void    loadline(char *line, int n_line, char *filename)
     char    **words;
     unsigned args_count;
 
-    if (s_is_whitespace(line))
-        return (true);
+    if (is_wspace(line))
+        return ;
     words = ft_split(line, ' ');
     args_count = count_args(words);
     if (args_count < 1)
-        return (false);
+        pexit("error MAP !", 3);
     if (!validated_type(words[0], args_count))
         pexit("unknown type !", 1);
     if (!elem_added(getengine(), words))
@@ -39,7 +39,7 @@ bool parsing(int ac, char *filename)
     fd = check_file(filename);
     if (fd < 0)
         pexit(filename, 2);
-    readfile(fd);
+    readfile(fd, filename);
     close(fd);
     return (true);
 }
