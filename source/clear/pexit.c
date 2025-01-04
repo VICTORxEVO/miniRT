@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 11:44:29 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/04 13:18:58 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/01/04 18:41:43 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,5 +22,6 @@ void	pexit(char *msg, short int exit_code)
 	else
 		perror(msg);
 	ft_putstr_fd(END, 2);
+	clear();
 	exit(exit_code);
 }
