@@ -116,12 +116,26 @@ typedef struct s_core
  */
 t_core			*getengine(void);
 
-/*                 >>>>>>>>>Parsing funtions<<<<<<<<<<       */
+/*     >>>>>Parsing Funtions Section<<<<<     */
 int	we_have_a_problem(int fd, char **str);
 unsigned count_args(char   **args);
 bool between(float n, float min, float max);
 float	 ft_atof(const char *s, bool *err);
 bool s_is_whitespace(char	*s);
+
+
+
+
+
+/*     >>>>>Rendering Funtions Section<<<<<     */
+void    rendering(void);
+
+
+
+
+
+
+
 
 /*
 	linked list
@@ -156,6 +170,28 @@ t_color neg_color(t_color c1);
 t_color zero_color();
 t_color scale_color(t_color v, float scale);
 void print_color(t_color c, bool newline);
+
+
+
+
+/*     >>>>>Utils funtions section<<<<<     */
+bool	is_wspace(char *s);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
