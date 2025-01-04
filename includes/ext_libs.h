@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 13:43:37 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/04 10:07:24 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/01/04 10:22:40 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@
 # include <unistd.h>
 #include <X11/keysym.h>
 # include <math.h>
-#include "math_libs.h"
+# include "math_libs.h"
+# include "get_next_line.h"
 
 typedef unsigned char	t_uc;
 	// just a macro that i used in libft to avoid long line on norminette ;)
