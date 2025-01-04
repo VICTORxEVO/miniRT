@@ -25,4 +25,5 @@ typedef struct s_ray
     t_vector direction;
 } t_ray;
 
+
 #endif

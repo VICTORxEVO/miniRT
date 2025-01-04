@@ -9,9 +9,10 @@ t_node* create_node(t_core *d, void *data)
     return new_node;
 }
 
-void add_node(t_core *d, t_node **head, void *data)
+void add_node(t_core *d, t_node **head, void *data, char type_macro)
 {
     t_node *new_node = create_node(d, data);
+    new_node->type = type_macro;
     new_node->next = *head;
     *head = new_node;
 }

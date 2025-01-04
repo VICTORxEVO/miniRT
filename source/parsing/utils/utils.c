@@ -7,11 +7,11 @@ bool is_wspace(char *s)
 	i = 0;
 	while (s[i])
 	{
-		if (!((s[i] >= 9 && s[i] <= 13) || s[i] == 32))
-			return (true);
+		if ((s[i] < 9 || s[i] > 13) && s[i] != 32)
+			return (false);
 		i++;
 	}
-	return (false);
+	return (true);
 }
 
 bool    color_struct_filled(t_color	*c, char  **args)

@@ -30,8 +30,8 @@ bool    camera_handled(t_core *d, char **args)
         return (printf("Error\nbad fov value for camera"), false);
     }
     d->w->cam = galloc(sizeof(t_camera));
-	d->w->cam->cam_ray.direction = vec3d;
-	d->w->cam->cam_ray.origin = pcord;
+	d->w->cam->direction = vec3d;
+	d->w->cam->origin = pcord;
 	d->w->cam->fov = FOV;
 	return (true);
 }
@@ -60,7 +60,7 @@ bool    light_handled(t_core *d, char **args)
     light->brightness = light_value;
     light->c = light_color;
     light->p = light_cord;
-	add_node(d, &d->w->lights, create_node(d, light));
+	add_node(d, &d->w->lights, light, e_light);
 	return (true);
 }
 
@@ -87,7 +87,7 @@ bool    plane_handled(t_core *d, char **args)
     plane->c = plane_color;
     plane->origin = plane_cord;
     plane->normal = plane_norm;
-	add_node(d, &d->w->planes, create_node(d, plane));
+	add_node(d, &d->w->planes, plane, e_plain);
 	return (true);
 }
 
@@ -127,7 +127,7 @@ bool    cylinder_handled(t_core *d, char **args)
     cylinder->normal = cylinder_norm;
     cylinder->diameter = diameter;
     cylinder->height = height;
-	add_node(d, &d->w->cylinders, create_node(d, cylinder));
+	add_node(d, &d->w->cylinders, cylinder, e_cylinder);
 	return (true);
 }
 
@@ -154,6 +154,6 @@ bool    sphere_handled(t_core *d, char **args)
     sphere->origin = sphere_cord;
     sphere->diameter = diameter;
 
-	add_node(d, &d->w->spheres, create_node(d, sphere));
+	add_node(d, &d->w->spheres, sphere, e_sphere);
 	return (true);
 }

@@ -34,6 +34,7 @@ bool parsing(int ac, char *filename)
     int fd;
     char *line;
 
+    getengine()->w = galloc(sizeof(t_world));
     if (ac != 2)
         pexit(YELLOW USAGE_WARN, 1);
     fd = check_file(filename);

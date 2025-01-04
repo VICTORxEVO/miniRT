@@ -3,10 +3,14 @@
 
 #include "gc.h"
 
+#define SCREEN_WIDTH 1920.f
+#define SCREEN_HEIGHT 1010.f
+
 typedef struct s_node
 {
     void *data;
     struct s_node *next;
+	char	type;
 } t_node;
 
 typedef struct s_mlx
@@ -28,15 +32,15 @@ enum e_types
 
 typedef struct s_color
 {
-	unsigned	r;
-	unsigned	g;
-	unsigned	b;
+	int	r;
+	int	g;
+	int	b;
 }	t_color;
 
 typedef struct s_ambient
 {
 	t_color		c;
-	unsigned	ratio;
+	float	ratio;
 }	t_ambient;
 
 
@@ -49,16 +53,13 @@ typedef struct s_light
 
 typedef struct s_camera
 {
-	t_ray cam_ray;
-	float hsize; // horizontal size in pixels of the canvas
-	float vsize; // vertical size in pixels of the canvas
-	float half_width; // in units
-	float half_height; // in units
-	float pixel_size;
+	t_point		origin;
+    t_vector	forward; // normalized
+    t_vector	right; // should be calculated
+    t_vector	up; // should be calculated
+	t_vector	direction;
 	unsigned  fov; // field of view angle (how much of the cam we can see) when fov is small view is zoomed in
-	float aspect; // 
-	float half_view; // 
-	float focal_len; // 
+	float		aspect;
 } t_camera;
 
 typedef struct s_world
@@ -102,11 +103,21 @@ typedef struct s_pars
 	bool	ambient_exist;
 } t_pars;
 
+typedef struct s_img
+{
+	void	*img;
+	char	*addr;
+	int		bits_per_pixel;
+	int		line_length;
+	int		endian;
+}   t_img;
+
 typedef struct s_core
 {
 	t_mlx m;
 	t_world *w;
 	t_gc	*gc;
+	t_img	img;
 } t_core;
 
 /**
@@ -134,8 +145,7 @@ void    rendering(void);
 
 
 
-
-
+t_vector normal(t_vector v);
 
 
 
@@ -143,10 +153,9 @@ void    rendering(void);
 	linked list
 */
 t_node* create_node(t_core *d, void *t_core);
-void add_node(t_core *d, t_node **head, void *t_core);
-int remove_node(t_core *d, t_node **head, void *t_core);
+void add_node(t_core *d, t_node **head, void *data, char type_macro);
+int remove_node(t_core *d, t_node **head, void *data);
 void add_float_node_sorted(t_core *d, t_node **head, float value);
-
 
 /*
 	shapes handling 
@@ -172,6 +181,7 @@ t_color neg_color(t_color c1);
 t_color zero_color();
 t_color scale_color(t_color v, float scale);
 void print_color(t_color c, bool newline);
+t_color sum_colors(t_color amb, t_color dif, t_color   spc);
 
 
 
@@ -182,9 +192,27 @@ bool	is_wspace(char *s);
 
 
 
+int get_rgb(t_color color);
+t_vector	reflect (t_vector	light, t_vector	norm);
+t_vector add_vectors(t_vector v1, t_vector v2);
+t_vector sub_vectors(t_vector v1, t_vector v2);
+t_vector sub_points(t_point p1, t_point p2);
+t_vector neg_vector(t_vector v1);
+t_vector scale_vector(t_vector v, float scale);
+t_vector shrink_vector(t_vector v, float shrink);
+float get_len_vector(t_vector v1);
+void print_vector(t_vector v);
+void print_point(t_point p);
+t_point	position_at(t_ray	*r, float t);
+t_vector normal(t_vector v);
+float dot(t_vector v1, t_vector v2);
+t_vector cross(t_vector v1, t_vector v2);
+t_vector normal_at(t_sphere s, t_point p);
+float deg_to_rad(float deg);
+float rad_to_rad(float rad);
 
 
-
+void	my_mlx_pixel_put(t_img *data, int x, int y, int color);
 
 
 
