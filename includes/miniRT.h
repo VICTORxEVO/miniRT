@@ -17,9 +17,13 @@
 #include "render.h"
 #include "math_lib.h"
 
+// MAC
+// #define SCREEN_WIDTH 3840.f
+// #define SCREEN_HEIGHT 2160.f
 
-#define SCREEN_WIDTH 1500.f
-#define SCREEN_HEIGHT 1000.f
+#define SCREEN_WIDTH 1920.f
+#define SCREEN_HEIGHT 1010.f
+
 #define AMB 1
 #define CAM 2
 #define LIG 3
@@ -131,6 +135,8 @@ typedef struct s_pars
 } t_pars;
 
 
+t_vector	reflect(t_vector	norm, t_vector	light);
+
 /*
 	parsing
 */
@@ -163,7 +169,7 @@ bool s_is_whitespace(char	*s);
 	linked list
 */
 t_node* create_node(t_data *d, void *t_data);
-void add_node(t_data *d, t_node **head, void *t_data);
+void add_node(t_data *d, t_node **head, void *t_data, char type_macro);
 int remove_node(t_data *d, t_node **head, void *t_data);
 void add_float_node_sorted(t_data *d, t_node **head, float value);
 
@@ -204,6 +210,7 @@ t_color mul_colors(t_color c1, t_color c2);
 t_color neg_color(t_color c1);
 t_color zero_color();
 t_color scale_color(t_color v, float scale);
+int get_rgb(t_color color);
 void print_color(t_color c, bool newline);
 
 int input(int key, void *d);

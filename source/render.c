@@ -1,5 +1,10 @@
 #include "miniRT.h"
 
+inline t_vector	reflect(t_vector	norm, t_vector	light)
+{
+	return sub_vectors(light, scale_vector(norm, 2 * dot(norm, light))); 
+}
+
 void print_cam(t_camera *cam)
 {
     printf("camera at [%f, %f, %f], direction for (%f, %f, %f)\n", cam->origin.x, cam->origin.y, cam->origin.z, cam->direction.x, cam->direction.y, cam->direction.z);
@@ -77,34 +82,97 @@ This is quadratic equation: at² + bt + c = 0
 Solution: t = (-b ± √(b² - 4ac)) / 2a
 
 */
-bool intersect(t_sphere s, t_ray ray)
+
+
+
+float intersect(t_sphere *s, t_ray *ray)
 {
     t_vector oc;
     float r;
     float a;
     float b;
     float c;
-    float discriminant;
+    float d;
     float t1, t2;
 
-    r = s.diameter / 2.0f;
-    oc = sub_points(ray.origin, s.origin);
-    a = dot(ray.direction, ray.direction);
-    b = 2.0f * dot(ray.direction, oc);
+    r = s->diameter / 2.0f;
+    oc = sub_points(ray->origin, s->origin);
+    a = dot(ray->direction, ray->direction);
+    b = 2.0f * dot(ray->direction, oc);
     c = dot(oc, oc) - (r * r);
 
-    discriminant = (b * b) - (4.0f * a * c);
+    d = (b * b) - (4.0f * a * c);
+	if (d < 0)
+		return -1;
+    t1 = (-b - sqrtf(d)) / (2.0f * a);
+    t2 = (-b + sqrtf(d)) / (2.0f * a);
 
-    t1 = (-b - sqrtf(discriminant)) / (2.0f * a);
-    t2 = (-b + sqrtf(discriminant)) / (2.0f * a);
-
-	// print all these values to debug
-	// printf("a: %f, b: %f, c: %f, discriminant: %f, t1: %f, t2: %f\n", a, b, c, discriminant, t1, t2);
-
-    if (t1 > 0 || t2 > 0)
-        return true;
+    if (t1 > t2)
+        return t2;
+	else
+		return t1;
     return false;
 }
+
+// white -> 255, 255, 255,  intesnsity -> .5 
+// res_light = 128, 128, 128
+
+t_color intersect_world(t_world *w, t_ray *cam_ray)
+{
+	t_color	color;
+	t_color	light_color;
+	t_color	speclar_color;
+	t_color	diffuse_color;
+	t_color	ambient_color;
+	t_node	*node;
+	t_sphere	*sphere;
+	t_sphere	*hit_sph;
+	t_light		*light;
+	t_ambient	*ambient;
+	t_vector	light_cam;
+	float smallest_t;
+	float light_dot_eye;
+	float t;
+	t_vector	sph_norm;
+	t_point inter_point;
+	hit_sph = NULL;
+	node = w->spheres;
+	light = w->lights->data;
+	ambient = w->ambient;
+	color = zero_color();
+	smallest_t = __FLT_MAX__;
+	while (node)
+	{
+		if (node->type == e_sphere)
+		{
+			sphere = (t_sphere	*)(node->data);
+			t = intersect(sphere, cam_ray);
+			if (t < smallest_t && t >= 0)
+			{
+				hit_sph = sphere;
+				smallest_t = t;
+			}
+ 		}
+		node = node->next;
+	}
+	if (hit_sph)
+	{
+		light_color = scale_color(light->c, light->brightness); // currently white
+		inter_point = position_at(cam_ray, smallest_t);
+		sph_norm = get_normalized(sub_points(inter_point, sphere->origin));
+		light_cam = get_normalized(sub_points(light->p, inter_point));
+	
+		light_dot_eye = dot(light_cam, sph_norm);
+		
+		ambient_color = scale_color(ambient->c, ambient->ratio); // its color * ratio
+		diffuse_color = scale_color(sphere->c, light_dot_eye);
+		color = mul_colors(sphere->c, light->c);
+		color = scale_color(add_colors(ambient->c, hit_sph->c), light_dot_eye);
+	}
+	return color;
+}
+
+
 
 bool initialized(t_data *d, t_img	*img)
 {
@@ -118,14 +186,14 @@ bool initialized(t_data *d, t_img	*img)
 	
 }
 
-t_vector	generate_cam_dir(t_camera	cam, float scale, float ndcx, float ndcy)
+t_vector	generate_cam_dir(t_camera	*cam, float scale, float ndcx, float ndcy)
 {
 	t_vector	dir;
 
-	dir = cam.forward;
-	dir.x += (ndcx * scale * cam.aspect * cam.right.x) + (ndcy * scale * cam.up.x);
-	dir.y += (ndcx * scale * cam.aspect * cam.right.y) + (ndcy * scale * cam.up.y);
-	dir.z += (ndcx * scale * cam.aspect * cam.right.z) + (ndcy * scale * cam.up.z);
+	dir = cam->forward;
+	dir.x += (ndcx * scale * cam->aspect * cam->right.x) + (ndcy * scale * cam->up.x);
+	dir.y += (ndcx * scale * cam->aspect * cam->right.y) + (ndcy * scale * cam->up.y);
+	dir.z += (ndcx * scale * cam->aspect * cam->right.z) + (ndcy * scale * cam->up.z);
 	return (get_normalized(dir));
 }
 
@@ -151,17 +219,14 @@ bool    rendered(t_data *d, t_img *img)
 	while (y < SCREEN_HEIGHT)
 	{
 		x = 0;
-		ndc_y = 1 - (2.f * y / SCREEN_HEIGHT);			
+		ndc_y = 1 - (2.f * (y + 0.5) / SCREEN_HEIGHT);			
 		while (x < SCREEN_WIDTH)
 		{
-			ndc_x = (2.f * x / SCREEN_WIDTH) - 1.f;
+			ndc_x = (2.f * (x + 0.5) / SCREEN_WIDTH) - 1.f;
 			ray.origin = cam->origin;
-			ray.direction = generate_cam_dir(*cam, scale, ndc_x, ndc_y);
+			ray.direction = generate_cam_dir(cam, scale, ndc_x, ndc_y);
 			// send ray from cam origin to the pixel
-			if (intersect(*s, ray))
-				my_mlx_pixel_put(img, x, y, 0xff00ff);
-			else
-				my_mlx_pixel_put(img, x, y, 0x000000);  // Black background
+			my_mlx_pixel_put(img, x, y, get_rgb(intersect_world(d->w, &ray)));
 			x++;
 		}
 		y++;

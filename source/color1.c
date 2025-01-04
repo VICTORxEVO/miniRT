@@ -1,21 +1,9 @@
 #include "miniRT.h"
 
-int get_color_value(t_color c)
+int get_rgb(t_color color)
 {
-    // Ensure values are clamped between 0 and 1
-    float r = fmaxf(0.0f, fminf(1.0f, c.r));
-    float g = fmaxf(0.0f, fminf(1.0f, c.g));
-    float b = fmaxf(0.0f, fminf(1.0f, c.b));
-
-    // Convert to 8-bit integer values (0-255 range)
-    int r_int = (int)(r * 255.0f);
-    int g_int = (int)(g * 255.0f);
-    int b_int = (int)(b * 255.0f);
-
-    // Combine into a single integer using bit shifting
-    // Typical MLX pixel format is 0xAARRGGBB (Alpha, Red, Green, Blue)
-    // We'll use 0xFF (full opacity) for the alpha channel
-    return (0xFF << 24 | r_int << 16 | g_int << 8 | b_int);
+    // Bitwise shift each component to its position and combine with OR
+    return (color.r << 16) | (color.g << 8) | color.b;
 }
 
 inline t_color add_colors(t_color c1, t_color c2)

@@ -7,12 +7,6 @@ t_node *create_node(t_data *d, void *data)
     t_sphere *original_sphere = (t_sphere *)data;
     t_sphere *new_sphere;
 
-    // Debug print before copy
-    printf("Creating node with original sphere:\n");
-    printf("Position: ");
-    print_point(original_sphere->origin);
-    printf("Diameter: %f\n", original_sphere->diameter);
-
     // Allocate node
     node = gc_malloc(d, sizeof(t_node));
     if (!node)
@@ -31,17 +25,13 @@ t_node *create_node(t_data *d, void *data)
     node->next = NULL;
 
     // Verify copy
-    printf("After copy in new node:\n");
-    printf("Position: ");
-    print_point(new_sphere->origin);
-    printf("Diameter: %f\n", new_sphere->diameter);
-
     return node;
 }
 
-void add_node(t_data *d, t_node **head, void *data)
+void add_node(t_data *d, t_node **head, void *data, char    type_macro)
 {
     t_node *new_node = create_node(d, data);
+    new_node->type = type_macro;
     new_node->next = *head;
     *head = new_node;
 }

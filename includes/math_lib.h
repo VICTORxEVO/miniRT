@@ -45,6 +45,7 @@ t_vector shrink_vector(t_vector v, float shrink);
 float get_len_vector(t_vector v1);
 void print_vector(t_vector v);
 void print_point(t_point p);
+t_point	position_at(t_ray	*r, float t);
 t_vector get_normalized(t_vector v);
 float dot(t_vector v1, t_vector v2);
 t_vector cross(t_vector v1, t_vector v2);

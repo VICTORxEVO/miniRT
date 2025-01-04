@@ -37,6 +37,7 @@ inline t_vector sub_vectors(t_vector v1, t_vector v2)
 }
 
 /* [p1 - p2]*/
+/* vec from p1 -> p2 => [p2 - p1]*/
 inline t_vector sub_points(t_point p1, t_point p2)
 {
     t_vector res_p;
@@ -135,4 +136,13 @@ inline t_vector cross(t_vector v1, t_vector v2)
 inline t_vector normal_at(t_sphere s, t_point p)
 {
     return get_normalized(sub_points(p, s.origin));
+}
+
+inline t_point	position_at(t_ray	*r, float t)
+{
+	t_point	p;
+	p.x = r->direction.x * t + r->origin.x;
+	p.y = r->direction.y * t + r->origin.y;
+	p.z = r->direction.z * t + r->origin.z;
+	return p;
 }

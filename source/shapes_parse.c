@@ -60,7 +60,7 @@ bool    light_handled(t_data *d, char **args)
     light->brightness = light_value;
     light->c = light_color;
     light->p = light_cord;
-	add_node(d, &d->w->lights, light);
+	add_node(d, &d->w->lights, light, e_light);
 	return (true);
 }
 
@@ -87,7 +87,7 @@ bool    plane_handled(t_data *d, char **args)
     plane->c = plane_color;
     plane->origin = plane_cord;
     plane->normal = plane_norm;
-	add_node(d, &d->w->planes, plane);
+	add_node(d, &d->w->planes, plane, e_plain);
 	return (true);
 }
 
@@ -127,7 +127,7 @@ bool    cylinder_handled(t_data *d, char **args)
     cylinder->normal = cylinder_norm;
     cylinder->diameter = diameter;
     cylinder->height = height;
-	add_node(d, &d->w->cylinders, cylinder);
+	add_node(d, &d->w->cylinders, cylinder, e_cylinder);
 	return (true);
 }
 
@@ -146,8 +146,6 @@ bool    sphere_handled(t_data *d, char **args)
     if (count_args(cord) != 3 || !point_struct_filled(&sphere_cord, cord))
         return (printf("Error\nsphere point invalid\n"), false);
     diameter = ft_atof(args[2], &err);
-    printf("diameter: %f\n", diameter);
-    printf("radius: %f\n", diameter / 2.f);
     clrs = ft_split(d, args[3], ',');
     if (count_args(clrs) != 3 || !color_struct_filled(&sphere_color, clrs))
         return (printf("Error\nsphere color invalid\n"), false);
@@ -156,12 +154,6 @@ bool    sphere_handled(t_data *d, char **args)
     sphere->origin = sphere_cord;
     sphere->diameter = diameter;
 
-	add_node(d, &d->w->spheres, sphere);
-    t_sphere *verify = (t_sphere *)d->w->spheres->data;
-    printf("Verification after adding to list:\n");
-    printf("Sphere position: ");
-    print_point(verify->origin);
-    printf("Sphere diameter: %f\n", verify->diameter);
-    
+	add_node(d, &d->w->spheres, sphere, e_sphere);
 	return (true);
 }

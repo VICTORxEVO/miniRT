@@ -2,9 +2,11 @@
 NAME = miniRT
 
 #cc compiler with all flags
-CCF = cc -Wall -Wextra -Werror -lm # -O3 -flto
+CCF = cc -Wall -Wextra # -Werror # 
 
 LIBS =  -lm
+
+SPEED_FLAGS = -O3 -flto
 
 MLX_FLAGS = -Lmlx -lmlx -L/usr/lib/X11 -lXext -lX11
 
