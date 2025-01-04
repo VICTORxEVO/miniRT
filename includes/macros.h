@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 13:40:27 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/04 11:12:00 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/01/04 13:19:45 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,10 @@
 /** Program name displayed in error messages */
 # define PRGM_NAME "miniRT"
 
-# define PTR_CLEAR_ERR ": clear_1data(): data pointer not found !!"
-# define USAGE_WARN ": usage: miniRT <map_path>"
-
+# define PTR_CLEAR_ERR "clear_1data(): data pointer not found !!"
+# define USAGE_WARN "usage: miniRT <map_path>"
+# define FILEEXT_ER "file extention must me '.rt' !"
+# define EMPTFILE_ERR "is empty !"
 
 // Regular text colors
 # define BLACK "\033[0;30m"
