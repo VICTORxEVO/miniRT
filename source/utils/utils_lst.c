@@ -68,4 +68,3 @@ int remove_node(t_data *d, t_node **head, void *data)
     }
     return 0; // Data not found
 }
-
