@@ -12,22 +12,21 @@ static bool validated_type(char *name, unsigned args_count)
     return (false);
 }
 
-static bool line_handled(t_data *d, char *line)
+void    loadline(char *line, int n_line, char *filename)
 {
     char    **words;
     unsigned args_count;
 
     if (s_is_whitespace(line))
         return (true);
-    words = ft_split(d, line, ' ');
+    words = ft_split(line, ' ');
     args_count = count_args(words);
     if (args_count < 1)
         return (false);
     if (!validated_type(words[0], args_count))
-        return (printf("Error\ntype unkown\n"), false);
-    if (!elem_added(d, words))
-        return (false);
-    return (true);
+        pexit("unknown type !", 1);
+    if (!elem_added(getengine(), words))
+        pexit("error !", 1);
 }
 
 bool parsing(int ac, char *filename)
@@ -36,16 +35,11 @@ bool parsing(int ac, char *filename)
     char *line;
 
     if (ac != 2)
-        pexit(RED USAGE_WARN, 1);
-    line = get_next_line(fd);
-    while (line)
-    {
-        if (!line_handled(d, line))
-            return (false);
-        line = get_next_line(d, fd);
-    }
-    if (!d->w->cam)
-        return (printf("Error\nno camera found\n"), close(fd), false);
+        pexit(YELLOW USAGE_WARN, 1);
+    fd = check_file(filename);
+    if (fd < 0)
+        pexit(filename, 2);
+    readfile(fd);
     close(fd);
     return (true);
 }

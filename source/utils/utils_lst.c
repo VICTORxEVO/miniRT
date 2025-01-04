@@ -1,7 +1,7 @@
 #include "miniRT.h"
 
 // Create a new node
-t_node* create_node(t_data *d, void *data)
+t_node* create_node(t_core *d, void *data)
 {
     t_node *new_node = (t_node *)gc_malloc(d, sizeof(t_node));
     new_node->data = data;
@@ -9,14 +9,14 @@ t_node* create_node(t_data *d, void *data)
     return new_node;
 }
 
-void add_node(t_data *d, t_node **head, void *data)
+void add_node(t_core *d, t_node **head, void *data)
 {
     t_node *new_node = create_node(d, data);
     new_node->next = *head;
     *head = new_node;
 }
 
-void add_float_node_sorted(t_data *d, t_node **head, float value)
+void add_float_node_sorted(t_core *d, t_node **head, float value)
 {
     // Allocate heap memory for the float data
     float *data_ptr = (float *)gc_malloc(d, sizeof(float));
@@ -42,7 +42,7 @@ void add_float_node_sorted(t_data *d, t_node **head, float value)
     current->next = new_node;
 }
 
-int remove_node(t_data *d, t_node **head, void *data)
+int remove_node(t_core *d, t_node **head, void *data)
 {
     t_node *current = *head;
     t_node *previous = NULL;

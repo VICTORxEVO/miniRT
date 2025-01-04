@@ -67,7 +67,7 @@ bool    vector_struct_filled(t_vector	*v, char  **args)
     return false;
 }
 
-bool    elem_added(t_data *d, char **args)
+bool    elem_added(t_core *d, char **args)
 {
     bool	    good;
 
@@ -87,7 +87,7 @@ bool    elem_added(t_data *d, char **args)
     return (good);
 }
 
-bool    ambient_handled(t_data *d, char **args)
+bool    ambient_handled(t_core *d, char **args)
 {
     char		**clrs;
     float   	ambient_ratio;

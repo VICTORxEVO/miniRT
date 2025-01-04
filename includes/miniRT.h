@@ -117,11 +117,11 @@ typedef struct s_core
 t_core			*getengine(void);
 
 /*     >>>>>Parsing Funtions Section<<<<<     */
-int	we_have_a_problem(int fd, char **str);
+bool parsing(int ac, char *filename);
 unsigned count_args(char   **args);
 bool between(float n, float min, float max);
 float	 ft_atof(const char *s, bool *err);
-bool s_is_whitespace(char	*s);
+void    loadline(char *line, int n_line, char *filename);
 
 
 
@@ -140,25 +140,25 @@ void    rendering(void);
 /*
 	linked list
 */
-t_node* create_node(t_data *d, void *t_data);
-void add_node(t_data *d, t_node **head, void *t_data);
-int remove_node(t_data *d, t_node **head, void *t_data);
-void add_float_node_sorted(t_data *d, t_node **head, float value);
+t_node* create_node(t_core *d, void *t_core);
+void add_node(t_core *d, t_node **head, void *t_core);
+int remove_node(t_core *d, t_node **head, void *t_core);
+void add_float_node_sorted(t_core *d, t_node **head, float value);
 
 
 /*
 	shapes handling 
 */
-bool    light_handled(t_data *d, char **args);
-bool    plane_handled(t_data *d, char **args);
-bool    cylinder_handled(t_data *d, char **args);
-bool    sphere_handled(t_data *d, char **args);
-bool    camera_handled(t_data *d, char **args);
-bool    ambient_handled(t_data *d, char **args);
+bool    light_handled(t_core *d, char **args);
+bool    plane_handled(t_core *d, char **args);
+bool    cylinder_handled(t_core *d, char **args);
+bool    sphere_handled(t_core *d, char **args);
+bool    camera_handled(t_core *d, char **args);
+bool    ambient_handled(t_core *d, char **args);
 bool    color_struct_filled(t_color	*c, char  **args);
 bool    point_struct_filled(t_point	*p, char  **args);
 bool    vector_struct_filled(t_vector	*v, char  **args);
-bool    elem_added(t_data *d,char **args);
+bool    elem_added(t_core *d,char **args);
 
 
 int get_color_value(t_color c);
