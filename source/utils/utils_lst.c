@@ -3,7 +3,7 @@
 // Create a new node
 t_node* create_node(t_core *d, void *data)
 {
-    t_node *new_node = (t_node *)gc_malloc(d, sizeof(t_node));
+    t_node *new_node = (t_node *)galloc(sizeof(t_node));
     new_node->data = data;
     new_node->next = NULL;
     return new_node;
@@ -19,7 +19,7 @@ void add_node(t_core *d, t_node **head, void *data)
 void add_float_node_sorted(t_core *d, t_node **head, float value)
 {
     // Allocate heap memory for the float data
-    float *data_ptr = (float *)gc_malloc(d, sizeof(float));
+    float *data_ptr = (float *)galloc(sizeof(float));
     *data_ptr = value;
 
     t_node *new_node = create_node(d, data_ptr);
@@ -60,7 +60,7 @@ int remove_node(t_core *d, t_node **head, void *data)
             } else {
                 previous->next = current->next;
             }
-            gc_free(d, current);
+            clear_1data(current);
             return 1; // Removal succeeded
         }
         previous = current;
