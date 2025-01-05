@@ -29,12 +29,32 @@ void    loadline(char *line, int n_line, char *filename)
         pexit("error !", 1);
 }
 
+void setup_cam_dir(t_camera	*cam)
+{
+	t_vector	temp_up;
+	// calc up, right vectors for where the cam is lookin (forward)
+	temp_up = (t_vector) {0, 1, 0};
+	cam->right = normal(cross(temp_up, cam->forward)); 
+	cam->up = normal(cross(cam->forward, cam->right)); // now reset up
+}
+
 bool parsing(int ac, char *filename)
 {
     int fd;
     char *line;
+    t_core  *engine;
+    void *d;
 
-    getengine()->w = galloc(sizeof(t_world));
+    engine = getengine();
+    
+    engine->w = galloc(sizeof(t_world));
+    d = mlx_init();
+    engine->m.win = mlx_new_window(d, SCREEN_WIDTH, SCREEN_HEIGHT, "Hello world!");
+	engine->img.img = mlx_new_image(d, SCREEN_WIDTH, SCREEN_HEIGHT);
+	engine->img.addr = mlx_get_data_addr(engine->img.img, &engine->img.bits_per_pixel, &engine->img.line_length,
+								&engine->img.endian);
+    engine->m.mlx = d;
+	setup_cam_dir(engine->w->cam);
     if (ac != 2)
         pexit(YELLOW USAGE_WARN, 1);
     fd = check_file(filename);
