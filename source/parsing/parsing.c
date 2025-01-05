@@ -36,6 +36,8 @@ void setup_cam_dir(t_camera	*cam)
 	temp_up = (t_vector) {0, 1, 0};
 	cam->right = normal(cross(temp_up, cam->forward)); 
 	cam->up = normal(cross(cam->forward, cam->right)); // now reset up
+    cam->aspect = (SCREEN_WIDTH / SCREEN_HEIGHT);
+
 }
 
 void parsing(int ac, char *filename)
@@ -61,5 +63,6 @@ void parsing(int ac, char *filename)
         pexit(filename, 2);
     readfile(fd, filename);
 	setup_cam_dir(engine->w->cam);
+
     close(fd);
 }

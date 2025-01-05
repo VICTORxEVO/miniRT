@@ -30,7 +30,7 @@ bool    camera_handled(t_core *d, char **args)
         return (printf("Error\nbad fov value for camera"), false);
     }
     d->w->cam = galloc(sizeof(t_camera));
-	d->w->cam->direction = vec3d;
+	d->w->cam->forward = normal(vec3d);
 	d->w->cam->origin = pcord;
 	d->w->cam->fov = FOV;
 	return (true);

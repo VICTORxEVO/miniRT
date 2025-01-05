@@ -111,6 +111,7 @@ t_color intersect_world(t_world *w, t_ray *cam_ray)
 	{
 		if (node->type == e_sphere)
 		{
+
 			sphere = (t_sphere *)(node->data);
 			t = intersect(sphere, cam_ray);
 			if (t < smallest_t && t >= 0)
@@ -156,6 +157,8 @@ void    rendering(void)
 	float ndc_y;
 
 	cam = engine->w->cam;
+	// debug light
+	printf("light info -> %f %f %f\n", ((t_light *)(engine->w->lights->data))->p.x, ((t_light *)(engine->w->lights->data))->p.y, ((t_light *)(engine->w->lights->data))->p.z);
 	scale = tan(deg_to_rad(cam->fov) / 2.f);
 	x = 0;
 	y = 0;
@@ -168,6 +171,9 @@ void    rendering(void)
 			ndc_x = (2.f * (x + 0.5) / SCREEN_WIDTH) - 1.f;
 			ray.origin = cam->origin;
 			ray.direction = generate_cam_dir(cam, scale, ndc_x, ndc_y);
+			// debug the ray direction but not every pixel
+			if (x % 100 == 0)
+				print_vector(ray.direction);
 			// send ray from cam origin to the pixel
 			my_mlx_pixel_put(&engine->img, x, y, get_rgb(intersect_world(engine->w, &ray)));
 			x++;
