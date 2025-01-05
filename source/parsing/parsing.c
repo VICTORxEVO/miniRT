@@ -54,12 +54,12 @@ void parsing(int ac, char *filename)
 	engine->img.addr = mlx_get_data_addr(engine->img.img, &engine->img.bits_per_pixel, &engine->img.line_length,
 								&engine->img.endian);
     engine->m.mlx = d;
-	setup_cam_dir(engine->w->cam);
     if (ac != 2)
         pexit(YELLOW USAGE_WARN, 1);
     fd = check_file(filename);
     if (fd < 0)
         pexit(filename, 2);
     readfile(fd, filename);
+	setup_cam_dir(engine->w->cam);
     close(fd);
 }

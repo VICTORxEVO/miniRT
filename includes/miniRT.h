@@ -140,6 +140,7 @@ int		check_file(char *filename);
 /*     >>>>>Rendering Funtions Section<<<<<     */
 void    rendering(void);
 
+int input(int key, void *d);
 
 
 t_vector normal(t_vector v);

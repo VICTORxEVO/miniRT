@@ -125,6 +125,19 @@ t_color intersect_world(t_world *w, t_ray *cam_ray)
 	return color;
 }
 
+int input(int key, void *d)
+{
+	t_core *data;
+
+	(void) data;
+	if (key == XK_Escape)
+	{
+		clear();
+		exit(0);
+	}
+	return 1;
+}
+
 void    rendering(void)
 {
     t_camera    *cam;
@@ -136,7 +149,6 @@ void    rendering(void)
     engine = getengine();
 	node = (t_node *)(engine->w->spheres); // first sphere
 	s = (t_sphere *)(node->data);
-    print_point(s->origin);
 	int	x;
 	int	y;
 	float scale;
@@ -163,5 +175,7 @@ void    rendering(void)
 		y++;
 	}
 	mlx_put_image_to_window(engine->m.mlx, engine->m.win, engine->img.img, 0, 0);
+	mlx_key_hook(engine->m.win, input, engine);
+	mlx_loop(engine->m.mlx);
     return ;
 }
