@@ -4,7 +4,7 @@ NAME = miniRT
 #cc compiler with all flags
 CCF = cc -Wall -Wextra # -Werror 
 EXTRA_LIBS = -lm
-MLX_FLAGS = -L mlx_linux -l mlx_Linux -l Xext -l X11 -l m -l z -O3
+MLX_FLAGS = -L ./mlx -l mlx_Linux -l Xext -l X11 -l m -l z -O3
 
 # Directories
 SRC_DIR := source
