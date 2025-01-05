@@ -10,8 +10,10 @@ void    readfile(int fd, char *filename)
     gc_add_node(line);
     if (!line || !*line)
         pexit(ft_strjoin(ft_strjoin(RED, filename), EMPTFILE_ERR), 3);
-    while(line)
+    while (line)
     {
+        if (line[ft_strlen(line) -1] == '\n')
+            line[ft_strlen(line) - 1] = '\0';
         loadline(line, n_line, filename);
         clear_1data(line);
         line = get_next_line(fd);
