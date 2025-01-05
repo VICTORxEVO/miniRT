@@ -88,6 +88,7 @@ typedef struct s_sphere
 {
 	t_point		origin;
 	float		diameter;
+	float		radius_squared;
 	t_color		c;
 } t_sphere;
 

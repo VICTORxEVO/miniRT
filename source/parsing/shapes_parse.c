@@ -153,6 +153,7 @@ bool    sphere_handled(t_core *d, char **args)
     sphere->c = sphere_color;
     sphere->origin = sphere_cord;
     sphere->diameter = diameter;
+    sphere->radius_squared = (diameter / 2) * (diameter / 2);
 
 	add_obj(d, &d->w->objects, sphere, SP_OBJ);
 	return (true);
