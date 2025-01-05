@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 13:40:27 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/04 18:23:36 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/01/05 11:12:01 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,12 @@
 # define FILEEXT_ER "file extention must me '.rt' !"
 # define EMPTFILE_ERR "is empty !"
 # define WHITESPACE     " \t\n\r\v\f"  // space, tab, newline, carriage return, vtab, formfeed
+
+
+
+#define SCREEN_WIDTH 1920.f
+#define SCREEN_HEIGHT 1010.f
+
 
 // Regular text colors
 # define BLACK "\033[0;30m"

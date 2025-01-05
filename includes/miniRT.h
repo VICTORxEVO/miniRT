@@ -3,9 +3,6 @@
 
 #include "gc.h"
 
-#define SCREEN_WIDTH 1920.f
-#define SCREEN_HEIGHT 1010.f
-
 typedef struct s_node
 {
     void *data;
@@ -128,7 +125,7 @@ typedef struct s_core
 t_core			*getengine(void);
 
 /*     >>>>>Parsing Funtions Section<<<<<     */
-bool	 parsing(int ac, char *filename);
+void parsing(int ac, char *filename);
 unsigned count_args(char   **args);
 bool	between(float n, float min, float max);
 float	ft_atof(const char *s, bool *err);
@@ -188,6 +185,7 @@ t_color sum_colors(t_color amb, t_color dif, t_color   spc);
 
 /*     >>>>>Utils funtions section<<<<<     */
 bool	is_wspace(char *s);
+char	*err_msg(const char *filename, const int n_line);
 
 
 
