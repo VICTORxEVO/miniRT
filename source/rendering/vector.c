@@ -20,7 +20,9 @@ inline t_vector sub_vectors(t_vector v1, t_vector v2)
     res_v.z = v1.z - v2.z;
     return res_v;
 }
-
+/*
+    p1 - p2  ->  vector from p2 to p1
+*/
 inline t_vector sub_points(t_point p1, t_point p2)
 {
     t_vector res_p;

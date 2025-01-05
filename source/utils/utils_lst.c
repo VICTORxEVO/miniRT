@@ -69,3 +69,75 @@ int remove_node(t_core *d, t_node **head, void *data)
     }
     return 0; // Data not found
 }
+
+
+
+
+t_object* create_obj(t_core *d, void *data)
+{
+    t_object *new_obj = (t_object *)galloc(sizeof(t_object));
+    new_obj->data = data;
+    new_obj->next = NULL;
+    return new_obj;
+}
+
+void add_obj(t_core *d, t_object **head, void *data, char type_macro)
+{
+    t_object *new_obj = create_obj(d, data);
+    new_obj->type = type_macro;
+    new_obj->next = *head;
+    *head = new_obj;
+}
+
+void add_float_object_sorted(t_core *d, t_object **head, float value)
+{
+    // Allocate heap memory for the float data
+    float *data_ptr = (float *)galloc(sizeof(float));
+    *data_ptr = value;
+
+    t_object *new_obj = create_obj(d, data_ptr);
+
+    // If the list is empty or the new value should be placed before head
+    if (*head == NULL || *((float*)(*head)->data) >= value)
+    {
+        new_obj->next = *head;
+        *head = new_obj;
+        return;
+    }
+
+    // Otherwise find the correct position
+    t_object *current = *head;
+    while (current->next != NULL && *((float*)current->next->data) < value)
+    {
+        current = current->next;
+    }
+    new_obj->next = current->next;
+    current->next = new_obj;
+}
+
+int remove_obj(t_core *d, t_object **head, void *data)
+{
+    t_object *current = *head;
+    t_object *previous = NULL;
+
+    while (current != NULL)
+    {
+        // Compare pointers directly
+        if (current->data == data)
+        {
+            // Found the obj whose data pointer matches
+            if (previous == NULL)
+            {
+                // Removing the head obj
+                *head = current->next;
+            } else {
+                previous->next = current->next;
+            }
+            clear_1data(current);
+            return 1; // Removal succeeded
+        }
+        previous = current;
+        current = current->next;
+    }
+    return 0; // Data not found
+}

@@ -87,7 +87,7 @@ bool    plane_handled(t_core *d, char **args)
     plane->c = plane_color;
     plane->origin = plane_cord;
     plane->normal = plane_norm;
-	add_node(d, &d->w->planes, plane, e_plain);
+	add_obj(d, &d->w->objects, plane, PL_OBJ);
 	return (true);
 }
 
@@ -127,7 +127,7 @@ bool    cylinder_handled(t_core *d, char **args)
     cylinder->normal = cylinder_norm;
     cylinder->diameter = diameter;
     cylinder->height = height;
-	add_node(d, &d->w->cylinders, cylinder, e_cylinder);
+	add_obj(d, &d->w->objects, cylinder, CY_OBJ);
 	return (true);
 }
 
@@ -154,6 +154,6 @@ bool    sphere_handled(t_core *d, char **args)
     sphere->origin = sphere_cord;
     sphere->diameter = diameter;
 
-	add_node(d, &d->w->spheres, sphere, e_sphere);
+	add_obj(d, &d->w->objects, sphere, SP_OBJ);
 	return (true);
 }

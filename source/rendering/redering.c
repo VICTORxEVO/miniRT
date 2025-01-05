@@ -32,7 +32,7 @@ t_color	lighting(t_world *w, t_ray *cam_ray, t_sphere *hit_sph, float smallest_t
 	ambient = w->ambient;
 	color = zero_color();
 	if (!hit_sph)
-		return (color);
+		return ((t_color) {20, 20, 20});
 	speclar_color = zero_color();
 	diffuse_color = zero_color();
 	ambient_color = zero_color();
@@ -63,7 +63,7 @@ t_vector	generate_cam_dir(t_camera	*cam, float scale, float ndcx, float ndcy)
 	return (normal(dir));
 }
 
-float intersect(t_sphere *s, t_ray *ray)
+float sp_intersect(t_sphere *s, t_ray *ray)
 {
     t_vector oc;
     float r;
@@ -89,13 +89,36 @@ float intersect(t_sphere *s, t_ray *ray)
         return t2;
 	else
 		return t1;
-    return false;
+}
+
+float pl_intersect(t_plane *pl, t_ray *ray)
+{
+    // if A and B |  -> A . B = 0
+    // if A and B |  -> (p - p0) . n = 0     n = plane normal,  p0  plane origin     p -> intersection point    
+	// ray is ->    o  + tD 
+	// so we get ->  (o + td - p0) . n = 0
+	// so we get ->  (o)n + (td)n - p0.n = 0
+	// so we get ->  (td)n = p0.n - (o).n
+	// so we get ->  t = (p0.n - (o).n) / (d).n
+	// so we get ->  t = ([p0 - o].n) / (d).n
+	float		t;
+	t_point	p0;
+	t_point	o;
+	t_vector	n;
+	t_vector	p0_n;
+
+	p0_n = sub_points(p0, o);
+	o = ray->origin;
+	p0 = pl->origin;
+	n = pl->normal;
+	t = dot(p0_n, n) / dot(ray->direction, n);
+	return t;
 }
 
 t_color intersect_world(t_world *w, t_ray *cam_ray)
 {
 	t_color	color;
-	t_node	*node;
+	t_object	*node;
 	t_sphere	*sphere;
 	t_sphere	*hit_sph;
 	float smallest_t;
@@ -105,21 +128,34 @@ t_color intersect_world(t_world *w, t_ray *cam_ray)
 	t_vector	light_ref;
 	t_point inter_point;
 	hit_sph = NULL;
-	node = w->spheres;
+	node = w->objects;
 	smallest_t = __FLT_MAX__;
+	int type;
+	type = node->type;
 	while (node)
 	{
-		if (node->type == e_sphere)
+		if (node->type == SP_OBJ)
 		{
-
 			sphere = (t_sphere *)(node->data);
-			t = intersect(sphere, cam_ray);
+			t = sp_intersect(sphere, cam_ray);
 			if (t < smallest_t && t >= 0)
 			{
 				hit_sph = sphere;
 				smallest_t = t;
 			}
  		}
+		else
+		{
+			if (node->type == PL_OBJ)
+			{
+				t = pl_intersect((t_plane *)node->data, cam_ray);
+				if (t < smallest_t && t >= 0)
+				{
+					hit_sph = NULL;
+					smallest_t = t;
+				}
+			}
+		}
 		node = node->next;
 	}
 	color = lighting(w, cam_ray, hit_sph, smallest_t);
@@ -142,14 +178,10 @@ int input(int key, void *d)
 void    rendering(void)
 {
     t_camera    *cam;
-	t_sphere	*s;
 	t_ray		ray;
-	t_node		*node;
     t_core      *engine;
 
     engine = getengine();
-	node = (t_node *)(engine->w->spheres); // first sphere
-	s = (t_sphere *)(node->data);
 	int	x;
 	int	y;
 	float scale;
@@ -158,7 +190,6 @@ void    rendering(void)
 
 	cam = engine->w->cam;
 	// debug light
-	printf("light info -> %f %f %f\n", ((t_light *)(engine->w->lights->data))->p.x, ((t_light *)(engine->w->lights->data))->p.y, ((t_light *)(engine->w->lights->data))->p.z);
 	scale = tan(deg_to_rad(cam->fov) / 2.f);
 	x = 0;
 	y = 0;
@@ -171,10 +202,6 @@ void    rendering(void)
 			ndc_x = (2.f * (x + 0.5) / SCREEN_WIDTH) - 1.f;
 			ray.origin = cam->origin;
 			ray.direction = generate_cam_dir(cam, scale, ndc_x, ndc_y);
-			// debug the ray direction but not every pixel
-			if (x % 100 == 0)
-				print_vector(ray.direction);
-			// send ray from cam origin to the pixel
 			my_mlx_pixel_put(&engine->img, x, y, get_rgb(intersect_world(engine->w, &ray)));
 			x++;
 		}

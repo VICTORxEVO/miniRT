@@ -3,12 +3,25 @@
 
 #include "gc.h"
 
+#define SP_OBJ 0
+#define PL_OBJ 1
+#define CY_OBJ 2
+
+
 typedef struct s_node
 {
     void *data;
     struct s_node *next;
 	char	type;
 } t_node;
+
+typedef struct s_object
+{
+    void *data;
+    struct s_object *next;
+	char	type;
+} t_object;
+
 
 typedef struct s_mlx
 {
@@ -67,6 +80,7 @@ typedef struct s_world
 	t_node 		*spheres;
 	t_ambient	*ambient;
 	t_camera 	*cam;
+	t_object	*objects;
 } t_world;
 
 
@@ -154,6 +168,13 @@ t_node* create_node(t_core *d, void *t_core);
 void add_node(t_core *d, t_node **head, void *data, char type_macro);
 int remove_node(t_core *d, t_node **head, void *data);
 void add_float_node_sorted(t_core *d, t_node **head, float value);
+
+t_object* create_obj(t_core *d, void *data);
+void add_obj(t_core *d, t_object **head, void *data, char type_macro);
+void add_float_object_sorted(t_core *d, t_object **head, float value);
+int remove_obj(t_core *d, t_object **head, void *data);
+
+
 
 /*
 	shapes handling 
