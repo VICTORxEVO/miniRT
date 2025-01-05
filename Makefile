@@ -1,10 +1,12 @@
 #program name
 NAME = miniRT
 
+
 #cc compiler with all flags
 CCF = cc -Wall -Wextra # -Werror 
 EXTRA_LIBS = -lm
-MLX_FLAGS = -L ./mlx -l mlx_Linux -l Xext -l X11 -l m -l z -O3
+MLX_FLG = -L ./mlx  -l mlx_Linux -l Xext -l X11 -l m -l z -O3
+USER_FLG = -D USER=\"$(USER)\"
 
 # Directories
 SRC_DIR := source
@@ -16,7 +18,7 @@ OBJ := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 
 #include header
-INC = -I ./includes -I mlx
+INC = -I ./includes
 
 DEBUG = GDB
 #debuging
@@ -31,7 +33,7 @@ endif
 all: $(NAME)
 
 $(NAME): $(OBJ)
-		@$(CCF) $(OBJ) $(INC) $(MLX_FLAGS) $(EXTRA_LIBS) -o $@
+		@$(CCF) $(OBJ) $(INC) $(MLX_FLG) $(EXTRA_LIBS) -o $@
 		@echo "compiling"
 		@sleep 0.5
 		@echo "$(NAME) is ready"
