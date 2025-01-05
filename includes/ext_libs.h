@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 13:43:37 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/04 10:22:40 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/01/05 11:31:28 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,24 +18,29 @@
 #ifndef EXT_LIBS_H
 # define EXT_LIBS_H
 
+# ifdef USER
+#  if USER == sgouzi
+#   include "mlx.h"
+#  else
+#   include <mlx.h>
+#  endif
+# else
+#  include <mlx.h>
+# endif
 # define _POSIX_C_SOURCE 200809L
 # include <fcntl.h>
 # include <stdbool.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
-# ifdef __APPLE__
-#  include <limits.h>
-# else
-#  include <linux/limits.h>
-# endif
+# include <linux/limits.h>
 # include <assert.h>
 # include <signal.h>
 # include <sys/stat.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <unistd.h>
-#include <X11/keysym.h>
+# include <X11/keysym.h>
 # include <math.h>
 # include "math_libs.h"
 # include "get_next_line.h"
