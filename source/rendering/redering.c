@@ -162,6 +162,6 @@ void    rendering(void)
 		}
 		y++;
 	}
-	mlx_put_image_to_window(engine->m.mlx, engine->m.win, engine->img, 0, 0);
+	mlx_put_image_to_window(engine->m.mlx, engine->m.win, engine->img.img, 0, 0);
     return ;
 }
