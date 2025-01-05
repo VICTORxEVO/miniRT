@@ -54,17 +54,15 @@ bool    vector_struct_filled(t_vector	*v, char  **args)
     // for camera , one at least should be 1
     error = false;
 	v->x = ft_atof(args[0], &error);
-	if (error || (v->x != 0.0f && v->x != 1.0f && v->x != -1.0f))
+	if (error || !between(v->x, -1, 1))
 		return (false);
 	v->y = ft_atof(args[1], &error);
-	if (error || (v->y != 0.0f && v->y != 1.0f && v->y != -1.0f))
+	if (error || !between(v->y, -1, 1))
 		return (false);
 	v->z = ft_atof(args[2], &error);
-	if (error || (v->z != 0.0f && v->z != 1.0f && v->z != -1.0f))
+	if (error || !between(v->z, -1, 1))
 		return (false);
-    if (fabsf(v->x) == 1.0f || fabsf(v->y) == 1.0f || fabsf(v->z) == 1.0f)
-	    return (true);
-    return false;
+    return (true);
 }
 
 bool    elem_added(t_core *d, char **args)
