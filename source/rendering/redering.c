@@ -13,13 +13,65 @@ inline t_vector	reflect (t_vector	light, t_vector	norm)
 	return sub_vectors(light, scale_vector(norm, 2 * dot(norm, light))); 
 }
 
-t_color	lighting(t_world *w, t_ray *cam_ray, t_object *hit_obj, float smallest_t)
+t_color	sp_light(t_sphere	*hit_sph, t_ray	*cam_ray, float smallest_t)
 {
 	t_color	color;
 	t_color	speclar_color;
 	t_color	diffuse_color;
 	t_color	ambient_color;
-	t_sphere	*hit_sph;
+	t_light		*light;
+	t_ambient	*ambient;
+	t_vector	pt_light_vec;
+	float light_dot_norm;
+	float refl_dot_cam;
+	t_vector	sph_norm_vec;
+	t_vector	pt_cam_vec;
+	t_vector	light_ref;
+	t_point inter_point;
+	light = getengine()->w->lights->data;
+	ambient = getengine()->w->ambient;
+	color = zero_color();
+	speclar_color = zero_color();
+	diffuse_color = zero_color();
+	ambient_color = zero_color();
+	inter_point = position_at(cam_ray, smallest_t);
+	ambient_color = scale_color(ambient->c, ambient->ratio * 0.1);
+	sph_norm_vec = normal(sub_points(inter_point, hit_sph->origin));
+	pt_light_vec = normal(sub_points(light->p, inter_point));
+	pt_cam_vec = normal(sub_points(cam_ray->origin ,inter_point));
+	light_dot_norm = dot(sph_norm_vec, pt_light_vec); // correct
+	if (light_dot_norm >= 0)
+		diffuse_color = (scale_color(hit_sph->c, light_dot_norm));
+	light_ref = reflect(neg_vector(pt_light_vec), sph_norm_vec);
+	refl_dot_cam = dot(light_ref, pt_cam_vec);
+	if (refl_dot_cam > 0)
+		speclar_color = scale_color(light->c, powf(refl_dot_cam, light->brightness * 100));
+	color = clamp_color(sum_colors(speclar_color ,diffuse_color, ambient_color));
+	return color;
+}
+
+t_color	pl_light(t_plane	*hit_pl, t_ray	*cam_ray, float smallest_t)
+{
+	t_vector	pt_vec;
+	t_vector	light_vec;
+	t_vector	light_ref;
+	t_point	intersec_ptr;
+	t_light	*light;
+	float	light_dot_norm;
+
+	light = getengine()->w->lights->data;
+	intersec_ptr = position_at(cam_ray, smallest_t);
+	light_vec = normal(sub_points(light->p, intersec_ptr)); // from point to light 
+	pt_vec = normal(sub_points(hit_pl->origin, intersec_ptr));
+	light_dot_norm = dot(hit_pl->normal, light_vec);
+	light_ref = reflect(neg_vector(light_vec), hit_pl->normal);
+	
+	return (scale_color(hit_pl->c, light_dot_norm));
+}
+
+t_color	lighting(t_world *w, t_ray *cam_ray, t_object *hit_obj, float smallest_t)
+{
+	t_color	color;
 	t_plane	*hit_pl;
 	t_light		*light;
 	t_ambient	*ambient;
@@ -36,31 +88,9 @@ t_color	lighting(t_world *w, t_ray *cam_ray, t_object *hit_obj, float smallest_t
 	if (!hit_obj)
 		return ((t_color) {20, 20, 20}); // sky
 	if (hit_obj->type == PL_OBJ)
-	{
-		hit_pl = hit_obj->data;
-		return (hit_pl->c);
-	}
-
+		return (pl_light(hit_obj->data, cam_ray, smallest_t));
 	if (hit_obj->type == SP_OBJ)
-	{
-		hit_sph = (t_sphere *)hit_obj->data;
-		speclar_color = zero_color();
-		diffuse_color = zero_color();
-		ambient_color = zero_color();
-		inter_point = position_at(cam_ray, smallest_t);
-		ambient_color = scale_color(ambient->c, ambient->ratio * 0.1); // its color * ratio // lower down the ambient
-		sph_norm_vec = normal(sub_points(inter_point, hit_sph->origin));
-		pt_light_vec = normal(sub_points(light->p, inter_point));
-		pt_cam_vec = normal(sub_points(cam_ray->origin ,inter_point));
-		light_dot_norm = dot(sph_norm_vec, pt_light_vec); // correct
-		if (light_dot_norm >= 0)
-			diffuse_color = (scale_color(hit_sph->c, light_dot_norm));
-		light_ref = reflect(neg_vector(pt_light_vec), sph_norm_vec);
-		refl_dot_cam = dot(light_ref, pt_cam_vec);
-		if (refl_dot_cam > 0)
-			speclar_color = scale_color(light->c, powf(refl_dot_cam, light->brightness * 100));
-		color = clamp_color(sum_colors(speclar_color ,diffuse_color, ambient_color));
-	}
+		return (sp_light(hit_obj->data, cam_ray, smallest_t));
 	return color;
 }
 
@@ -117,17 +147,17 @@ float pl_intersect(t_plane *pl, t_ray *ray)
 	t_point	p0;
 	t_point	o;
 	t_vector	n;
-	t_vector	p0_n;
+	t_vector	p0_o;
 
 	o = ray->origin;
 	p0 = pl->origin;
 	n = pl->normal;
 	d = ray->direction;
-	p0_n = sub_points(p0, o);
+	p0_o = sub_points(p0, o);
 	d_dot_n = dot(d, n);
 	if (d_dot_n == 0)
 		return -1; // no intersection   divide by zero
-	t = dot(p0_n, n) / d_dot_n;
+	t = dot(p0_o, n) / d_dot_n;
 	return t;
 }
 

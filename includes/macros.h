@@ -20,7 +20,10 @@
 # define PTR_CLEAR_ERR "clear_1data(): data pointer not found !!"
 # define USAGE_WARN "usage: miniRT <map_path>"
 # define FILEEXT_ER "file extention must me '.rt' !"
-# define EMPTFILE_ERR "is empty !"
+# define EMPTFILE_ERR " is empty !"
+# define NOLIGHT_ERR " there is no light!"
+# define NOCAM_ERR " there is no camera!"
+# define NOAMB_ERR " there is no ambient!"
 # define WHITESPACE     " \t\n\r\v\f"  // space, tab, newline, carriage return, vtab, formfeed
 
 

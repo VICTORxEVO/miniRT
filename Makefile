@@ -3,7 +3,7 @@ NAME = miniRT
 
 
 #cc compiler with all flags
-CCF = cc -Wall -Wextra # -Werror 
+CCF = cc -Wall # -Wextra # -Werror 
 EXTRA_LIBS = -lm
 MLX_FLG = -L ./mlx  -l mlx_Linux -l Xext -l X11 -l m -l z -O3
 USER_FLG = -D USER=\"$(USER)\"

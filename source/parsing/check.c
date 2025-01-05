@@ -19,6 +19,13 @@ void    readfile(int fd, char *filename)
         line = get_next_line(fd);
         n_line++;
     }
+    if (!getengine()->w->lights)
+        pexit(ft_strjoin(ft_strjoin(RED, filename), NOLIGHT_ERR), 4);
+    if (!getengine()->w->cam)
+        pexit(ft_strjoin(ft_strjoin(RED, filename), NOCAM_ERR), 5);
+    if (!getengine()->w->ambient)
+        pexit(ft_strjoin(ft_strjoin(RED, filename), NOAMB_ERR), 6);
+
 }
 
 
