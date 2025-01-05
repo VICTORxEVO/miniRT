@@ -1,5 +1,18 @@
 #include "miniRT.h"
 
+char *err_msg(const char *filename, const int n_line)
+{
+	char *str;
+	char *str1;
+
+	str = ft_strjoin(RED, filename);
+	str1 = ft_strjoin(":", "error in line ");
+	str = ft_strjoin(str, str1);
+	str = ft_strjoin(str, ft_itoa(n_line));
+	return (str);
+}
+
+
 bool is_wspace(char *s)
 {
 	int	i;

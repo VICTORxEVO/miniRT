@@ -22,7 +22,7 @@ void    loadline(char *line, int n_line, char *filename)
     words = ft_split(line, ' ');
     args_count = count_args(words);
     if (args_count < 1)
-        pexit("error MAP !", 3);
+        pexit(err_msg(filename, n_line), 3);
     if (!validated_type(words[0], args_count))
         pexit("unknown type !", 1);
     if (!elem_added(getengine(), words))
@@ -38,7 +38,7 @@ void setup_cam_dir(t_camera	*cam)
 	cam->up = normal(cross(cam->forward, cam->right)); // now reset up
 }
 
-bool parsing(int ac, char *filename)
+void parsing(int ac, char *filename)
 {
     int fd;
     char *line;
@@ -62,5 +62,4 @@ bool parsing(int ac, char *filename)
         pexit(filename, 2);
     readfile(fd, filename);
     close(fd);
-    return (true);
 }
