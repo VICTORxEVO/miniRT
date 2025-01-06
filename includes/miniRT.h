@@ -3,9 +3,7 @@
 
 #include "gc.h"
 
-#define SP_OBJ 0
-#define PL_OBJ 1
-#define CY_OBJ 2
+
 
 
 typedef struct s_node

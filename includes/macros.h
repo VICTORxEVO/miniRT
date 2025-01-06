@@ -13,6 +13,11 @@
 #ifndef MACROS_H
 # define MACROS_H
 
+#define SP_OBJ 0
+#define PL_OBJ 1
+#define CY_OBJ 2
+
+#define EPSILON 0.0000001f
 
 /** Program name displayed in error messages */
 # define PRGM_NAME "miniRT"

@@ -12,12 +12,32 @@ static bool validated_type(char *name, unsigned args_count)
     return (false);
 }
 
+bool    starts_with(char    *s, char    *start)
+{
+    int i;
+    int j;
+
+    i = 0;
+    while (s[i] && start[i] && start[i] == s[i])
+    {
+        if (s[i] != start[j])
+            return false;
+        i++;
+        j++;
+    }
+    if (i != j)
+        return false;
+    if (start[j])
+        return false;
+    return (true);
+}
+
 void    loadline(char *line, int n_line, char *filename)
 {
     char    **words;
     unsigned args_count;
 
-    if (is_wspace(line))
+    if (is_wspace(line) || starts_with(line, "#"))
         return ;
     words = ft_split(line, ' ');
     args_count = count_args(words);

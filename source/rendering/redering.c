@@ -118,9 +118,9 @@ t_color	lighting(t_world *w, t_ray *cam_ray, t_object *hit_obj, float smallest_t
 	light_pos = ((t_light *)w->lights->data)->p;
 	inters_point = position_at(cam_ray, smallest_t);
 	if (inters_point.y >= 0)
-		inters_point.y += 0.00001;
+		inters_point.y += EPSILON;
 	else
-		inters_point.y += 0.00001;
+		inters_point.y += EPSILON;
 
 	pt_light_vec = sub_points(light_pos, inters_point);
 	pt_to_light_dist = get_len_vector(pt_light_vec);
@@ -130,7 +130,7 @@ t_color	lighting(t_world *w, t_ray *cam_ray, t_object *hit_obj, float smallest_t
 	if (reverse_inter_dis < smallest_t)
 	{
 		if (hit_obj->type == PL_OBJ)
-			return (scale_color(w->ambient->c, w->ambient->ratio * 0.1)); // sky
+			return (scale_color(w->ambient->c, w->ambient->ratio)); // sky
 	}
 	if (!hit_obj)
 		return ((t_color) {20, 20, 20}); // sky
