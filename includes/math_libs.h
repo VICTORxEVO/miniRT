@@ -25,5 +25,7 @@ typedef struct s_ray
     t_vector direction;
 } t_ray;
 
+float maxf(float a, float b);
+float minf(float a, float b);
 
 #endif

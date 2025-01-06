@@ -68,6 +68,7 @@ typedef struct s_camera
 	t_vector	direction;
 	unsigned  fov; // field of view angle (how much of the cam we can see) when fov is small view is zoomed in
 	float		aspect;
+	float		scale;
 } t_camera;
 
 typedef struct s_world
@@ -152,7 +153,7 @@ int		check_file(char *filename);
 
 /*     >>>>>Rendering Funtions Section<<<<<     */
 void	my_mlx_pixel_put(t_img *img, int x, int y, int color);
-float get_intersect_dist(t_world *w, t_ray *ray);
+float get_intersect_dist(t_world *w, t_ray *ray,  t_object *obj_in_way_of_light);
 inline t_vector	reflect (t_vector	light, t_vector	norm);
 t_color	sp_light(t_sphere	*hit_sph, t_ray	*cam_ray, float smallest_t);
 t_color	pl_light(t_plane	*hit_pl, t_ray	*cam_ray, float smallest_t);
@@ -227,6 +228,7 @@ t_vector sub_points(t_point p1, t_point p2);
 t_vector neg_vector(t_vector v1);
 t_vector scale_vector(t_vector v, float scale);
 t_vector shrink_vector(t_vector v, float shrink);
+t_vector mul_vectors(t_vector v1, t_vector v2);
 float get_len_vector(t_vector v1);
 void print_vector(t_vector v);
 void print_point(t_point p);
@@ -237,6 +239,8 @@ t_vector cross(t_vector v1, t_vector v2);
 t_vector normal_at(t_sphere s, t_point p);
 float deg_to_rad(float deg);
 float rad_to_rad(float rad);
+t_point v_to_p(t_vector v);
+t_vector p_to_v(t_point p);
 
 
 void	my_mlx_pixel_put(t_img *data, int x, int y, int color);

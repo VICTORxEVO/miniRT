@@ -18,6 +18,7 @@ bool    starts_with(char    *s, char    *start)
     int j;
 
     i = 0;
+    j = 0;
     while (s[i] && start[i] && start[i] == s[i])
     {
         if (s[i] != start[j])
@@ -57,7 +58,7 @@ void setup_cam_dir(t_camera	*cam)
 	cam->right = normal(cross(temp_up, cam->forward)); 
 	cam->up = normal(cross(cam->forward, cam->right)); // now reset up
     cam->aspect = (SCREEN_WIDTH / SCREEN_HEIGHT);
-
+	cam->scale = tan(deg_to_rad(cam->fov) / 2.f);
 }
 
 void parsing(int ac, char *filename)
@@ -65,17 +66,17 @@ void parsing(int ac, char *filename)
     int fd;
     char *line;
     t_core  *engine;
-    void *d;
+    t_world *w;
+    t_camera    *cam;
 
     engine = getengine();
-    
     engine->w = galloc(sizeof(t_world));
-    d = mlx_init();
-    engine->m.win = mlx_new_window(d, SCREEN_WIDTH, SCREEN_HEIGHT, "Hello world!");
-	engine->img.img = mlx_new_image(d, SCREEN_WIDTH, SCREEN_HEIGHT);
+    w = engine->w;
+    engine->m.mlx = mlx_init();
+    engine->m.win = mlx_new_window(engine->m.mlx, SCREEN_WIDTH, SCREEN_HEIGHT, "Hello world!");
+	engine->img.img = mlx_new_image(engine->m.mlx, SCREEN_WIDTH, SCREEN_HEIGHT);
 	engine->img.addr = mlx_get_data_addr(engine->img.img, &engine->img.bits_per_pixel, &engine->img.line_length,
 								&engine->img.endian);
-    engine->m.mlx = d;
     if (ac != 2)
         pexit(YELLOW USAGE_WARN, 1);
     fd = check_file(filename);
@@ -83,6 +84,5 @@ void parsing(int ac, char *filename)
         pexit(filename, 2);
     readfile(fd, filename);
 	setup_cam_dir(engine->w->cam);
-
     close(fd);
 }

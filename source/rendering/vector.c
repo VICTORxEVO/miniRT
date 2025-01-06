@@ -52,6 +52,16 @@ inline t_vector scale_vector(t_vector v, float scale)
     return scaled;
 }
 
+inline t_vector mul_vectors(t_vector v1, t_vector v2)
+{
+    t_vector scaled;
+
+    scaled.x = v1.x * v2.x;
+    scaled.y = v1.y * v2.y;
+    scaled.z = v1.z * v2.z;
+    return scaled;
+}
+
 inline t_vector shrink_vector(t_vector v, float shrink)
 {
     t_vector shrinked;
@@ -137,4 +147,24 @@ inline float rad_to_rad(float rad)
     return (rad * 180 / M_PI);
     // deg -> 180
     // rad -> PIE
+}
+
+inline t_point v_to_p(t_vector v)
+{
+	t_point p;
+
+	p.x = v.x;
+	p.y = v.y;
+	p.z = v.z;
+	return p;
+}
+
+inline t_vector p_to_v(t_point p)
+{
+	t_vector v;
+
+	v.x = p.x;
+	v.y = p.y;
+	v.z = p.z;
+	return v;
 }
