@@ -8,6 +8,36 @@ void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
 	*(unsigned int*)dst = color;
 }
 
+float get_intersect_dist(t_world *w, t_ray *ray)
+{
+	t_object	*node;
+	t_sphere	*sphere;
+	t_plane		*plane;
+	float smallest_t;
+	float t;
+	node = w->objects;
+	smallest_t = __FLT_MAX__;
+	while (node)
+	{
+		if (node->type == SP_OBJ)
+		{
+			sphere = (t_sphere *)(node->data);
+			t = sp_intersect(sphere, ray);
+			if (t < smallest_t && t >= 0)
+				smallest_t = t;
+ 		}
+		else if (node->type == PL_OBJ)
+		{
+			plane = (t_plane *)(node->data);
+			t = pl_intersect(plane, ray);
+			if (t < smallest_t && t >= 0)
+				smallest_t = t;
+		}
+		node = node->next;
+	}
+	return smallest_t;
+}
+
 inline t_vector	reflect (t_vector	light, t_vector	norm)
 {
 	return sub_vectors(light, scale_vector(norm, 2 * dot(norm, light))); 
@@ -39,7 +69,7 @@ t_color	sp_light(t_sphere	*hit_sph, t_ray	*cam_ray, float smallest_t)
 	sph_norm_vec = normal(sub_points(inter_point, hit_sph->origin));
 	pt_light_vec = normal(sub_points(light->p, inter_point));
 	pt_cam_vec = normal(sub_points(cam_ray->origin ,inter_point));
-	light_dot_norm = dot(sph_norm_vec, pt_light_vec); // correct
+	light_dot_norm = dot(sph_norm_vec, pt_light_vec);
 	if (light_dot_norm >= 0)
 		diffuse_color = (scale_color(hit_sph->c, light_dot_norm));
 	light_ref = reflect(neg_vector(pt_light_vec), sph_norm_vec);
@@ -69,22 +99,34 @@ t_color	pl_light(t_plane	*hit_pl, t_ray	*cam_ray, float smallest_t)
 	return (scale_color(hit_pl->c, light_dot_norm));
 }
 
+bool	is_shadowed(t_world	*w, t_ray	*ray, float distance_t)
+{
+	return false;
+}
+
 t_color	lighting(t_world *w, t_ray *cam_ray, t_object *hit_obj, float smallest_t)
 {
-	t_color	color;
-	t_plane	*hit_pl;
-	t_light		*light;
-	t_ambient	*ambient;
+	t_point	inters_point;
+	t_point	light_pos;
 	t_vector	pt_light_vec;
-	float light_dot_norm;
-	float refl_dot_cam;
-	t_vector	sph_norm_vec;
-	t_vector	pt_cam_vec;
-	t_vector	light_ref;
-	t_point inter_point;
-	light = w->lights->data;
-	ambient = w->ambient;
+	float		pt_to_light_dist;
+	t_color	color;
+	t_ray	pt_light_ray;
+	float	reverse_inter_dis;
+
 	color = zero_color();
+	light_pos = ((t_light *)w->lights->data)->p;
+	inters_point = position_at(cam_ray, smallest_t);
+	pt_light_vec = sub_points(light_pos, inters_point);
+	pt_to_light_dist = get_len_vector(pt_light_vec);
+	pt_light_ray.origin = inters_point;
+	pt_light_ray.direction = normal(pt_light_vec);
+	reverse_inter_dis = get_intersect_dist(w, &pt_light_ray);
+	if (reverse_inter_dis < smallest_t && reverse_inter_dis > 0)
+	{
+		if (hit_obj->type == PL_OBJ)
+			return ((t_color) {20, 20, 20}); // sky
+	}
 	if (!hit_obj)
 		return ((t_color) {20, 20, 20}); // sky
 	if (hit_obj->type == PL_OBJ)
@@ -170,15 +212,9 @@ t_color intersect_world(t_world *w, t_ray *cam_ray)
 	t_object	*hit_obj;
 	float smallest_t;
 	float t;
-	t_vector	sph_norm_vec;
-	t_vector	pt_cam_vec;
-	t_vector	light_ref;
-	t_point inter_point;
 	hit_obj = NULL;
 	node = w->objects;
 	smallest_t = __FLT_MAX__;
-	int type;
-	type = node->type;
 	while (node)
 	{
 		if (node->type == SP_OBJ)
@@ -212,22 +248,33 @@ int input(int key, void *d)
 	t_core *engine;
 
 	engine = getengine();
+	// move first light
+	if (key == XK_Right)
+	{
+		((t_light *)engine->w->lights->data)->p.x -= 2;
+		rendering();
+	}
+	if (key == XK_Left)
+	{
+		((t_light *)engine->w->lights->data)->p.x += 2;
+		rendering();
+	}
+	if (key == XK_Up)
+	{
+		((t_light *)engine->w->lights->data)->p.y += 2;
+		rendering();
+	}
+	if (key == XK_Down)
+	{
+		((t_light *)engine->w->lights->data)->p.y -= 2;
+		rendering();
+	}
 	if (key == XK_Escape)
 	{
 		clear();
 		exit(0);
 	}
-	if (key == XK_Up)
-	{
-		engine->w->cam->origin.y+=0.1;
-		rendering();
-	}
-
-	if (key == XK_Down)
-	{
-		engine->w->cam->origin.y-=0.1;
-		rendering();
-	}
+	
 	return 1;
 }
 

@@ -153,12 +153,20 @@ int		check_file(char *filename);
 
 
 /*     >>>>>Rendering Funtions Section<<<<<     */
+void	my_mlx_pixel_put(t_img *img, int x, int y, int color);
+float get_intersect_dist(t_world *w, t_ray *ray);
+inline t_vector	reflect (t_vector	light, t_vector	norm);
+t_color	sp_light(t_sphere	*hit_sph, t_ray	*cam_ray, float smallest_t);
+t_color	pl_light(t_plane	*hit_pl, t_ray	*cam_ray, float smallest_t);
+bool	is_shadowed(t_world	*w, t_ray	*ray, float distance_t);
+t_color	lighting(t_world *w, t_ray *cam_ray, t_object *hit_obj, float smallest_t);
+t_vector	generate_cam_dir(t_camera	*cam, float scale, float ndcx, float ndcy);
+float sp_intersect(t_sphere *s, t_ray *ray);
+float pl_intersect(t_plane *pl, t_ray *ray);
+t_color intersect_world(t_world *w, t_ray *cam_ray);
+int input(int key, void *d);
 void    rendering(void);
 
-int input(int key, void *d);
-
-
-t_vector normal(t_vector v);
 
 
 
