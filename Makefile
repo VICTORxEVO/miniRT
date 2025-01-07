@@ -1,12 +1,22 @@
 #program name
 NAME = miniRT
 
+# Optimization flags
+OPT_FLAGS := -O3 -march=native -ffast-math \
+             -ftree-vectorize -fopt-info-vec \
+             -funroll-loops -flto \
+             -fno-signed-zeros \
+
+# SIMD specific flags (advanced cpu instructions)
+SIMD_FLAGS := -msse4.2 -mavx2 -mfma
+
 
 #cc compiler with all flags
-CCF = cc -Wall # -Wextra # -Werror 
+CCF = cc -Wall $(OPT_FLAGS) $(SIMD_FLAGS) # -Wextra # -Werror 
 EXTRA_LIBS = -lm
 MLX_FLG = -L ./mlx  -l mlx_Linux -l Xext -l X11 -l m -l z -O3
 USER_FLG = -D USER=\"$(USER)\"
+
 
 # Directories
 SRC_DIR := source
@@ -61,3 +71,9 @@ bclear: all clean
 
 norm :
 		@norminette $(SRC) includes/
+
+run : clear
+		@./miniRT maps/map.rt
+
+rrun : clear
+		@./miniRT maps/real.rt
