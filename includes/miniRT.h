@@ -208,8 +208,8 @@ t_color neg_color(t_color c1);
 t_color zero_color();
 t_color scale_color(t_color v, float scale);
 void print_color(t_color c, bool newline);
-t_color sum_colors(t_color amb, t_color dif, t_color   spc);
-
+t_color sum_phong(t_color amb, t_color dif, t_color   spc);
+t_color  decrease_color(t_color  c, unsigned amount);
 
 
 

@@ -40,7 +40,7 @@ inline t_color clamp_color(t_color c1)
     return res_color;
 }
 
-inline t_color sub_phong(t_color c1, t_color c2)
+inline t_color sub_color(t_color c1, t_color c2)
 {
     t_color res_color;
 

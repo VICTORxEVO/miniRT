@@ -29,13 +29,24 @@ void print_color(t_color c, bool newline)
 		printf("\n");
 }
 
-inline t_color sum_colors(t_color amb, t_color dif, t_color   spc)
+inline t_color sum_phong(t_color amb, t_color dif, t_color   spc)
 {
     t_color res;
     res.r = amb.r + dif.r + spc.r;
     res.g = amb.g + dif.g + spc.g;
     res.b = amb.b + dif.b + spc.b;
-    clamp_color(res);
+    res = clamp_color(res);
+    return res;
+}
+
+inline t_color  decrease_color(t_color  c, unsigned amount)
+{
+    t_color res;
+
+    res.r = c.r - amount;
+    res.g = c.g - amount;
+    res.b = c.b - amount;
+
     return res;
 }
 

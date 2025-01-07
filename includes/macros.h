@@ -33,8 +33,8 @@
 
 
 
-#define SCREEN_WIDTH 1920.f
-#define SCREEN_HEIGHT 1010.f
+#define SCREEN_WIDTH 520.f
+#define SCREEN_HEIGHT 310.f
 
 
 // Regular text colors
