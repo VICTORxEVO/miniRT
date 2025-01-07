@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 13:40:27 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/05 11:12:01 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/01/07 20:39:52 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@
 
 
 
-#define SCREEN_WIDTH 520.f
-#define SCREEN_HEIGHT 310.f
+#define SCREEN_WIDTH 1920.f
+#define SCREEN_HEIGHT 1080.f
 
 
 // Regular text colors
