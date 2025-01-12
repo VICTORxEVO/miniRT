@@ -5,14 +5,22 @@ t_vector get_obj_norm(t_object	*o, t_point	pt_on_sphere)
 	t_sphere *s;
 
 	if (o->type == PL_OBJ)
-		return (((t_plane *)o)->normal);
+		return (((t_plane *)o->data)->normal);
 	else if (o->type == SP_OBJ)
 	{
 		s = (t_sphere *)o->data;
 		return (sub_points(pt_on_sphere, s->origin));
 	}
 	return (t_vector) {0,0,0};
-}	
+}
+
+t_color	get_obj_color(t_object *o)
+{
+	if (o->type == SP_OBJ)
+		return ((t_sphere *)o->data)->c;
+	else
+		return ((t_plane *)o->data)->c;
+}
 
 void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
 {
@@ -52,12 +60,13 @@ float get_intersect_dist(t_world *w, t_ray *ray)
 	return smallest_t;
 }
 
-inline t_vector	reflect (t_vector	light, t_vector	norm)
+inline t_vector	reflect (t_vector	light, t_vector	norm) // light is a vector from a point towards the light
 {
 	return sub_vectors(light, scale_vector(norm, 2 * dot(norm, light))); 
 }
 
-t_color	sp_light(t_sphere	*hit_sph, t_ray	*cam_ray, float smallest_t)
+
+t_color	obj_light(t_object	*hit_obj, t_ray	*cam_ray, float smallest_t)
 {
 	t_color	color;
 	t_color	speclar_color;
@@ -65,11 +74,12 @@ t_color	sp_light(t_sphere	*hit_sph, t_ray	*cam_ray, float smallest_t)
 	t_color	ambient_color;
 	t_light		*light;
 	t_ambient	*ambient;
-	t_vector	pt_light_vec;
 	float light_dot_norm;
+	float cam_ray_surf_norm_dot;
 	float refl_dot_cam;
-	t_vector	sph_norm_vec;
-	t_vector	pt_cam_vec;
+	t_vector	pt_cam_vec;   // ray from camera to a point
+	t_vector	pl_norm; // ray from sphere origin to a point
+	t_vector	pt_light_vec; // ray from point to light
 	t_vector	light_ref;
 	t_point inter_point;
 	light = getengine()->w->lights->data;
@@ -79,55 +89,91 @@ t_color	sp_light(t_sphere	*hit_sph, t_ray	*cam_ray, float smallest_t)
 	diffuse_color = zero_color();
 	ambient_color = zero_color();
 	inter_point = position_at(cam_ray, smallest_t);
-	ambient_color = scale_color(ambient->c, ambient->ratio * 0.2);
-	sph_norm_vec = normal(sub_points(inter_point, hit_sph->origin));
-	pt_light_vec = normal(sub_points(light->p, inter_point));
-	pt_cam_vec = normal(sub_points(inter_point, cam_ray->origin));
-	light_dot_norm = dot(sph_norm_vec, pt_light_vec);
+	ambient_color = scale_color(ambient->c, ambient->ratio * 0.2); // should this be a unified color or just a color to add to my objects's colors
+	pt_cam_vec = normal(sub_points(inter_point, cam_ray->origin)); 
+	pl_norm = hit_obj->get_norm(hit_obj, inter_point);
+	cam_ray_surf_norm_dot = dot(pt_cam_vec, pl_norm);
+	if (cam_ray_surf_norm_dot >= 0)
+		pl_norm = neg_vector(pl_norm);
+	pt_light_vec = normal(sub_points(light->p, inter_point)); // ray from point to light
+	light_dot_norm = dot(pl_norm, pt_light_vec);
 	if (light_dot_norm >= 0)
 	{
-		diffuse_color = scale_color(hit_sph->c, light_dot_norm * light->brightness);
-		light_ref = reflect(neg_vector(pt_light_vec), sph_norm_vec);
+		diffuse_color = scale_color(hit_obj->get_color(hit_obj), light_dot_norm * light->brightness);
+		light_ref = reflect(pt_light_vec, pl_norm);
         refl_dot_cam = dot(normal(light_ref), pt_cam_vec);
         if (refl_dot_cam > 0 && light->brightness > 0)
 			speclar_color = scale_color(scale_color(light->c, light->brightness), powf(refl_dot_cam, light->brightness * 100));
     }
-	
 	color = clamp_color(sum_colors(speclar_color ,diffuse_color, ambient_color));
 	return color;
 }
 
-t_color	pl_light(t_plane	*hit_pl, t_ray	*cam_ray, float smallest_t)
+bool is_shadowed(t_world *w, t_point p)
 {
-	t_vector	pt_vec;
-	t_vector	light_vec;
-	t_vector	light_ref;
-	t_point	intersec_ptr;
-	t_light	*light;
-	float	light_dot_norm;
-	t_ambient	*ambient;
-
-	ambient = getengine()->w->ambient;
-	light = getengine()->w->lights->data;
-	intersec_ptr = position_at(cam_ray, smallest_t);
-	light_vec = normal(sub_points(light->p, intersec_ptr)); // from point to light 
-	pt_vec = normal(sub_points(hit_pl->origin, intersec_ptr));
-	light_dot_norm = dot(hit_pl->normal, light_vec);
-	light_ref = reflect(neg_vector(light_vec), hit_pl->normal);
-
-	return (scale_color(hit_pl->c, light_dot_norm));
+	t_camera *cam;
+	t_light *light;
+	t_ray pt_to_light_ray;
+	t_vector offset;
+	float inter_dist;
+	float pt_to_light_dist;
+	cam = w->cam;
+	light = w->lights->data;
+	offset = scale_vector(normal(sub_points(light->p, p)), EPSILON);
+	pt_to_light_ray.origin = add_points(p, v_to_p(offset));
+	pt_to_light_ray.direction = normal(sub_points(light->p, p));
+	pt_to_light_dist = get_len_vector(sub_points(light->p, p));
+	inter_dist = get_intersect_dist(w, &pt_to_light_ray);
+	if (inter_dist > EPSILON && inter_dist < pt_to_light_dist)
+		return true;
+	return false;
 }
 
-t_color	lighting(t_world *w, t_ray *cam_ray, t_object *hit_obj, float smallest_t)
+t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t)
 {
 	if (!hit_obj)
-		return ((t_color) {20, 20, 20});
-	if (hit_obj->type == PL_OBJ)
-		return (pl_light(hit_obj->data, cam_ray, smallest_t));
-	if (hit_obj->type == SP_OBJ)
-		return (sp_light(hit_obj->data, cam_ray, smallest_t));
-	return ((t_color) {20, 20, 20});
-
+		return ((t_color) {40, 20, 20});
+	t_color	color;
+	t_color	speclar_color;
+	t_color	diffuse_color;
+	t_color	ambient_color;
+	t_light		*light;
+	t_ambient	*ambient;
+	float light_dot_norm;
+	float cam_ray_surf_norm_dot;
+	float refl_dot_cam;
+	t_vector	pt_cam_vec;   // ray from camera to a point
+	t_vector	pl_norm; // ray from sphere origin to a point
+	t_vector	pt_light_vec; // ray from point to light
+	t_vector	light_ref;
+	t_point inter_point;
+	light = getengine()->w->lights->data;
+	ambient = getengine()->w->ambient;
+	color = zero_color();
+	speclar_color = zero_color();
+	diffuse_color = zero_color();
+	ambient_color = zero_color();
+	ambient_color = scale_color(mul_colors(ambient->c, hit_obj->get_color(hit_obj)), ambient->ratio * 0.1); // should this be a unified color or just a color to add to my objects's colors
+	inter_point = position_at(cam_ray, smallest_t);
+	if (is_shadowed(getengine()->w, inter_point))
+		return ambient_color;
+	pt_cam_vec = normal(sub_points(inter_point, cam_ray->origin)); 
+	pl_norm = hit_obj->get_norm(hit_obj, inter_point);
+	cam_ray_surf_norm_dot = dot(pt_cam_vec, pl_norm);
+	if (cam_ray_surf_norm_dot >= 0)
+		pl_norm = neg_vector(pl_norm);
+	pt_light_vec = normal(sub_points(light->p, inter_point)); // ray from point to light
+	light_dot_norm = dot(pl_norm, pt_light_vec);
+	if (light_dot_norm >= 0)
+	{
+		diffuse_color = scale_color(hit_obj->get_color(hit_obj), light_dot_norm * light->brightness);
+		light_ref = reflect(pt_light_vec, pl_norm);
+        refl_dot_cam = dot(normal(light_ref), pt_cam_vec);
+        if (refl_dot_cam > 0 && light->brightness > 0)
+			speclar_color = scale_color(scale_color(light->c, light->brightness), powf(refl_dot_cam, light->brightness * 100));
+    }
+	color = clamp_color(sum_colors(speclar_color ,diffuse_color, ambient_color));
+	return color;
 }
 
 float sp_intersect(t_sphere *s, t_ray *ray)
@@ -149,7 +195,7 @@ float sp_intersect(t_sphere *s, t_ray *ray)
 		return -1;
     t1 = (-b - sqrtf(d)) / (2.0f * a);
     t2 = (-b + sqrtf(d)) / (2.0f * a);
-    return (maxf(t1, t2));
+	return minf(t1, t2);
 }
 
 float pl_intersect(t_plane *pl, t_ray *ray)
@@ -168,9 +214,11 @@ float pl_intersect(t_plane *pl, t_ray *ray)
 	d = ray->direction;
 	p0_o = sub_points(p0, o);
 	d_dot_n = dot(d, n);
-	if (d_dot_n == 0)
+	if (fabs(d_dot_n) < EPSILON)
 		return -1; // no intersection   divide by zero
 	t = dot(p0_o, n) / d_dot_n;
+	if (t < EPSILON)
+		return -1;
 	return t;
 }
 
@@ -188,7 +236,7 @@ t_color intersect_world(t_world *w, t_ray *cam_ray)
 		if (node->type == SP_OBJ)
 		{
 			t = sp_intersect(node->data, cam_ray);
-			if (t < smallest_t && t >= 0)
+			if (t <= smallest_t && t > 0)
 			{
 				hit_obj = node;
 				smallest_t = t;
@@ -197,7 +245,7 @@ t_color intersect_world(t_world *w, t_ray *cam_ray)
 		else if (node->type == PL_OBJ)
 		{
 			t = pl_intersect(node->data, cam_ray);
-			if (t < smallest_t && t >= 0)
+			if (t <= smallest_t && t > 0)
 			{
 				hit_obj = node;
 				smallest_t = t;
@@ -205,10 +253,8 @@ t_color intersect_world(t_world *w, t_ray *cam_ray)
 		}
 		node = node->next;
 	}
-	return lighting(w, cam_ray, hit_obj, smallest_t);
+	return lighting(cam_ray, hit_obj, smallest_t);
 }
-
-
 
 void    rendering(void)
 {

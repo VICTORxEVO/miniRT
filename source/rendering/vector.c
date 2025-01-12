@@ -178,7 +178,7 @@ float maxf(float a, float b)
 
 float minf(float a, float b)
 {
-    if (a > b)
+    if (a < b)
         return (a);
     return (b);
 }

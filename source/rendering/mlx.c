@@ -4,22 +4,22 @@ int key_press(int key, t_core *engine)
 {
     if (key == XK_RIGHT_CTRL)
         engine->m.ctrl_pressed = true;
-    if (key == XK_Right && engine->m.ctrl_pressed)
+    if (key == XK_Right  /* && engine->m.ctrl_pressed */)
     {
         ((t_light *)engine->w->lights->data)->p.x -= 2;
         rendering();
     }
-    if (key == XK_Left && engine->m.ctrl_pressed)
+    if (key == XK_Left  /* && engine->m.ctrl_pressed */)
     {
         ((t_light *)engine->w->lights->data)->p.x += 2;
         rendering();
     }
-    if (key == XK_Up && engine->m.ctrl_pressed)
+    if (key == XK_Up  /* && engine->m.ctrl_pressed */)
     {
         ((t_light *)engine->w->lights->data)->p.y += 2;
         rendering();
     }
-    if (key == XK_Down && engine->m.ctrl_pressed)
+    if (key == XK_Down  /* && engine->m.ctrl_pressed */)
     {
         ((t_light *)engine->w->lights->data)->p.y -= 2;
         rendering();
@@ -36,7 +36,8 @@ int key_release(int keycode, t_core *engine)
 {
     if (keycode == XK_RIGHT_CTRL)
     {
-        engine->m.ctrl_pressed = false;
+        // engine->m.ctrl_pressed = true;
+        engine->m.ctrl_pressed = true;
         printf("release\n");
     }
     return (0);

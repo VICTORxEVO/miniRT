@@ -17,7 +17,7 @@
 #define PL_OBJ 1
 #define CY_OBJ 2
 
-#define EPSILON 0.0000001f
+#define EPSILON 0.0001f
 
 /** Program name displayed in error messages */
 # define PRGM_NAME "miniRT"

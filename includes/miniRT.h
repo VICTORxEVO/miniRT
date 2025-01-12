@@ -15,11 +15,20 @@ typedef struct s_node
 	char	type;
 } t_node;
 
+typedef struct s_color
+{
+	int	r;
+	int	g;
+	int	b;
+}	t_color;
+
 typedef struct s_object
 {
     void *data;
     struct s_object *next;
 	char	type;
+	t_vector (*get_norm ) (struct s_object *o, t_point pt_on_sp);
+	t_color	(*get_color) (struct s_object *o); 
 } t_object;
 
 
@@ -40,13 +49,6 @@ enum e_types
 	e_plain = 4,
 	e_cylinder = 6,
 };
-
-typedef struct s_color
-{
-	int	r;
-	int	g;
-	int	b;
-}	t_color;
 
 /* pixel color -> ambient, diffuse, specular */
 typedef struct s_px_color
@@ -167,10 +169,12 @@ int		check_file(char *filename);
 void	my_mlx_pixel_put(t_img *img, int x, int y, int color);
 float get_intersect_dist(t_world *w, t_ray *ray);
 inline t_vector	reflect (t_vector	light, t_vector	norm);
-t_color	sp_light(t_sphere	*hit_sph, t_ray	*cam_ray, float smallest_t);
-t_color	pl_light(t_plane	*hit_pl, t_ray	*cam_ray, float smallest_t);
-bool	is_shadowed(t_world	*w, t_ray	*ray, float distance_t);
-t_color	lighting(t_world *w, t_ray *cam_ray, t_object *hit_obj, float smallest_t);
+// t_color	sp_light(t_sphere	*hit_sph, t_ray	*cam_ray, float smallest_t);
+t_color	sp_light(t_object	*hit_sph, t_ray	*cam_ray, float smallest_t);
+// t_color	pl_light(t_plane	*hit_pl, t_ray	*cam_ray, float smallest_t);
+t_color	pl_light(t_object	*hit_obj, t_ray	*cam_ray, float smallest_t);
+bool is_shadowed(t_world *w, t_point p);
+t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t);
 t_vector	generate_cam_dir(t_camera	*cam, float scale, float ndcx, float ndcy);
 float sp_intersect(t_sphere *s, t_ray *ray);
 float pl_intersect(t_plane *pl, t_ray *ray);
@@ -229,7 +233,6 @@ t_color sum_colors(t_color amb, t_color dif, t_color   spc);
 
 
 
-
 /*     >>>>>Utils funtions section<<<<<     */
 bool	is_wspace(char *s);
 char	*err_msg(const char *filename, const int n_line);
@@ -263,6 +266,7 @@ t_vector normal_at(t_sphere s, t_point p);
 float deg_to_rad(float deg);
 float rad_to_rad(float rad);
 t_vector get_obj_norm(t_object	*o, t_point	pt_on_sphere);
+t_color get_obj_color(t_object *o);
 void	my_mlx_pixel_put(t_img *data, int x, int y, int color);
 
 
