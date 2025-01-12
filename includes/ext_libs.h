@@ -44,6 +44,11 @@
 # include <math.h>
 # include "math_libs.h"
 # include "get_next_line.h"
+#include <X11/X.h>
+#include <X11/keysym.h>
+#include <X11/XKBlib.h>
+
+
 
 typedef unsigned char	t_uc;
 	// just a macro that i used in libft to avoid long line on norminette ;)

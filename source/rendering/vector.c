@@ -11,6 +11,17 @@ inline t_vector add_vectors(t_vector v1, t_vector v2)
     return res_v;
 }
 
+inline t_point add_points(t_point v1, t_point v2)
+{
+    t_point res_v;
+
+    res_v.x = v1.x + v2.x;
+    res_v.y = v1.y + v2.y;
+    res_v.z = v1.z + v2.z;
+
+    return res_v;
+}
+
 inline t_vector sub_vectors(t_vector v1, t_vector v2)
 {
     t_vector res_v;
@@ -125,6 +136,25 @@ inline t_vector cross(t_vector v1, t_vector v2)
     res.z = v1.x * v2.y - v1.y * v2.x;
     return res;
 }
+t_vector p_to_v(t_point p)
+{
+    t_vector v;
+
+    v.x = p.x;
+    v.y = p.y;
+    v.z = p.z;
+    return v;
+}
+
+t_point v_to_p(t_vector v)
+{
+    t_point p;
+
+    p.x = v.x;
+    p.y = v.y;
+    p.z = v.z;
+    return p;
+}
 inline float deg_to_rad(float deg)
 {
     return (deg * M_PI / 180);
@@ -137,4 +167,32 @@ inline float rad_to_rad(float rad)
     return (rad * 180 / M_PI);
     // deg -> 180
     // rad -> PIE
+}
+
+float maxf(float a, float b)
+{
+    if (a > b)
+        return (a);
+    return (b);
+}
+
+float minf(float a, float b)
+{
+    if (a > b)
+        return (a);
+    return (b);
+}
+
+float maxi(float a, float b)
+{
+    if (a > b)
+        return (a);
+    return (b);
+}
+
+float mini(float a, float b)
+{
+    if (a > b)
+        return (a);
+    return (b);
 }

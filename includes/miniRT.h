@@ -3,6 +3,8 @@
 
 #include "gc.h"
 
+#define KEY_PRESS 2
+#define KEY_RELEASE 3
 
 
 
@@ -25,6 +27,7 @@ typedef struct s_mlx
 {
 	void *mlx;
 	void *win;
+	bool	ctrl_pressed;
 }  t_mlx;
 
 enum e_types
@@ -44,6 +47,15 @@ typedef struct s_color
 	int	g;
 	int	b;
 }	t_color;
+
+/* pixel color -> ambient, diffuse, specular */
+typedef struct s_px_color
+{
+	t_color a;
+	t_color d;
+	t_color s;
+} 
+t_px_color ;
 
 typedef struct s_ambient
 {
@@ -106,12 +118,11 @@ typedef struct s_cylinder
 	t_color		c;
 } t_cylinder;
 
-
-typedef struct s_pars
+typedef struct s_intersect
 {
-	bool	camera_exist;
-	bool	ambient_exist;
-} t_pars;
+	float t;
+	t_object	*obj;
+}	t_intersect;
 
 typedef struct s_img
 {
@@ -129,6 +140,8 @@ typedef struct s_core
 	t_gc	*gc;
 	t_img	img;
 } t_core;
+
+
 
 /**
  * @brief Returns global raytracing engine instance
@@ -183,6 +196,11 @@ int remove_obj(t_core *d, t_object **head, void *data);
 
 
 
+float maxf(float a, float b);
+float minf(float a, float b);
+float maxi(float a, float b);
+float mini(float a, float b);
+
 /*
 	shapes handling 
 */
@@ -216,6 +234,10 @@ t_color sum_colors(t_color amb, t_color dif, t_color   spc);
 bool	is_wspace(char *s);
 char	*err_msg(const char *filename, const int n_line);
 
+int key_press(int keycode, t_core *engine);
+int key_release(int keycode, t_core *engine);
+void init_hooks(t_core *engine);
+int input(int key, void *d);
 
 
 
@@ -225,6 +247,9 @@ t_vector add_vectors(t_vector v1, t_vector v2);
 t_vector sub_vectors(t_vector v1, t_vector v2);
 t_vector sub_points(t_point p1, t_point p2);
 t_vector neg_vector(t_vector v1);
+t_point add_points(t_point v1, t_point v2);
+t_vector p_to_v(t_point p);
+t_point v_to_p(t_vector v);
 t_vector scale_vector(t_vector v, float scale);
 t_vector shrink_vector(t_vector v, float shrink);
 float get_len_vector(t_vector v1);
@@ -237,8 +262,7 @@ t_vector cross(t_vector v1, t_vector v2);
 t_vector normal_at(t_sphere s, t_point p);
 float deg_to_rad(float deg);
 float rad_to_rad(float rad);
-
-
+t_vector get_obj_norm(t_object	*o, t_point	pt_on_sphere);
 void	my_mlx_pixel_put(t_img *data, int x, int y, int color);
 
 

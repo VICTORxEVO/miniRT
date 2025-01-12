@@ -33,9 +33,18 @@
 
 
 
-#define SCREEN_WIDTH 1920.f
-#define SCREEN_HEIGHT 1010.f
+#ifdef LINUX
+    #define SCREEN_WIDTH 1920.f
+    #define SCREEN_HEIGHT 1010.f
+#endif
 
+#ifndef LINUX
+    #define SCREEN_WIDTH 600.f
+    #define SCREEN_HEIGHT 400.f
+#endif
+
+#define XK_RIGHT_CTRL 65508
+#define XK_LEFT_CTRL 65507
 
 // Regular text colors
 # define BLACK "\033[0;30m"

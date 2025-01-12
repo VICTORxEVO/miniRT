@@ -18,6 +18,7 @@ bool    starts_with(char    *s, char    *start)
     int j;
 
     i = 0;
+    j = 0;
     while (s[i] && start[i] && start[i] == s[i])
     {
         if (s[i] != start[j])
@@ -76,6 +77,7 @@ void parsing(int ac, char *filename)
 	engine->img.addr = mlx_get_data_addr(engine->img.img, &engine->img.bits_per_pixel, &engine->img.line_length,
 								&engine->img.endian);
     engine->m.mlx = d;
+    engine->m.ctrl_pressed = false;
     if (ac != 2)
         pexit(YELLOW USAGE_WARN, 1);
     fd = check_file(filename);
