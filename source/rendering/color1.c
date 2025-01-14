@@ -16,6 +16,16 @@ inline t_color add_colors(t_color c1, t_color c2)
     return clamp_color(res_color);
 }
 
+inline t_color increment_color(t_color c1, int amount)
+{
+    t_color res_color;
+
+    res_color.r = c1.r + amount;
+    res_color.g = c1.g + amount;
+    res_color.b = c1.b + amount;
+    return clamp_color(res_color);
+}
+
 inline t_color clamp_color(t_color c1)
 {
     t_color res_color;
@@ -58,4 +68,9 @@ inline t_color mul_colors(t_color c1, t_color c2)
     res_color.g = c1.g * c2.g;
     res_color.b = c1.b * c2.b;
     return clamp_color(res_color);
+}
+
+inline t_color rgb_to_gray(t_color c) {
+    int gray = (0.299 * c.r + 0.587 * c.g + 0.114 * c.b);
+    return ((t_color) {gray, gray, gray});
 }

@@ -93,6 +93,7 @@ typedef struct s_world
 	t_ambient	*ambient;
 	t_camera 	*cam;
 	t_object	*objects;
+	bool		gray_on;
 } t_world;
 
 
@@ -141,6 +142,8 @@ typedef struct s_core
 	t_world *w;
 	t_gc	*gc;
 	t_img	img;
+	bool	cmd_on; // maybe add a command line to handle adding spheres and light ... ?
+	int		iter; // if 1 it iterates throught each pixel, as big as it gets, the quality goes down
 } t_core;
 
 
@@ -225,11 +228,54 @@ t_color add_colors(t_color c1, t_color c2);
 t_color clamp_color(t_color c1);
 t_color sub_colors(t_color c1, t_color c2);
 t_color mul_colors(t_color c1, t_color c2);
+t_color increment_color(t_color c1, int amount);
 t_color neg_color(t_color c1);
 t_color zero_color();
 t_color scale_color(t_color v, float scale);
 void print_color(t_color c, bool newline);
 t_color sum_colors(t_color amb, t_color dif, t_color   spc);
+t_color rgb_to_gray(t_color c);
+
+
+
+/* matrices */
+float **create_matrix_2x2(float a, float b, float c, float d);
+float **create_matrix_3x3(float a, float b, float c, float l, float m, float n, float x, float y, float z);
+float **create_matrix_4x4(float a, float b, float c, float d, 
+    float e, float f, float g, float h,
+    float i, float j, float k, float l,
+    float m, float n, float o, float q);
+void init_matrix_n(float **matrix, int n);
+void print_matrix_n(float **matrix, int n);
+void print_matrix_row_col(float **matrix, int row, int col);
+float **submatrix(float **matrix, int row, int col, int n);
+float  **get_new_matrix_n(int n);
+float  **get_new_matrix_row_col(int row, int col);
+float **mul_matrix_n(float **m1, float **m2, int n);
+float **mul_matrix_row_col(float **m1, float **m2, int row1, int col2);
+float **get_transposed(float **m, int n);
+void transpose(float **m, int n);
+float get_determinant_2(float **m);
+float get_determinant_n(float **m, int n);
+float **get_identity_matrix_n(int n);
+float get_minor_n(float **matrix, int row, int col, int n);
+float get_cofactor_n(float **matrix, int row, int col, int n);
+float **get_inverted_n(float **matrix, int n);
+float **get_4_1_matrix(float x, float y, float z, float w);
+float **from_n_to_4_1_matrix(float **matrix_n);
+float **from_4_1_to_n_matrix(float **matrix_4_1);
+float **get_translation_matrix(float x, float y, float z);
+float **get_scaling_matrix(float x, float y, float z, float w);
+float deg_to_rad(float deg);
+float rad_to_deg(float rad);
+float **rotate_x(float rad);
+float **rotate_y(float rad);
+float **rotate_z(float rad);
+t_ray transform_ray(t_ray old_r, float **transformation_mx);
+float **get_orientation_view_matrix(t_vector left, t_vector true_up, t_vector forward);
+float **get_view_matrix(t_point from, t_point to, t_vector up);
+t_sphere transform_sphere(t_sphere s);
+t_point translate_mx_to_point(float **m);
 
 
 
@@ -241,8 +287,8 @@ int key_press(int keycode, t_core *engine);
 int key_release(int keycode, t_core *engine);
 void init_hooks(t_core *engine);
 int input(int key, void *d);
-
-
+void handle_input();
+int mouse_input(int key, int x, int y, void *d);
 
 int get_rgb(t_color color);
 t_vector	reflect (t_vector	light, t_vector	norm);

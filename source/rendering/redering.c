@@ -9,7 +9,7 @@ t_vector get_obj_norm(t_object	*o, t_point	pt_on_sphere)
 	else if (o->type == SP_OBJ)
 	{
 		s = (t_sphere *)o->data;
-		return (sub_points(pt_on_sphere, s->origin));
+		return (normal(sub_points(pt_on_sphere, s->origin)));
 	}
 	return (t_vector) {0,0,0};
 }
@@ -132,7 +132,7 @@ bool is_shadowed(t_world *w, t_point p)
 t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t)
 {
 	if (!hit_obj)
-		return ((t_color) {40, 20, 20});
+		return ((t_color) {10, 10, 10});
 	t_color	color;
 	t_color	speclar_color;
 	t_color	diffuse_color;
@@ -140,10 +140,11 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t)
 	t_light		*light;
 	t_ambient	*ambient;
 	float light_dot_norm;
+	t_color	obj_clr;
 	float cam_ray_surf_norm_dot;
 	float refl_dot_cam;
 	t_vector	pt_cam_vec;   // ray from camera to a point
-	t_vector	pl_norm; // ray from sphere origin to a point
+	t_vector	obj_norm; // ray from object origin to a point
 	t_vector	pt_light_vec; // ray from point to light
 	t_vector	light_ref;
 	t_point inter_point;
@@ -153,26 +154,31 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t)
 	speclar_color = zero_color();
 	diffuse_color = zero_color();
 	ambient_color = zero_color();
-	ambient_color = scale_color(mul_colors(ambient->c, hit_obj->get_color(hit_obj)), ambient->ratio * 0.1); // should this be a unified color or just a color to add to my objects's colors
+	obj_clr = hit_obj->get_color(hit_obj);
+	ambient_color = scale_color(mul_colors(ambient->c, obj_clr), ambient->ratio * 0.1); // should this be a unified color or just a color to add to my objects's colors
 	inter_point = position_at(cam_ray, smallest_t);
 	if (is_shadowed(getengine()->w, inter_point))
 		return ambient_color;
 	pt_cam_vec = normal(sub_points(inter_point, cam_ray->origin)); 
-	pl_norm = hit_obj->get_norm(hit_obj, inter_point);
-	cam_ray_surf_norm_dot = dot(pt_cam_vec, pl_norm);
+	obj_norm = hit_obj->get_norm(hit_obj, inter_point);
+	cam_ray_surf_norm_dot = dot(pt_cam_vec, obj_norm);
 	if (cam_ray_surf_norm_dot >= 0)
-		pl_norm = neg_vector(pl_norm);
+	{
+		obj_norm = neg_vector(obj_norm);
+	}	
 	pt_light_vec = normal(sub_points(light->p, inter_point)); // ray from point to light
-	light_dot_norm = dot(pl_norm, pt_light_vec);
+	light_dot_norm = dot(obj_norm, pt_light_vec);
 	if (light_dot_norm >= 0)
 	{
 		diffuse_color = scale_color(hit_obj->get_color(hit_obj), light_dot_norm * light->brightness);
-		light_ref = reflect(pt_light_vec, pl_norm);
+		light_ref = reflect(pt_light_vec, obj_norm);
         refl_dot_cam = dot(normal(light_ref), pt_cam_vec);
         if (refl_dot_cam > 0 && light->brightness > 0)
 			speclar_color = scale_color(scale_color(light->c, light->brightness), powf(refl_dot_cam, light->brightness * 100));
     }
 	color = clamp_color(sum_colors(speclar_color ,diffuse_color, ambient_color));
+	if (getengine()->w->gray_on)
+		return (rgb_to_gray(color));
 	return color;
 }
 
@@ -191,11 +197,14 @@ float sp_intersect(t_sphere *s, t_ray *ray)
     c = dot(oc, oc) - s->radius_squared;
 
     d = (b * b) - (4.0f * a * c);
-	if (d < 0 || (a == 0))
+	if (d < 0 || (a == 0.f))
 		return -1;
     t1 = (-b - sqrtf(d)) / (2.0f * a);
     t2 = (-b + sqrtf(d)) / (2.0f * a);
-	return minf(t1, t2);
+	if (t1 < t2 && t1 >= 0)
+		return t1;
+	return t2;
+
 }
 
 float pl_intersect(t_plane *pl, t_ray *ray)
@@ -214,6 +223,8 @@ float pl_intersect(t_plane *pl, t_ray *ray)
 	d = ray->direction;
 	p0_o = sub_points(p0, o);
 	d_dot_n = dot(d, n);
+	if ((fabs(dot(sub_points(ray->origin, p0), n))) - EPSILON < 0)
+		return 0;
 	if (fabs(d_dot_n) < EPSILON)
 		return -1; // no intersection   divide by zero
 	t = dot(p0_o, n) / d_dot_n;
@@ -245,7 +256,7 @@ t_color intersect_world(t_world *w, t_ray *cam_ray)
 		else if (node->type == PL_OBJ)
 		{
 			t = pl_intersect(node->data, cam_ray);
-			if (t <= smallest_t && t > 0)
+			if (t <= smallest_t && t >= 0)
 			{
 				hit_obj = node;
 				smallest_t = t;
@@ -269,6 +280,10 @@ void    rendering(void)
 	float ndc_x;
 	float ndc_y;
 	init_hooks(engine);
+	engine->img.img = mlx_new_image(engine->m.mlx, SCREEN_WIDTH, SCREEN_HEIGHT);
+	engine->img.addr = mlx_get_data_addr(engine->img.img, &engine->img.bits_per_pixel, &engine->img.line_length,
+								&engine->img.endian);
+	// mlx_clear_window(engine->m.mlx, engine->m.win);
 	cam = engine->w->cam;
 	// debug light
 	scale = tan(deg_to_rad(cam->fov) / 2.f);
@@ -284,13 +299,17 @@ void    rendering(void)
 			ray.origin = cam->origin;
 			ray.direction = generate_cam_dir(cam, scale, ndc_x, ndc_y);
 			my_mlx_pixel_put(&engine->img, x, y, get_rgb(intersect_world(engine->w, &ray)));
-			x++;
+			x += engine->iter;
+			printf("eng -> %d\n", engine->iter);
 		}
-		y++;
+		y += engine->iter;
 	}
+	mlx_clear_window(engine->m.mlx, engine->m.win);
 	mlx_put_image_to_window(engine->m.mlx, engine->m.win, engine->img.img, 0, 0);
     mlx_hook(engine->m.win, KeyPress, KEY_PRESS, key_press, engine);
     mlx_hook(engine->m.win, KeyRelease, KEY_RELEASE, key_release, engine);
+	mlx_mouse_hook(engine->m.win, mouse_input, engine);
+    // handle_input();  // later
 	mlx_loop(engine->m.mlx);
     return ;
 }

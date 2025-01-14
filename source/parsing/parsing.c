@@ -71,12 +71,8 @@ void parsing(int ac, char *filename)
     engine = getengine();
     
     engine->w = galloc(sizeof(t_world));
-    d = mlx_init();
-    engine->m.win = mlx_new_window(d, SCREEN_WIDTH, SCREEN_HEIGHT, "Hello world!");
-	engine->img.img = mlx_new_image(d, SCREEN_WIDTH, SCREEN_HEIGHT);
-	engine->img.addr = mlx_get_data_addr(engine->img.img, &engine->img.bits_per_pixel, &engine->img.line_length,
-								&engine->img.endian);
-    engine->m.mlx = d;
+    engine->m.mlx = mlx_init();
+	engine->m.win = mlx_new_window(engine->m.mlx, SCREEN_WIDTH, SCREEN_HEIGHT, "Hello world!");
     engine->m.ctrl_pressed = false;
     if (ac != 2)
         pexit(YELLOW USAGE_WARN, 1);
@@ -85,6 +81,8 @@ void parsing(int ac, char *filename)
         pexit(filename, 2);
     readfile(fd, filename);
 	setup_cam_dir(engine->w->cam);
-
+    engine->w->gray_on = false;
+    engine->cmd_on = true;
+    engine->iter = 1;
     close(fd);
 }

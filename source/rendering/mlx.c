@@ -1,53 +1,229 @@
 #include "miniRT.h"
 
+int mouse_input(int key, int y, int x, void *d)
+{
+    t_core  *engine;
+    t_sphere    *s;
+    engine = getengine();
+
+    printf("x -> %d     y -> %d\n", x, y);
+    s = galloc(sizeof(t_sphere));
+    s->c = (t_color) {0,0,255};
+    s->origin = (t_point ) {x,y,5};
+    s->diameter = 10;
+    s->radius_squared = 25;
+    add_obj(engine, &engine->w->objects, s, SP_OBJ);
+    rendering();
+    return 1;
+}
+
 int key_press(int key, t_core *engine)
 {
+    t_point cam_pos = engine->w->cam->origin;
+    t_point light_pos = ((t_light *)(engine->w->lights->data))->p;
+    float **cam_pos_mx;
+    float **trans_mx;
+    float **mul_res;
+
     if (key == XK_RIGHT_CTRL)
+    {
         engine->m.ctrl_pressed = true;
-    if (key == XK_Right  /* && engine->m.ctrl_pressed */)
-    {
-        ((t_light *)engine->w->lights->data)->p.x -= 2;
+        printf("Control pressed - ctrl_state: %d\n", engine->m.ctrl_pressed);
+    }
+    else if (key == XK_1)
+    {  
+        trans_mx = rotate_z(0.1);  // Changed from -1 to 1
+        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
+        mul_res = mul_matrix_row_col(trans_mx, cam_pos_mx, 4, 1);
+        engine->w->cam->origin = translate_mx_to_point(mul_res);
         rendering();
     }
-    if (key == XK_Left  /* && engine->m.ctrl_pressed */)
-    {
-        ((t_light *)engine->w->lights->data)->p.x += 2;
+    else if (key == XK_2)
+    {  
+        trans_mx = rotate_z(-0.1);  // Changed from -1 to 1
+        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
+        mul_res = mul_matrix_row_col(trans_mx, cam_pos_mx, 4, 1);
+        engine->w->cam->origin = translate_mx_to_point(mul_res);
         rendering();
     }
-    if (key == XK_Up  /* && engine->m.ctrl_pressed */)
-    {
-        ((t_light *)engine->w->lights->data)->p.y += 2;
+    else if (key == XK_3)
+    {  
+        trans_mx = rotate_y(0.1);  // Changed from -1 to 1
+        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
+        mul_res = mul_matrix_row_col(trans_mx, cam_pos_mx, 4, 1);
+        engine->w->cam->origin = translate_mx_to_point(mul_res);
         rendering();
     }
-    if (key == XK_Down  /* && engine->m.ctrl_pressed */)
-    {
-        ((t_light *)engine->w->lights->data)->p.y -= 2;
+    else if (key == XK_4)
+    {  
+        trans_mx = rotate_y(-0.1);  // Changed from -1 to 1
+        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
+        mul_res = mul_matrix_row_col(trans_mx, cam_pos_mx, 4, 1);
+        engine->w->cam->origin = translate_mx_to_point(mul_res);
         rendering();
     }
-    if (key == XK_Escape)
+    else if (key == XK_5)
+    {  
+        trans_mx = rotate_x(0.1);  // Changed from -1 to 1
+        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
+        mul_res = mul_matrix_row_col(trans_mx, cam_pos_mx, 4, 1);
+        engine->w->cam->origin = translate_mx_to_point(mul_res);
+        rendering();
+    }
+    else if (key == XK_6)
+    {  
+        trans_mx = rotate_x(-0.1);  // Changed from -1 to 1
+        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
+        mul_res = mul_matrix_row_col(trans_mx, cam_pos_mx, 4, 1);
+        engine->w->cam->origin = translate_mx_to_point(mul_res);
+        rendering();
+    }
+    else if (key == XK_q)
+    {
+        trans_mx = get_translation_matrix(0,0,1);
+        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
+        mul_res = mul_matrix_row_col( trans_mx, cam_pos_mx, 4, 1);
+        engine->w->cam->origin = translate_mx_to_point(mul_res);
+        rendering();
+    }
+    else if (key == XK_e)
+    {
+        trans_mx = get_translation_matrix(0,0,-1);
+        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
+        mul_res = mul_matrix_row_col( trans_mx, cam_pos_mx, 4, 1);
+        engine->w->cam->origin = translate_mx_to_point(mul_res);
+        rendering();
+    }
+    else if (key == XK_w)
+    {
+        trans_mx = get_translation_matrix(0,1.f,0);
+        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
+        mul_res = mul_matrix_row_col( trans_mx, cam_pos_mx, 4, 1);
+        engine->w->cam->origin = translate_mx_to_point(mul_res);
+        rendering();
+    }
+    else if (key == XK_s)
+    {
+        trans_mx = get_translation_matrix(0.f,-1.f,0.0f);
+        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
+        mul_res = mul_matrix_row_col( trans_mx, cam_pos_mx, 4, 1);
+        engine->w->cam->origin = translate_mx_to_point(mul_res);
+        rendering();
+    }
+    else if (key == XK_d)
+    {
+        trans_mx = get_translation_matrix(-1,0,0);
+        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
+        mul_res = mul_matrix_row_col( trans_mx, cam_pos_mx, 4, 1);
+        engine->w->cam->origin = translate_mx_to_point(mul_res);
+        rendering();
+    }
+    else if (key == XK_a)
+    {
+        trans_mx = get_translation_matrix(1,0,0);
+        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
+        mul_res = mul_matrix_row_col( trans_mx, cam_pos_mx, 4, 1);
+        engine->w->cam->origin = translate_mx_to_point(mul_res);
+        rendering();
+    }
+    else if (key == XK_Up)
+    {
+        trans_mx = get_translation_matrix(0,1,0);
+        cam_pos_mx = get_4_1_matrix(light_pos.x, light_pos.y, light_pos.z, 1);
+        mul_res = mul_matrix_row_col( trans_mx, cam_pos_mx, 4, 1);
+        ((t_light *)(engine->w->lights->data))->p = translate_mx_to_point(mul_res);
+        rendering();
+    }
+    else if (key == XK_Down)
+    {
+        trans_mx = get_translation_matrix(0,-1,0);
+        cam_pos_mx = get_4_1_matrix(light_pos.x, light_pos.y, light_pos.z, 1);
+        mul_res = mul_matrix_row_col( trans_mx, cam_pos_mx, 4, 1);
+        ((t_light *)(engine->w->lights->data))->p = translate_mx_to_point(mul_res);
+        rendering();
+    }
+    else if (key == XK_Right)
+    {
+        trans_mx = get_translation_matrix(1,0,0);
+        cam_pos_mx = get_4_1_matrix(light_pos.x, light_pos.y, light_pos.z, 1);
+        mul_res = mul_matrix_row_col( trans_mx, cam_pos_mx, 4, 1);
+        ((t_light *)(engine->w->lights->data))->p = translate_mx_to_point(mul_res);
+        rendering();
+    }
+    else if (key == XK_Left)
+    {
+        trans_mx = get_translation_matrix(-1,0,0);
+        cam_pos_mx = get_4_1_matrix(light_pos.x, light_pos.y, light_pos.z, 1);
+        mul_res = mul_matrix_row_col( trans_mx, cam_pos_mx, 4, 1);
+        ((t_light *)(engine->w->lights->data))->p = translate_mx_to_point(mul_res);
+        rendering();
+    }
+    else if (key == XK_z)
+    {
+        (engine->w->ambient->ratio) -= 0.1;
+        rendering();
+    }
+    else if (key == XK_x)
+    {
+        (engine->w->ambient->ratio) += 0.1;
+        rendering();
+    }
+    else if (key == XK_c)
+    {
+        ((t_light *)(engine->w->lights)->data)->brightness -= 0.05;
+        rendering();
+    }
+    else if (key == XK_v)
+    {
+        ((t_light *)(engine->w->lights)->data)->brightness += 0.05;
+        rendering();
+    }
+    else if (key == XK_b)
+    {
+        ((t_light *)(engine->w->lights)->data)->c = increment_color(((t_light *)(engine->w->lights)->data)->c, -10);
+        rendering();
+    }
+    else if (key == XK_n)
+    {
+        ((t_light *)(engine->w->lights)->data)->c = increment_color(((t_light *)(engine->w->lights)->data)->c, 10);
+        rendering();
+    }
+    else if (key == XK_space)
+    {
+        engine->w->gray_on = !engine->w->gray_on;
+        rendering();
+    }
+    else if (key == XK_KP_Divide)
+    {
+        engine->iter = engine->iter + 1;
+        rendering();
+    }
+    else if (key == XK_KP_Multiply)
+    {
+        if (engine->iter > 1)
+            engine->iter = engine->iter - 1;
+        rendering();
+    }
+    else if (key == XK_Escape)
     {
         clear();
         exit(0);
     }
+
     return (0);
 }
-
-int key_release(int keycode, t_core *engine)
+int key_release(int key, t_core *engine)
 {
-    if (keycode == XK_RIGHT_CTRL)
+    if (key == XK_RIGHT_CTRL)
     {
-        // engine->m.ctrl_pressed = true;
-        engine->m.ctrl_pressed = true;
-        printf("release\n");
+        engine->m.ctrl_pressed = false;
     }
     return (0);
 }
 
-// Add this to initialization:
 void init_hooks(t_core *engine)
 {
     engine->m.ctrl_pressed = false;
-
 }
 
 
