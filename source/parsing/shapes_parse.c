@@ -154,7 +154,9 @@ bool    sphere_handled(t_core *d, char **args)
     sphere->origin = sphere_cord;
     sphere->diameter = diameter;
     sphere->radius_squared = (diameter / 2) * (diameter / 2);
-
+    sphere->pattern = galloc(sizeof(t_pattern));
+    sphere->pattern->c1 = (t_color ) {72, 100, 192};
+    sphere->pattern->c2 = (t_color ) {100, 200, 35};
 	add_obj(d, &d->w->objects, sphere, SP_OBJ);
 	return (true);
 }

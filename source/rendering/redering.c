@@ -117,9 +117,18 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t)
 	speclar_color = zero_color();
 	diffuse_color = zero_color();
 	ambient_color = zero_color();
-	obj_clr = hit_obj->get_color(hit_obj);
 	ambient_color = scale_color(mul_colors(ambient->c, obj_clr), ambient->ratio * 0.1); // should this be a unified color or just a color to add to my objects's colors
 	inter_point = position_at(cam_ray, smallest_t);
+	obj_clr = hit_obj->get_color(hit_obj);
+	if (hit_obj->type == SP_OBJ)
+	{
+		printf("x -> %d  ", (((int)(inter_point.x)) % 2));
+		print_point(inter_point);
+		if ((((int)(inter_point.x)) % 2) == 0)
+			obj_clr = ((t_sphere *)hit_obj->data)->pattern->c1;
+		else
+			obj_clr = ((t_sphere *)hit_obj->data)->pattern->c2;
+	}
 	if (is_shadowed(getengine()->w, inter_point))
 		return ambient_color;
 	pt_cam_vec = normal(sub_points(inter_point, cam_ray->origin)); 
@@ -131,7 +140,7 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t)
 	light_dot_norm = dot(obj_norm, pt_light_vec);
 	if (light_dot_norm >= 0)
 	{
-		diffuse_color = scale_color(hit_obj->get_color(hit_obj), light_dot_norm * light->brightness);
+		diffuse_color = scale_color(obj_clr, light_dot_norm * light->brightness);
 		light_ref = reflect(pt_light_vec, obj_norm);
         refl_dot_cam = dot(normal(light_ref), pt_cam_vec);
         if (refl_dot_cam > 0 && light->brightness > 0)
