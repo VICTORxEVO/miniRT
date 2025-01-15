@@ -22,6 +22,15 @@ t_color	get_obj_color(t_object *o)
 		return ((t_plane *)o->data)->c;
 }
 
+void set_obj_color(t_object *o, t_color c)
+{
+	if (o->type == SP_OBJ)
+		((t_sphere *)o->data)->c = c;
+	else
+		((t_plane *)o->data)->c = c;
+
+}
+
 void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
 {
 	char	*dst;
@@ -65,59 +74,13 @@ inline t_vector	reflect (t_vector	light, t_vector	norm) // light is a vector fro
 	return sub_vectors(light, scale_vector(norm, 2 * dot(norm, light))); 
 }
 
-
-t_color	obj_light(t_object	*hit_obj, t_ray	*cam_ray, float smallest_t)
-{
-	t_color	color;
-	t_color	speclar_color;
-	t_color	diffuse_color;
-	t_color	ambient_color;
-	t_light		*light;
-	t_ambient	*ambient;
-	float light_dot_norm;
-	float cam_ray_surf_norm_dot;
-	float refl_dot_cam;
-	t_vector	pt_cam_vec;   // ray from camera to a point
-	t_vector	pl_norm; // ray from sphere origin to a point
-	t_vector	pt_light_vec; // ray from point to light
-	t_vector	light_ref;
-	t_point inter_point;
-	light = getengine()->w->lights->data;
-	ambient = getengine()->w->ambient;
-	color = zero_color();
-	speclar_color = zero_color();
-	diffuse_color = zero_color();
-	ambient_color = zero_color();
-	inter_point = position_at(cam_ray, smallest_t);
-	ambient_color = scale_color(ambient->c, ambient->ratio * 0.2); // should this be a unified color or just a color to add to my objects's colors
-	pt_cam_vec = normal(sub_points(inter_point, cam_ray->origin)); 
-	pl_norm = hit_obj->get_norm(hit_obj, inter_point);
-	cam_ray_surf_norm_dot = dot(pt_cam_vec, pl_norm);
-	if (cam_ray_surf_norm_dot >= 0)
-		pl_norm = neg_vector(pl_norm);
-	pt_light_vec = normal(sub_points(light->p, inter_point)); // ray from point to light
-	light_dot_norm = dot(pl_norm, pt_light_vec);
-	if (light_dot_norm >= 0)
-	{
-		diffuse_color = scale_color(hit_obj->get_color(hit_obj), light_dot_norm * light->brightness);
-		light_ref = reflect(pt_light_vec, pl_norm);
-        refl_dot_cam = dot(normal(light_ref), pt_cam_vec);
-        if (refl_dot_cam > 0 && light->brightness > 0)
-			speclar_color = scale_color(scale_color(light->c, light->brightness), powf(refl_dot_cam, light->brightness * 100));
-    }
-	color = clamp_color(sum_colors(speclar_color ,diffuse_color, ambient_color));
-	return color;
-}
-
 bool is_shadowed(t_world *w, t_point p)
 {
-	t_camera *cam;
 	t_light *light;
 	t_ray pt_to_light_ray;
 	t_vector offset;
 	float inter_dist;
 	float pt_to_light_dist;
-	cam = w->cam;
 	light = w->lights->data;
 	offset = scale_vector(normal(sub_points(light->p, p)), EPSILON);
 	pt_to_light_ray.origin = add_points(p, v_to_p(offset));
@@ -163,9 +126,7 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t)
 	obj_norm = hit_obj->get_norm(hit_obj, inter_point);
 	cam_ray_surf_norm_dot = dot(pt_cam_vec, obj_norm);
 	if (cam_ray_surf_norm_dot >= 0)
-	{
 		obj_norm = neg_vector(obj_norm);
-	}	
 	pt_light_vec = normal(sub_points(light->p, inter_point)); // ray from point to light
 	light_dot_norm = dot(obj_norm, pt_light_vec);
 	if (light_dot_norm >= 0)
@@ -300,7 +261,6 @@ void    rendering(void)
 			ray.direction = generate_cam_dir(cam, scale, ndc_x, ndc_y);
 			my_mlx_pixel_put(&engine->img, x, y, get_rgb(intersect_world(engine->w, &ray)));
 			x += engine->iter;
-			printf("eng -> %d\n", engine->iter);
 		}
 		y += engine->iter;
 	}
@@ -309,7 +269,6 @@ void    rendering(void)
     mlx_hook(engine->m.win, KeyPress, KEY_PRESS, key_press, engine);
     mlx_hook(engine->m.win, KeyRelease, KEY_RELEASE, key_release, engine);
 	mlx_mouse_hook(engine->m.win, mouse_input, engine);
-    // handle_input();  // later
 	mlx_loop(engine->m.mlx);
     return ;
 }

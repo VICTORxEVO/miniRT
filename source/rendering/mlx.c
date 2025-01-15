@@ -19,9 +19,12 @@ int mouse_input(int key, int y, int x, void *d)
 
 int key_press(int key, t_core *engine)
 {
+    t_camera *cam = engine->w->cam;
+    t_vector cam_dir = engine->w->cam->forward;
     t_point cam_pos = engine->w->cam->origin;
     t_point light_pos = ((t_light *)(engine->w->lights->data))->p;
     float **cam_pos_mx;
+    float **cam_dir_mx;
     float **trans_mx;
     float **mul_res;
 
@@ -32,50 +35,56 @@ int key_press(int key, t_core *engine)
     }
     else if (key == XK_1)
     {  
-        trans_mx = rotate_z(0.1);  // Changed from -1 to 1
-        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
-        mul_res = mul_matrix_row_col(trans_mx, cam_pos_mx, 4, 1);
-        engine->w->cam->origin = translate_mx_to_point(mul_res);
+        trans_mx = rotate_x(0.1);  // Changed from -1 to 1
+        cam_dir_mx = get_4_1_matrix(cam_dir.x, cam_dir.y, cam_dir.z, 1);
+        mul_res = mul_matrix_row_col(trans_mx, cam_dir_mx, 4, 1);
+        engine->w->cam->forward = translate_mx_to_vector(mul_res);
+        setup_cam_dir(cam);
         rendering();
     }
     else if (key == XK_2)
     {  
-        trans_mx = rotate_z(-0.1);  // Changed from -1 to 1
-        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
-        mul_res = mul_matrix_row_col(trans_mx, cam_pos_mx, 4, 1);
-        engine->w->cam->origin = translate_mx_to_point(mul_res);
+        trans_mx = rotate_x(-0.1);  // Changed from -1 to 1
+        cam_dir_mx = get_4_1_matrix(cam_dir.x, cam_dir.y, cam_dir.z, 1);
+        mul_res = mul_matrix_row_col(trans_mx, cam_dir_mx, 4, 1);
+        engine->w->cam->forward = translate_mx_to_vector(mul_res);
+        setup_cam_dir(cam);
         rendering();
     }
     else if (key == XK_3)
     {  
         trans_mx = rotate_y(0.1);  // Changed from -1 to 1
-        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
-        mul_res = mul_matrix_row_col(trans_mx, cam_pos_mx, 4, 1);
-        engine->w->cam->origin = translate_mx_to_point(mul_res);
+        cam_dir_mx = get_4_1_matrix(cam_dir.x, cam_dir.y, cam_dir.z, 1);
+        mul_res = mul_matrix_row_col(trans_mx, cam_dir_mx, 4, 1);
+        engine->w->cam->forward = translate_mx_to_vector(mul_res);
+        setup_cam_dir(cam);
         rendering();
     }
     else if (key == XK_4)
     {  
         trans_mx = rotate_y(-0.1);  // Changed from -1 to 1
-        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
-        mul_res = mul_matrix_row_col(trans_mx, cam_pos_mx, 4, 1);
-        engine->w->cam->origin = translate_mx_to_point(mul_res);
+        cam_dir_mx = get_4_1_matrix(cam_dir.x, cam_dir.y, cam_dir.z, 1);
+        mul_res = mul_matrix_row_col(trans_mx, cam_dir_mx, 4, 1);
+        engine->w->cam->forward = translate_mx_to_vector(mul_res);
+        setup_cam_dir(cam);
         rendering();
     }
     else if (key == XK_5)
     {  
-        trans_mx = rotate_x(0.1);  // Changed from -1 to 1
-        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
-        mul_res = mul_matrix_row_col(trans_mx, cam_pos_mx, 4, 1);
-        engine->w->cam->origin = translate_mx_to_point(mul_res);
+        trans_mx = rotate_z(0.1);  // Changed from -1 to 1
+        cam_dir_mx = get_4_1_matrix(cam_dir.x, cam_dir.y, cam_dir.z, 1);
+        mul_res = mul_matrix_row_col(trans_mx, cam_dir_mx, 4, 1);
+        engine->w->cam->forward = translate_mx_to_vector(mul_res);
+        setup_cam_dir(cam);
         rendering();
     }
     else if (key == XK_6)
     {  
-        trans_mx = rotate_x(-0.1);  // Changed from -1 to 1
-        cam_pos_mx = get_4_1_matrix(cam_pos.x, cam_pos.y, cam_pos.z, 1);
-        mul_res = mul_matrix_row_col(trans_mx, cam_pos_mx, 4, 1);
-        engine->w->cam->origin = translate_mx_to_point(mul_res);
+        trans_mx = rotate_z(-0.1);  // Changed from -1 to 1
+        cam_dir_mx = get_4_1_matrix(cam_dir.x, cam_dir.y, cam_dir.z, 1);
+        mul_res = mul_matrix_row_col(trans_mx, cam_dir_mx, 4, 1);
+        engine->w->cam->forward = translate_mx_to_vector(mul_res);
+        setup_cam_dir(cam);
         rendering();
     }
     else if (key == XK_q)
@@ -142,7 +151,7 @@ int key_press(int key, t_core *engine)
         ((t_light *)(engine->w->lights->data))->p = translate_mx_to_point(mul_res);
         rendering();
     }
-    else if (key == XK_Right)
+    else if (key == XK_Left)
     {
         trans_mx = get_translation_matrix(1,0,0);
         cam_pos_mx = get_4_1_matrix(light_pos.x, light_pos.y, light_pos.z, 1);
@@ -150,7 +159,7 @@ int key_press(int key, t_core *engine)
         ((t_light *)(engine->w->lights->data))->p = translate_mx_to_point(mul_res);
         rendering();
     }
-    else if (key == XK_Left)
+    else if (key == XK_Right)
     {
         trans_mx = get_translation_matrix(-1,0,0);
         cam_pos_mx = get_4_1_matrix(light_pos.x, light_pos.y, light_pos.z, 1);

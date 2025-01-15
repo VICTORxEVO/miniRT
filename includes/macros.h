@@ -33,15 +33,11 @@
 
 
 
-#ifdef LINUX
+// #ifdef LINUX
     #define SCREEN_WIDTH 1920.f
     #define SCREEN_HEIGHT 1010.f
-#endif
+// #endif
 
-#ifndef LINUX
-    #define SCREEN_WIDTH 600.f
-    #define SCREEN_HEIGHT 400.f
-#endif
 
 #define XK_RIGHT_CTRL 65508
 #define XK_LEFT_CTRL 65507

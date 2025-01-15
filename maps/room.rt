@@ -1,0 +1,22 @@
+# Scene ambient light (increased intensity)
+A 0.5 255,255,255
+
+# Camera: Adjusted position for better view
+C 0,3,-5 0,-0.2,1 90
+
+# Light source (repositioned and increased intensity)
+L 0,2,0 1.0 255,255,255
+
+# Main sphere (partially embedded in floor)
+sp 0,-1,0 3 255,0,110
+
+# Floor plane
+pl 0,-2,0 0,1,0 128,128,128
+
+# Back wall
+pl 0,0,5 0,0,-1 200,200,200
+
+# Ceiling (raised higher)
+pl 0,6,0 0,-1,0 180,180,180
+pl -4,0,0 1,0,0 150,150,150
+pl 4,0,0 -1,0,0 150,150,150

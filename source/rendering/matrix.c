@@ -442,6 +442,15 @@ inline t_point translate_mx_to_point(float **m)
     return p;
 }
 
+inline t_vector translate_mx_to_vector(float **m)
+{
+    t_vector v;
+    v.x = m[0][0];
+    v.y = m[1][0];
+    v.z = m[2][0];
+    return v;
+}
+
 float **rotate_x(float rad)
 {
     float **matrix;
@@ -547,26 +556,26 @@ float **get_orientation_view_matrix(t_vector left, t_vector true_up, t_vector fo
     return vm;
 }
 
-float **get_view_matrix(t_point from, t_point to, t_vector up)
-{
-    float **orientation_mx;
-    float **view_mx;
-    t_vector forward;
-    float **transformation_mx;
-    t_vector left;
-    t_vector true_up;
+// float **get_view_matrix(t_point from, t_point to, t_vector up)
+// {
+//     float **orientation_mx;
+//     float **view_mx;
+//     t_vector forward;
+//     float **transformation_mx;
+//     t_vector left;
+//     t_vector true_up;
 
-    // forwad ->   sub 'from' from 'to'    normalized
-    // forward = get_normalized(get_vector_2_pts(from, to));  
-    // left = cross_product(forward, up);
-    // true_up = cross_product(left, forward);
-    // orientation_mx = get_orientation_view_matrix(left, true_up, forward);
-    // transformation_mx = get_translation_matrix(-from.x, -from.y, -from.z);
-    view_mx = mul_matrix_n(orientation_mx, transformation_mx, 4);
-    return view_mx;
-}
+//     // forwad ->   sub 'from' from 'to'    normalized
+//     // forward = get_normalized(get_vector_2_pts(from, to));  
+//     // left = cross_product(forward, up);
+//     // true_up = cross_product(left, forward);
+//     // orientation_mx = get_orientation_view_matrix(left, true_up, forward);
+//     // transformation_mx = get_translation_matrix(-from.x, -from.y, -from.z);
+//     view_mx = mul_matrix_n(orientation_mx, transformation_mx, 4);
+//     return view_mx;
+// }
 
-t_sphere transform_sphere(t_sphere s)
+t_sphere transform_sphere(t_sphere s, float **transformation_mx)
 {
     t_sphere new_sphere;
     float  **sphere_matrix_origin;
@@ -579,7 +588,7 @@ t_sphere transform_sphere(t_sphere s)
     sphere_matrix_origin[2][0] = s.origin.z;
     sphere_matrix_origin[3][0] = 0;
 
-    // origin_mul_res_matrix = mul_matrix_row_col(s.transoformation_mx, sphere_matrix_origin, 4, 1);
+    origin_mul_res_matrix = mul_matrix_row_col(transformation_mx, sphere_matrix_origin, 4, 1);
     new_sphere.origin.x = origin_mul_res_matrix[0][0];
     new_sphere.origin.y = origin_mul_res_matrix[1][0];
     new_sphere.origin.z = origin_mul_res_matrix[2][0];

@@ -64,12 +64,8 @@ void setup_cam_dir(t_camera	*cam)
 void parsing(int ac, char *filename)
 {
     int fd;
-    char *line;
     t_core  *engine;
-    void *d;
-
     engine = getengine();
-    
     engine->w = galloc(sizeof(t_world));
     engine->m.mlx = mlx_init();
 	engine->m.win = mlx_new_window(engine->m.mlx, SCREEN_WIDTH, SCREEN_HEIGHT, "Hello world!");

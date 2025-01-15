@@ -28,7 +28,8 @@ typedef struct s_object
     struct s_object *next;
 	char	type;
 	t_vector (*get_norm ) (struct s_object *o, t_point pt_on_sp);
-	t_color	(*get_color) (struct s_object *o); 
+	t_color	(*get_color) (struct s_object *o);
+	void (*set_color) (struct s_object *o, t_color new_color); 
 } t_object;
 
 
@@ -96,6 +97,11 @@ typedef struct s_world
 	bool		gray_on;
 } t_world;
 
+typedef struct s_pattern
+{
+	t_color c1;
+	t_color c2;
+}	t_pattern;
 
 typedef struct s_sphere
 {
@@ -103,6 +109,7 @@ typedef struct s_sphere
 	float		diameter;
 	float		radius_squared;
 	t_color		c;
+	t_pattern	*pattern;
 } t_sphere;
 
 typedef struct s_plane
@@ -171,7 +178,6 @@ int		check_file(char *filename);
 /*     >>>>>Rendering Funtions Section<<<<<     */
 void	my_mlx_pixel_put(t_img *img, int x, int y, int color);
 float get_intersect_dist(t_world *w, t_ray *ray);
-inline t_vector	reflect (t_vector	light, t_vector	norm);
 // t_color	sp_light(t_sphere	*hit_sph, t_ray	*cam_ray, float smallest_t);
 t_color	sp_light(t_object	*hit_sph, t_ray	*cam_ray, float smallest_t);
 // t_color	pl_light(t_plane	*hit_pl, t_ray	*cam_ray, float smallest_t);
@@ -201,6 +207,8 @@ void add_obj(t_core *d, t_object **head, void *data, char type_macro);
 void add_float_object_sorted(t_core *d, t_object **head, float value);
 int remove_obj(t_core *d, t_object **head, void *data);
 
+
+void setup_cam_dir(t_camera	*cam);
 
 
 float maxf(float a, float b);
@@ -273,10 +281,9 @@ float **rotate_y(float rad);
 float **rotate_z(float rad);
 t_ray transform_ray(t_ray old_r, float **transformation_mx);
 float **get_orientation_view_matrix(t_vector left, t_vector true_up, t_vector forward);
-float **get_view_matrix(t_point from, t_point to, t_vector up);
-t_sphere transform_sphere(t_sphere s);
+t_sphere transform_sphere(t_sphere s, float **transformation_mx);
 t_point translate_mx_to_point(float **m);
-
+t_vector translate_mx_to_vector(float **m);
 
 
 /*     >>>>>Utils funtions section<<<<<     */
@@ -313,6 +320,7 @@ float deg_to_rad(float deg);
 float rad_to_rad(float rad);
 t_vector get_obj_norm(t_object	*o, t_point	pt_on_sphere);
 t_color get_obj_color(t_object *o);
+void set_obj_color(t_object *o, t_color c);
 void	my_mlx_pixel_put(t_img *data, int x, int y, int color);
 
 
