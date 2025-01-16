@@ -135,6 +135,7 @@ bool    sphere_handled(t_core *d, char **args)
 {
     char		**clrs;
     t_color		sphere_color;
+    t_color		sphere_checker_color;
     t_point		sphere_cord;
     float       diameter;
 	t_sphere  *sphere;
@@ -154,9 +155,24 @@ bool    sphere_handled(t_core *d, char **args)
     sphere->origin = sphere_cord;
     sphere->diameter = diameter;
     sphere->radius_squared = (diameter / 2) * (diameter / 2);
-    sphere->pattern = galloc(sizeof(t_pattern));
-    sphere->pattern->c1 = (t_color ) {72, 100, 192};
-    sphere->pattern->c2 = (t_color ) {100, 200, 35};
+    sphere->pattern = NULL;
+    if (args[4])
+    {
+        if (ft_strcmp(args[4], "checkered") != 0)
+            return (printf("Error\nsphere checker settings invalid\n"), false);
+        else
+        {
+            clrs = ft_split(args[5], ',');
+            if (count_args(clrs) != 3 || !color_struct_filled(&sphere_checker_color, clrs))
+                return (printf("Error\nsphere checker board color invalid\n"), false);
+            sphere->pattern = galloc(sizeof(t_pattern));
+            sphere->pattern->c1 = sphere_color;
+            sphere->pattern->c2 = sphere_checker_color;
+        }
+            
+    }
+    
+
 	add_obj(d, &d->w->objects, sphere, SP_OBJ);
 	return (true);
 }

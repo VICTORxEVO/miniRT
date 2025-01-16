@@ -48,6 +48,7 @@ enum e_types
 	e_light = 4,
 	e_sphere = 4,
 	e_plain = 4,
+	e_sphere_checkered = 6,
 	e_cylinder = 6,
 };
 
@@ -101,6 +102,7 @@ typedef struct s_pattern
 {
 	t_color c1;
 	t_color c2;
+	char	PATTERN_TYPE;
 }	t_pattern;
 
 typedef struct s_sphere

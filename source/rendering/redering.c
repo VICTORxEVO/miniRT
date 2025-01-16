@@ -122,12 +122,17 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t)
 	obj_clr = hit_obj->get_color(hit_obj);
 	if (hit_obj->type == SP_OBJ)
 	{
-		printf("x -> %d  ", (((int)(inter_point.x)) % 2));
-		print_point(inter_point);
-		if ((((int)(inter_point.x)) % 2) == 0)
-			obj_clr = ((t_sphere *)hit_obj->data)->pattern->c1;
-		else
-			obj_clr = ((t_sphere *)hit_obj->data)->pattern->c2;
+		t_sphere *s;
+		s = hit_obj->data;
+		if (s->pattern)
+		{
+			t_point relative_point = (v_to_p(sub_points(inter_point, (((t_sphere *)hit_obj->data)->origin))));
+
+			if (((int)(floor)(relative_point.x) + (int)(floor)(relative_point.y) + (int)(floor)(relative_point.z)) % 2 == 0)
+				obj_clr = ((t_sphere *)hit_obj->data)->pattern->c1;
+			else
+				obj_clr = ((t_sphere *)hit_obj->data)->pattern->c2;
+		}
 	}
 	if (is_shadowed(getengine()->w, inter_point))
 		return ambient_color;

@@ -7,6 +7,7 @@ static bool validated_type(char *name, unsigned args_count)
     (!ft_strcmp(name, "L") && args_count == e_light) || 
     (!ft_strcmp(name, "pl") && args_count == e_plain) || 
     (!ft_strcmp(name, "sp") && args_count == e_sphere) || 
+    (!ft_strcmp(name, "sp") && args_count == e_sphere_checkered) || 
     (!ft_strcmp(name, "cy") && args_count == e_cylinder))
         return (true);
     return (false);

@@ -39,6 +39,14 @@
 // #endif
 
 
+#define STRIPE_X_PAT 1
+#define STRIPE_Y_PAT 2
+#define STRIPE_Z_PAT 3
+#define RING_X_PAT 4
+#define RING_Y_PAT 5
+#define RING_Z_PAT 6
+#define CHECKER_PAT 7
+
 #define XK_RIGHT_CTRL 65508
 #define XK_LEFT_CTRL 65507
 
