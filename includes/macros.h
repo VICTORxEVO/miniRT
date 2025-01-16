@@ -46,6 +46,8 @@
 #define RING_Y_PAT 5
 #define RING_Z_PAT 6
 #define CHECKER_PAT 7
+#define GRADIANT_Y 8
+#define SWIRL 9
 
 #define XK_RIGHT_CTRL 65508
 #define XK_LEFT_CTRL 65507

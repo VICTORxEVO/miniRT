@@ -135,7 +135,7 @@ bool    sphere_handled(t_core *d, char **args)
 {
     char		**clrs;
     t_color		sphere_color;
-    t_color		sphere_checker_color;
+    t_color		sphere_pattern_color;
     t_point		sphere_cord;
     float       diameter;
 	t_sphere  *sphere;
@@ -158,16 +158,31 @@ bool    sphere_handled(t_core *d, char **args)
     sphere->pattern = NULL;
     if (args[4])
     {
-        if (ft_strcmp(args[4], "checkered") != 0)
-            return (printf("Error\nsphere checker settings invalid\n"), false);
+        if (ft_strcmp(args[4], "checkered") != 0 && ft_strcmp(args[4], "striped_x") != 0 && 
+            ft_strcmp(args[4], "gradient_y") != 0 &&
+            ft_strcmp(args[4], "ring_z") != 0 &&
+            ft_strcmp(args[4], "swirl") != 0)
+            return (printf("Error\nsphere pattern settings invalid\n"), false);
         else
         {
             clrs = ft_split(args[5], ',');
-            if (count_args(clrs) != 3 || !color_struct_filled(&sphere_checker_color, clrs))
-                return (printf("Error\nsphere checker board color invalid\n"), false);
+            if (count_args(clrs) != 3 || !color_struct_filled(&sphere_pattern_color, clrs))
+                return (printf("Error\nsphere pattern color invalid\n"), false);
             sphere->pattern = galloc(sizeof(t_pattern));
+            if (ft_strcmp(args[4], "checkered") == 0)
+                sphere->pattern->PATTERN_TYPE = CHECKER_PAT;
+            else if (ft_strcmp(args[4], "striped_x") == 0)
+                sphere->pattern->PATTERN_TYPE = STRIPE_X_PAT;
+            else if (ft_strcmp(args[4], "gradient_y") == 0)
+                sphere->pattern->PATTERN_TYPE = GRADIANT_Y;
+            else if (ft_strcmp(args[4], "ring_z") == 0)
+                sphere->pattern->PATTERN_TYPE = RING_Z_PAT;
+            else if (ft_strcmp(args[4], "swirl") == 0)
+                sphere->pattern->PATTERN_TYPE = SWIRL;
+            else
+                return (printf("Error\nsphere pattern type invalid\n"), false);
             sphere->pattern->c1 = sphere_color;
-            sphere->pattern->c2 = sphere_checker_color;
+            sphere->pattern->c2 = sphere_pattern_color;
         }
             
     }

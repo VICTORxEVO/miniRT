@@ -74,6 +74,92 @@ inline t_vector	reflect (t_vector	light, t_vector	norm) // light is a vector fro
 	return sub_vectors(light, scale_vector(norm, 2 * dot(norm, light))); 
 }
 
+t_color handle_object_pat(t_object *hit_obj, t_point inter_point)
+{
+	t_color	obj_color;
+	t_sphere *s;
+	float scale;
+	float scaled_x;
+	float scaled_z;
+	t_vector	moved_p;
+	t_point p;
+
+	obj_color = hit_obj->get_color(hit_obj);
+	if (hit_obj->type == SP_OBJ)
+	{
+		s = hit_obj->data;
+		if (s->pattern && s->pattern->PATTERN_TYPE == CHECKER_PAT)
+		{
+			moved_p = sub_points(inter_point, s->origin);
+			p = v_to_p(moved_p);
+    
+			// Normalize point to get direction vector
+			float length = get_len_vector(moved_p);
+			// Convert to UV coordinates
+			float nx = p.x / length;
+			float ny = p.y / length;
+			float nz = p.z / length;
+
+			float u = 0.5f + (atan2f(nz, nx) / (2.0f * M_PI));
+			float v = 0.5f - (asinf(ny) / M_PI);
+			
+			// Create checkerboard pattern
+			float scale = s->diameter * s->diameter;  // Adjust for checker size
+			int check_u = (int)(u * scale);
+			int check_v = (int)(v * scale);
+			
+			if ((check_u + check_v) % 2 == 0)
+				obj_color = s->pattern->c1;
+			else
+				obj_color = s->pattern->c2;
+		}
+		else if (s->pattern && s->pattern->PATTERN_TYPE == STRIPE_X_PAT)
+		{
+			p = (v_to_p(sub_points(inter_point, (((t_sphere *)hit_obj->data)->origin))));
+			scale = 10;
+			scaled_x = (int)((p.x / s->diameter) * scale);
+			if ((int)scaled_x % 2 == 0)
+				obj_color = ((t_sphere *)hit_obj->data)->pattern->c1;
+			else
+				obj_color = ((t_sphere *)hit_obj->data)->pattern->c2;
+		}
+		else if (s->pattern && s->pattern->PATTERN_TYPE == GRADIANT_Y)
+		{
+			float fraction;
+			p = v_to_p(sub_points(inter_point, s->origin));
+			// Map to [-1,1] range first, then to [0,1]
+			fraction = p.x / s->diameter;     // This gives us [-0.5, 0.5]
+			fraction = fraction + 0.5;                     // Now [0,1]
+			// Clamp fraction between 0 and 1
+			fraction = fraction < 0 ? 0 : (fraction > 1 ? 1 : fraction);
+			
+			obj_color.r = (int)(s->pattern->c1.r * (1 - fraction) + s->pattern->c2.r * fraction);
+			obj_color.g = (int)(s->pattern->c1.g * (1 - fraction) + s->pattern->c2.g * fraction);
+			obj_color.b = (int)(s->pattern->c1.b * (1 - fraction) + s->pattern->c2.b * fraction);
+		}
+		else if (s->pattern && s->pattern->PATTERN_TYPE == SWIRL)
+		{
+			moved_p = sub_points(inter_point, s->origin);
+			p = v_to_p(moved_p);
+
+			// Compute angle and distance for the swirl
+			float angle = atan2f(p.y, p.x);
+			float dist = sqrtf(p.x * p.x + p.y * p.y);
+			
+			// Swirl pattern factor
+			float swirl = sinf(5.0f * angle + 3.0f * dist);
+			// map swirl [-1,1] to [0,1]
+			swirl = 0.5f * (swirl + 1.0f);
+
+			// Blend colors
+			obj_color.r = (int)(s->pattern->c1.r * (1.0f - swirl) + s->pattern->c2.r * swirl);
+			obj_color.g = (int)(s->pattern->c1.g * (1.0f - swirl) + s->pattern->c2.g * swirl);
+			obj_color.b = (int)(s->pattern->c1.b * (1.0f - swirl) + s->pattern->c2.b * swirl);
+		}
+	}
+	return obj_color;
+}
+
 bool is_shadowed(t_world *w, t_point p)
 {
 	t_light *light;
@@ -117,23 +203,9 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t)
 	speclar_color = zero_color();
 	diffuse_color = zero_color();
 	ambient_color = zero_color();
-	ambient_color = scale_color(mul_colors(ambient->c, obj_clr), ambient->ratio * 0.1); // should this be a unified color or just a color to add to my objects's colors
 	inter_point = position_at(cam_ray, smallest_t);
-	obj_clr = hit_obj->get_color(hit_obj);
-	if (hit_obj->type == SP_OBJ)
-	{
-		t_sphere *s;
-		s = hit_obj->data;
-		if (s->pattern)
-		{
-			t_point relative_point = (v_to_p(sub_points(inter_point, (((t_sphere *)hit_obj->data)->origin))));
-
-			if (((int)(floor)(relative_point.x) + (int)(floor)(relative_point.y) + (int)(floor)(relative_point.z)) % 2 == 0)
-				obj_clr = ((t_sphere *)hit_obj->data)->pattern->c1;
-			else
-				obj_clr = ((t_sphere *)hit_obj->data)->pattern->c2;
-		}
-	}
+	obj_clr = handle_object_pat(hit_obj, inter_point);
+	ambient_color = scale_color(mul_colors(ambient->c, obj_clr), ambient->ratio * 0.1); // should this be a unified color or just a color to add to my objects's colors
 	if (is_shadowed(getengine()->w, inter_point))
 		return ambient_color;
 	pt_cam_vec = normal(sub_points(inter_point, cam_ray->origin)); 
@@ -258,9 +330,7 @@ void    rendering(void)
 	engine->img.img = mlx_new_image(engine->m.mlx, SCREEN_WIDTH, SCREEN_HEIGHT);
 	engine->img.addr = mlx_get_data_addr(engine->img.img, &engine->img.bits_per_pixel, &engine->img.line_length,
 								&engine->img.endian);
-	// mlx_clear_window(engine->m.mlx, engine->m.win);
 	cam = engine->w->cam;
-	// debug light
 	scale = tan(deg_to_rad(cam->fov) / 2.f);
 	x = 0;
 	y = 0;

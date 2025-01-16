@@ -237,15 +237,16 @@ int get_color_value(t_color c);
 t_color add_colors(t_color c1, t_color c2);
 t_color clamp_color(t_color c1);
 t_color sub_colors(t_color c1, t_color c2);
+t_color abs_sub_colors(t_color c1, t_color c2);
 t_color mul_colors(t_color c1, t_color c2);
 t_color increment_color(t_color c1, int amount);
 t_color neg_color(t_color c1);
 t_color zero_color();
 t_color scale_color(t_color v, float scale);
+t_color lerp_colors(t_color c1, t_color c2, float t);
 void print_color(t_color c, bool newline);
 t_color sum_colors(t_color amb, t_color dif, t_color   spc);
 t_color rgb_to_gray(t_color c);
-
 
 
 /* matrices */
