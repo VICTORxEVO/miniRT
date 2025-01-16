@@ -22,6 +22,13 @@ typedef struct s_color
 	int	b;
 }	t_color;
 
+typedef struct s_pattern
+{
+	t_color c1;
+	t_color c2;
+	char	PATTERN_TYPE;
+}	t_pattern;
+
 typedef struct s_object
 {
     void *data;
@@ -30,6 +37,8 @@ typedef struct s_object
 	t_vector (*get_norm ) (struct s_object *o, t_point pt_on_sp);
 	t_color	(*get_color) (struct s_object *o);
 	void (*set_color) (struct s_object *o, t_color new_color); 
+	t_pattern *(*get_pattern) (struct s_object *o); 
+	void (*set_pattern) (struct s_object *o, t_pattern	*p); 
 } t_object;
 
 
@@ -46,9 +55,10 @@ enum e_types
 	e_camera = 4,
 	e_color = 4,
 	e_light = 4,
-	e_sphere = 4,
 	e_plain = 4,
-	e_sphere_checkered = 6,
+	e_plain_pattern = 6,
+	e_sphere = 4,
+	e_sphere_pattern = 6,
 	e_cylinder = 6,
 };
 
@@ -98,12 +108,6 @@ typedef struct s_world
 	bool		gray_on;
 } t_world;
 
-typedef struct s_pattern
-{
-	t_color c1;
-	t_color c2;
-	char	PATTERN_TYPE;
-}	t_pattern;
 
 typedef struct s_sphere
 {
@@ -119,6 +123,7 @@ typedef struct s_plane
 	t_point		origin;
 	t_vector	normal;
 	t_color		c;
+	t_pattern *pattern;
 } t_plane;
 
 typedef struct s_cylinder
@@ -323,6 +328,8 @@ float deg_to_rad(float deg);
 float rad_to_rad(float rad);
 t_vector get_obj_norm(t_object	*o, t_point	pt_on_sphere);
 t_color get_obj_color(t_object *o);
+t_pattern	*get_obj_pattern(t_object	*o);
+void set_obj_pattern(t_object *o, t_pattern *p);
 void set_obj_color(t_object *o, t_color c);
 void	my_mlx_pixel_put(t_img *data, int x, int y, int color);
 

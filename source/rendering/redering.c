@@ -21,13 +21,29 @@ t_color	get_obj_color(t_object *o)
 	else
 		return ((t_plane *)o->data)->c;
 }
-
 void set_obj_color(t_object *o, t_color c)
 {
 	if (o->type == SP_OBJ)
 		((t_sphere *)o->data)->c = c;
 	else
 		((t_plane *)o->data)->c = c;
+
+}
+
+t_pattern	*get_obj_pattern(t_object	*o)
+{
+	if (o->type == SP_OBJ)
+		return ((t_sphere *)o->data)->pattern;
+	else if (o->type == PL_OBJ)
+		return ((t_plane *)o->data)->pattern;
+	else return (NULL);
+}
+void set_obj_pattern(t_object *o, t_pattern *p)
+{
+	if (o->type == SP_OBJ)
+		((t_sphere *)o->data)->pattern = p;
+	else
+		((t_plane *)o->data)->pattern = p;
 
 }
 
@@ -77,85 +93,97 @@ inline t_vector	reflect (t_vector	light, t_vector	norm) // light is a vector fro
 t_color handle_object_pat(t_object *hit_obj, t_point inter_point)
 {
 	t_color	obj_color;
-	t_sphere *s;
 	float scale;
 	float scaled_x;
-	float scaled_z;
 	t_vector	moved_p;
 	t_point p;
+	t_pattern	*pattern;
+	t_point	origin_p;
+	float	diameter;
 
-	obj_color = hit_obj->get_color(hit_obj);
 	if (hit_obj->type == SP_OBJ)
 	{
-		s = hit_obj->data;
-		if (s->pattern && s->pattern->PATTERN_TYPE == CHECKER_PAT)
-		{
-			moved_p = sub_points(inter_point, s->origin);
+		origin_p = ((t_sphere *)hit_obj->data)->origin;
+		diameter = ((t_sphere *)hit_obj->data)->diameter;
+	}
+	else
+	{
+		origin_p = ((t_plane *)hit_obj->data)->origin;
+		diameter = 5;
+	}
+
+	obj_color = hit_obj->get_color(hit_obj);
+	if (hit_obj->get_pattern)
+		pattern = hit_obj->get_pattern(hit_obj);
+	if (pattern && pattern->PATTERN_TYPE == CHECKER_PAT)
+	{
+		moved_p = sub_points(inter_point, origin_p);
+		if (hit_obj->type == SP_OBJ)
 			p = v_to_p(moved_p);
-    
-			// Normalize point to get direction vector
-			float length = get_len_vector(moved_p);
-			// Convert to UV coordinates
-			float nx = p.x / length;
-			float ny = p.y / length;
-			float nz = p.z / length;
+		else
+			p = inter_point;
+		// Normalize point to get direction vector
+		float length = get_len_vector(moved_p);
+		// Convert to UV coordinates
+		float nx = p.x / length;
+		float ny = p.y / length;
+		float nz = p.z / length;
 
-			float u = 0.5f + (atan2f(nz, nx) / (2.0f * M_PI));
-			float v = 0.5f - (asinf(ny) / M_PI);
-			
-			// Create checkerboard pattern
-			float scale = s->diameter * s->diameter;  // Adjust for checker size
-			int check_u = (int)(u * scale);
-			int check_v = (int)(v * scale);
-			
-			if ((check_u + check_v) % 2 == 0)
-				obj_color = s->pattern->c1;
-			else
-				obj_color = s->pattern->c2;
-		}
-		else if (s->pattern && s->pattern->PATTERN_TYPE == STRIPE_X_PAT)
-		{
-			p = (v_to_p(sub_points(inter_point, (((t_sphere *)hit_obj->data)->origin))));
-			scale = 10;
-			scaled_x = (int)((p.x / s->diameter) * scale);
-			if ((int)scaled_x % 2 == 0)
-				obj_color = ((t_sphere *)hit_obj->data)->pattern->c1;
-			else
-				obj_color = ((t_sphere *)hit_obj->data)->pattern->c2;
-		}
-		else if (s->pattern && s->pattern->PATTERN_TYPE == GRADIANT_Y)
-		{
-			float fraction;
-			p = v_to_p(sub_points(inter_point, s->origin));
-			// Map to [-1,1] range first, then to [0,1]
-			fraction = p.x / s->diameter;     // This gives us [-0.5, 0.5]
-			fraction = fraction + 0.5;                     // Now [0,1]
-			// Clamp fraction between 0 and 1
-			fraction = fraction < 0 ? 0 : (fraction > 1 ? 1 : fraction);
-			
-			obj_color.r = (int)(s->pattern->c1.r * (1 - fraction) + s->pattern->c2.r * fraction);
-			obj_color.g = (int)(s->pattern->c1.g * (1 - fraction) + s->pattern->c2.g * fraction);
-			obj_color.b = (int)(s->pattern->c1.b * (1 - fraction) + s->pattern->c2.b * fraction);
-		}
-		else if (s->pattern && s->pattern->PATTERN_TYPE == SWIRL)
-		{
-			moved_p = sub_points(inter_point, s->origin);
-			p = v_to_p(moved_p);
+		float u = 0.5f + (atan2f(nz, nx) / (2.0f * M_PI));
+		float v = 0.5f - (asinf(ny) / M_PI);
+		
+		// Create checkerboard pattern
+		float scale = diameter * diameter;  // Adjust for checker size
+		int check_u = (int)(u * scale);
+		int check_v = (int)(v * scale);
+		
+		if ((check_u + check_v) % 2 == 0)
+			obj_color = pattern->c1;
+		else
+			obj_color = pattern->c2;
+	}
+	else if (pattern && pattern->PATTERN_TYPE == STRIPE_X_PAT)
+	{
+		p = (v_to_p(sub_points(inter_point, origin_p)));
+		scale = 10;
+		scaled_x = (int)((p.x / diameter) * scale);
+		if ((int)scaled_x % 2 == 0)
+			obj_color = pattern->c1;
+		else
+			obj_color = pattern->c2;
+	}
+	else if (pattern && pattern->PATTERN_TYPE == GRADIANT_Y)
+	{
+		float fraction;
+		p = v_to_p(sub_points(inter_point, origin_p));
+		// Map to [-1,1] range first, then to [0,1]
+		fraction = p.x / diameter;     // This gives us [-0.5, 0.5]
+		fraction = fraction + 0.5;                     // Now [0,1]
+		// Clamp fraction between 0 and 1
+		fraction = fraction < 0 ? 0 : (fraction > 1 ? 1 : fraction);
+		
+		obj_color.r = (int)(pattern->c1.r * (1 - fraction) + pattern->c2.r * fraction);
+		obj_color.g = (int)(pattern->c1.g * (1 - fraction) + pattern->c2.g * fraction);
+		obj_color.b = (int)(pattern->c1.b * (1 - fraction) + pattern->c2.b * fraction);
+	}
+	else if (pattern && pattern->PATTERN_TYPE == SWIRL)
+	{
+		moved_p = sub_points(inter_point, origin_p);
+		p = v_to_p(moved_p);
 
-			// Compute angle and distance for the swirl
-			float angle = atan2f(p.y, p.x);
-			float dist = sqrtf(p.x * p.x + p.y * p.y);
-			
-			// Swirl pattern factor
-			float swirl = sinf(5.0f * angle + 3.0f * dist);
-			// map swirl [-1,1] to [0,1]
-			swirl = 0.5f * (swirl + 1.0f);
+		// Compute angle and distance for the swirl
+		float angle = atan2f(p.y, p.x);
+		float dist = sqrtf(p.x * p.x + p.y * p.y);
+		
+		// Swirl pattern factor
+		float swirl = sinf(5.0f * angle + 3.0f * dist);
+		// map swirl [-1,1] to [0,1]
+		swirl = 0.5f * (swirl + 1.0f);
 
-			// Blend colors
-			obj_color.r = (int)(s->pattern->c1.r * (1.0f - swirl) + s->pattern->c2.r * swirl);
-			obj_color.g = (int)(s->pattern->c1.g * (1.0f - swirl) + s->pattern->c2.g * swirl);
-			obj_color.b = (int)(s->pattern->c1.b * (1.0f - swirl) + s->pattern->c2.b * swirl);
-		}
+		// Blend colors
+		obj_color.r = (int)(pattern->c1.r * (1.0f - swirl) + pattern->c2.r * swirl);
+		obj_color.g = (int)(pattern->c1.g * (1.0f - swirl) + pattern->c2.g * swirl);
+		obj_color.b = (int)(pattern->c1.b * (1.0f - swirl) + pattern->c2.b * swirl);
 	}
 	return obj_color;
 }

@@ -218,9 +218,26 @@ int key_press(int key, t_core *engine)
         clear();
         exit(0);
     }
-
-    return (0);
+    if (key == XK_Return) // Enter key
+    {
+        // Loop through spheres and planes and set pattern to NULL
+        t_object *obj = engine->w->objects;
+        while (obj)
+        {
+            if (obj->type == SP_OBJ || obj->type == PL_OBJ)
+            {
+                if (!obj->get_pattern)
+                    obj->get_pattern = get_obj_pattern;
+                else
+                    obj->get_pattern = NULL;
+            }
+            obj = obj->next;
+        }
+        rendering(); // Re-render the scene
+    }
+    return 0;
 }
+
 int key_release(int key, t_core *engine)
 {
     if (key == XK_RIGHT_CTRL)

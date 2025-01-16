@@ -34,8 +34,8 @@
 
 
 // #ifdef LINUX
-    #define SCREEN_WIDTH 800.f
-    #define SCREEN_HEIGHT 500.f
+    #define SCREEN_WIDTH 1800.f
+    #define SCREEN_HEIGHT 1200.f
 // #endif
 
 

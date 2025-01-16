@@ -69,6 +69,7 @@ bool    plane_handled(t_core *d, char **args)
     char		**clrs;
     char		**vctr;
     t_color		plane_color;
+    t_color		plane_pattern_color;
     t_point		plane_cord;
     t_vector	plane_norm;
 	t_plane		*plane;
@@ -84,9 +85,39 @@ bool    plane_handled(t_core *d, char **args)
     if (count_args(clrs) != 3 || !color_struct_filled(&plane_color, clrs))
         return (printf("bad plane color\n"), false);
     plane = galloc(sizeof(t_plane));
+    plane->pattern = NULL;
     plane->c = plane_color;
     plane->origin = plane_cord;
     plane->normal = plane_norm;
+    if (args[4])
+    {
+        if (ft_strcmp(args[4], "checkered") != 0 && ft_strcmp(args[4], "striped_x") != 0 && 
+            ft_strcmp(args[4], "gradient_y") != 0 &&
+            ft_strcmp(args[4], "ring_z") != 0 &&
+            ft_strcmp(args[4], "swirl") != 0)
+            return (printf("Error\nsphere pattern settings invalid\n"), false);
+        else
+        {
+            clrs = ft_split(args[5], ',');
+            if (count_args(clrs) != 3 || !color_struct_filled(&plane_pattern_color, clrs))
+                return (printf("Error\nsphere pattern color invalid\n"), false);
+            plane->pattern = galloc(sizeof(t_pattern));
+            if (ft_strcmp(args[4], "checkered") == 0)
+                plane->pattern->PATTERN_TYPE = CHECKER_PAT;
+            else if (ft_strcmp(args[4], "striped_x") == 0)
+                plane->pattern->PATTERN_TYPE = STRIPE_X_PAT;
+            else if (ft_strcmp(args[4], "gradient_y") == 0)
+                plane->pattern->PATTERN_TYPE = GRADIANT_Y;
+            else if (ft_strcmp(args[4], "ring_z") == 0)
+                plane->pattern->PATTERN_TYPE = RING_Z_PAT;
+            else if (ft_strcmp(args[4], "swirl") == 0)
+                plane->pattern->PATTERN_TYPE = SWIRL;
+            else
+                return (printf("Error\nplane pattern type invalid\n"), false);
+            plane->pattern->c1 = plane_color;
+            plane->pattern->c2 = plane_pattern_color;
+        }
+    }
 	add_obj(d, &d->w->objects, plane, PL_OBJ);
 	return (true);
 }
@@ -184,7 +215,6 @@ bool    sphere_handled(t_core *d, char **args)
             sphere->pattern->c1 = sphere_color;
             sphere->pattern->c2 = sphere_pattern_color;
         }
-            
     }
     
 

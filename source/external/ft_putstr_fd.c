@@ -14,9 +14,12 @@
 
 void	ft_putstr_fd(char *s, int fd)
 {
+	int no_meaning_variable;
+
 	if (fd != -1 || s)
 	{
 		while (*s)
-			write(fd, s++, 1);
+			no_meaning_variable = write(fd, s++, 1);
 	}
+	fd = no_meaning_variable;
 }
