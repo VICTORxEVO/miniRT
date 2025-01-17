@@ -308,6 +308,24 @@ float pl_intersect(t_plane *pl, t_ray *ray)
 	return t;
 }
 
+int move(void *ptr)
+{
+	static int count;
+	t_core	*engine;
+
+	engine = (t_core *) ptr;
+	count++;
+	if (count % 10000 == 0)
+	{
+		((t_light *)engine->w->lights->data)->p.x += 0.02;
+		((t_light *)engine->w->lights->data)->p.y += 0.02;
+		((t_light *)engine->w->lights->data)->p.z -= 0.02;
+		rendering();
+		count = 0;
+	}
+	return 1;
+}
+
 t_color intersect_world(t_world *w, t_ray *cam_ray)
 {
 	t_object	*node;
@@ -346,14 +364,17 @@ void    rendering(void)
 {
     t_camera    *cam;
 	t_ray		ray;
+	t_color		final_clr;
+	t_color		temp_clr;
     t_core      *engine;
-
-    engine = getengine();
 	int	x;
 	int	y;
 	float scale;
 	float ndc_x;
 	float ndc_y;
+	float i;
+
+    engine = getengine();
 	init_hooks(engine);
 	engine->img.img = mlx_new_image(engine->m.mlx, SCREEN_WIDTH, SCREEN_HEIGHT);
 	engine->img.addr = mlx_get_data_addr(engine->img.img, &engine->img.bits_per_pixel, &engine->img.line_length,
@@ -368,10 +389,18 @@ void    rendering(void)
 		ndc_y = 1 - (2.f * (y + 0.5) / SCREEN_HEIGHT);			
 		while (x < SCREEN_WIDTH)
 		{
-			ndc_x = (2.f * (x + 0.5) / SCREEN_WIDTH) - 1.f;
-			ray.origin = cam->origin;
-			ray.direction = generate_cam_dir(cam, scale, ndc_x, ndc_y);
-			my_mlx_pixel_put(&engine->img, x, y, get_rgb(intersect_world(engine->w, &ray)));
+			i = -1;
+			final_clr = zero_color();
+			while (++i < RAYS_PER_PX) /* this part is for super sampling (anti aliasing)*/
+			{
+				ndc_x = (2.f * (x + (0.5 + i / RAYS_PER_PX)) / SCREEN_WIDTH) - 1.f;
+				ray.origin = cam->origin;
+				ray.direction = generate_cam_dir(cam, scale, ndc_x, ndc_y);
+				temp_clr = intersect_world(engine->w, &ray);
+				final_clr = add_colors(final_clr, temp_clr, false);
+			}
+			final_clr = scale_color(final_clr, 1.f / RAYS_PER_PX);
+			my_mlx_pixel_put(&engine->img, x, y, get_rgb(final_clr));
 			x += engine->iter;
 		}
 		y += engine->iter;
@@ -381,6 +410,7 @@ void    rendering(void)
     mlx_hook(engine->m.win, KeyPress, KEY_PRESS, key_press, engine);
     mlx_hook(engine->m.win, KeyRelease, KEY_RELEASE, key_release, engine);
 	mlx_mouse_hook(engine->m.win, mouse_input, engine);
+	// mlx_loop_hook(engine->m.mlx, move, engine);
 	mlx_loop(engine->m.mlx);
     return ;
 }

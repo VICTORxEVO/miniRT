@@ -239,7 +239,7 @@ bool    elem_added(t_core *d,char **args);
 
 
 int get_color_value(t_color c);
-t_color add_colors(t_color c1, t_color c2);
+t_color add_colors(t_color c1, t_color c2, bool is_clampt);
 t_color clamp_color(t_color c1);
 t_color sub_colors(t_color c1, t_color c2);
 t_color abs_sub_colors(t_color c1, t_color c2);

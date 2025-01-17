@@ -31,7 +31,7 @@
 # define NOAMB_ERR " there is no ambient!"
 # define WHITESPACE     " \t\n\r\v\f"  // space, tab, newline, carriage return, vtab, formfeed
 
-
+# define RAYS_PER_PX 50
 
 // #ifdef LINUX
     #define SCREEN_WIDTH 1800.f
