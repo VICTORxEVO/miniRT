@@ -1,19 +1,19 @@
 # Scene ambient light (increased intensity)
-A 0.5 255,255,255
+A 1 255,255,255
 
 # Camera: Adjusted position for better view
-C 0,3,2 0,-0.2,-1 90
+C -2,3,-2 0,-0.2,-1 90
 
 # Light source (repositioned and increased intensity)
-L 0,2,0 1.0 255,255,255
+L 0,2,10 1.0 255,255,255
 
 # Main sphere (partially embedded in floor)
 
-sp  0,2,-10         1.4          255,0,0  swirl 58,70,180
-sp  0.5,2,-8         5          255,62,80  gradient_y 30,255,108
-sp   -5,2,-5         2.1           0,255,0 swirl 58,70,180
+sp  -4,-2,-10         3.4          255,255,255 gradient_y 0,0,0
+sp  0.5,2,-8         5          180,25,60
+sp   -5,2,-7         2.1           0,255,0 swirl 58,70,180
 sp   -3,1,-10           3           96,80,180 striped_x 180,100,180 
-sp   -4,5,-20          7         255,255,255 checkered 0,0,0
+sp   -4,5,-10          7         255,255,255 checkered 0,0,0
 
 
 

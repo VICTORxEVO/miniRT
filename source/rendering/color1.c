@@ -18,15 +18,6 @@ inline t_color add_colors(t_color c1, t_color c2, bool is_clampt)
     return clamp_color(res_color);
 }
 
-inline t_color lerp_colors(t_color c1, t_color c2, float t)
-{
-    t_color result;
-    result.r = c1.r * (1 - t) + c2.r * t;
-    result.g = c1.g * (1 - t) + c2.g * t;
-    result.b = c1.b * (1 - t) + c2.b * t;
-    return result;
-}
-
 inline t_color increment_color(t_color c1, int amount)
 {
     t_color res_color;

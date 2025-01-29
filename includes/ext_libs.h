@@ -47,6 +47,8 @@
 #include <X11/X.h>
 #include <X11/keysym.h>
 #include <X11/XKBlib.h>
+#include <time.h>
+#include "stb_image_write.h"
 
 
 

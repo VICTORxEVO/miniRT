@@ -39,3 +39,7 @@ inline t_color sum_colors(t_color amb, t_color dif, t_color   spc)
     return res;
 }
 
+inline float get_brightness(t_color c)
+{
+    return sqrtf( powf(0.299*c.r, 2.f) + powf(0.587*c.g, 2.f) + powf(0.114*c.b, 2.f) );
+}

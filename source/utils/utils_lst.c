@@ -89,6 +89,8 @@ void add_obj(t_core *d, t_object **head, void *data, char type_macro)
     new_obj->set_color = set_obj_color;
     new_obj->get_pattern = get_obj_pattern;
     new_obj->set_pattern = set_obj_pattern;
+    new_obj->get_reflect = get_obj_reflect;
+    new_obj->get_origin = get_obj_origin;
     new_obj->type = type_macro;
     new_obj->next = *head;
     *head = new_obj;

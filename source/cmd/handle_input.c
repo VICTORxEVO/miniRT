@@ -22,6 +22,7 @@ void handle_input()
         s->origin = (t_point ) {0,0,0};
         s->diameter = 2;
         s->radius_squared = 4;
+        s->reflect = 0;
         add_obj(engine, &engine->w->objects, s, SP_OBJ);
     }
 }

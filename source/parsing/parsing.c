@@ -57,6 +57,7 @@ void setup_cam_dir(t_camera	*cam)
 	t_vector	temp_up;
 	// calc up, right vectors for where the cam is lookin (forward)
 	temp_up = (t_vector) {0, 1, 0};
+    cam->forward;
 	cam->right = normal(cross(temp_up, cam->forward)); 
 	cam->up = normal(cross(cam->forward, cam->right)); // now reset up
     cam->aspect = (SCREEN_WIDTH / SCREEN_HEIGHT);
@@ -67,10 +68,12 @@ void parsing(int ac, char *filename)
 {
     int fd;
     t_core  *engine;
+
+    srand((unsigned int)time(NULL));
     engine = getengine();
     engine->w = galloc(sizeof(t_world));
     engine->m.mlx = mlx_init();
-	engine->m.win = mlx_new_window(engine->m.mlx, SCREEN_WIDTH, SCREEN_HEIGHT, "Hello world!");
+	engine->m.win = mlx_new_window(engine->m.mlx, SCREEN_WIDTH, SCREEN_HEIGHT, "miniRT");
     engine->m.ctrl_pressed = false;
     if (ac != 2)
         pexit(YELLOW USAGE_WARN, 1);
@@ -81,6 +84,11 @@ void parsing(int ac, char *filename)
 	setup_cam_dir(engine->w->cam);
     engine->w->gray_on = false;
     engine->cmd_on = true;
+    engine->rays_px = 1.f;
+    engine->aa_on = false;
     engine->iter = 1;
+	engine->png = galloc(SCREEN_WIDTH * SCREEN_HEIGHT * 3);
+    engine->refl_on = false;
+	engine->counter = 0;
     close(fd);
 }

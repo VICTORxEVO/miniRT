@@ -196,3 +196,9 @@ float mini(float a, float b)
         return (a);
     return (b);
 }
+
+
+inline t_vector	reflect (t_vector	light, t_vector	norm) // light is a vector from a point towards the light
+{
+	return sub_vectors(light, scale_vector(norm, 2 * dot(norm, light))); 
+}

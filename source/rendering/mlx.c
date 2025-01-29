@@ -1,4 +1,6 @@
 #include "miniRT.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 
 int mouse_input(int key, int y, int x, void *d)
 {
@@ -202,15 +204,39 @@ int key_press(int key, t_core *engine)
         engine->w->gray_on = !engine->w->gray_on;
         rendering();
     }
-    else if (key == XK_KP_Divide)
+    else if (key == XK_Shift_L || key == XK_Shift_R)
     {
-        engine->iter = engine->iter + 1;
+        if (engine->aa_on)
+        {
+            engine->aa_on = false;
+            engine->rays_px = 1;
+        }
+        else
+        {
+            engine->aa_on = true;
+            engine->rays_px = 200;
+        }
         rendering();
     }
-    else if (key == XK_KP_Multiply)
+    else if (key == XK_l)
     {
-        if (engine->iter > 1)
-            engine->iter = engine->iter - 1;
+        engine->rays_px+=10;
+        rendering();
+    }
+    else if (key == XK_k)
+    {
+        if (engine->rays_px > 10)
+            engine->rays_px -= 10;
+        rendering();
+    }
+    else if (key == XK_KP_Add && engine->iter > 1)
+    {
+        engine->iter--;
+        rendering();
+    }
+    else if (key == XK_KP_Subtract)
+    {
+        engine->iter++;
         rendering();
     }
     else if (key == XK_Escape)
@@ -235,6 +261,33 @@ int key_press(int key, t_core *engine)
         }
         rendering(); // Re-render the scene
     }
+    if (key == XK_p)
+    {
+        // save_img()
+        char *name = ft_strjoin("scenes/scene", ft_itoa(engine->counter));
+        engine->counter++;
+        name = ft_strjoin(name, ".png");
+        stbi_write_png(name, SCREEN_WIDTH, SCREEN_HEIGHT, 3, engine->png, SCREEN_WIDTH * 3);
+    }
+    if (key == XK_r)
+    {
+        // save_img()
+        if (engine->refl_on)
+        {
+            engine->refl_on = false;
+            engine->rays_px = 1;
+            engine->aa_on = false;
+        }
+        else
+        {
+            engine->refl_on = true;
+            engine->rays_px = 20;
+            engine->aa_on = true;
+        }
+        rendering(); // Re-render the scene
+
+    }
+    return 0;
     return 0;
 }
 
@@ -253,37 +306,10 @@ void init_hooks(t_core *engine)
 }
 
 
-// int input(int key, void *d)
-// {
-// 	t_core *engine;
+void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
+{
+	char	*dst;
 
-// 	engine = getengine();
-// 	// move first light
-// 	if (key == XK_Right)
-// 	{
-// 		((t_light *)engine->w->lights->data)->p.x -= 2;
-// 		rendering();
-// 	}
-// 	if (key == XK_Left)
-// 	{
-// 		((t_light *)engine->w->lights->data)->p.x += 2;
-// 		rendering();
-// 	}
-// 	if (key == XK_Up)
-// 	{
-// 		((t_light *)engine->w->lights->data)->p.y += 2;
-// 		rendering();
-// 	}
-// 	if (key == XK_Down)
-// 	{
-// 		((t_light *)engine->w->lights->data)->p.y -= 2;
-// 		rendering();
-// 	}
-// 	if (key == XK_Escape)
-// 	{
-// 		clear();
-// 		exit(0);
-// 	}
-	
-// 	return 1;
-// }
+	dst = img->addr + (y * img->line_length + x * (img->bits_per_pixel / 8));
+	*(unsigned int*)dst = color;
+}

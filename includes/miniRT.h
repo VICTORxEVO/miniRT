@@ -22,11 +22,12 @@ typedef struct s_color
 	int	b;
 }	t_color;
 
+
 typedef struct s_pattern
 {
 	t_color c1;
 	t_color c2;
-	char	PATTERN_TYPE;
+	char	type;
 }	t_pattern;
 
 typedef struct s_object
@@ -35,12 +36,20 @@ typedef struct s_object
     struct s_object *next;
 	char	type;
 	t_vector (*get_norm ) (struct s_object *o, t_point pt_on_sp);
+	t_point (*get_origin ) (struct s_object *o);
 	t_color	(*get_color) (struct s_object *o);
 	void (*set_color) (struct s_object *o, t_color new_color); 
 	t_pattern *(*get_pattern) (struct s_object *o); 
+	float (*get_reflect) (struct s_object *o); 
 	void (*set_pattern) (struct s_object *o, t_pattern	*p); 
 } t_object;
 
+
+typedef struct s_hit
+{
+	float d;
+	t_object	*obj;
+}	t_hit;
 
 typedef struct s_mlx
 {
@@ -116,6 +125,8 @@ typedef struct s_sphere
 	float		radius_squared;
 	t_color		c;
 	t_pattern	*pattern;
+    float reflect;
+
 } t_sphere;
 
 typedef struct s_plane
@@ -124,6 +135,7 @@ typedef struct s_plane
 	t_vector	normal;
 	t_color		c;
 	t_pattern *pattern;
+    float reflect;
 } t_plane;
 
 typedef struct s_cylinder
@@ -156,8 +168,14 @@ typedef struct s_core
 	t_world *w;
 	t_gc	*gc;
 	t_img	img;
+	double		rays_px;
 	bool	cmd_on; // maybe add a command line to handle adding spheres and light ... ?
+	bool	aa_on; // maybe add a command line to handle adding spheres and light ... ?
+	bool	refl_on; // maybe add a command line to handle adding spheres and light ... ?
 	int		iter; // if 1 it iterates throught each pixel, as big as it gets, the quality goes down
+	int		counter;
+
+	unsigned char *png;
 } t_core;
 
 
@@ -190,11 +208,11 @@ t_color	sp_light(t_object	*hit_sph, t_ray	*cam_ray, float smallest_t);
 // t_color	pl_light(t_plane	*hit_pl, t_ray	*cam_ray, float smallest_t);
 t_color	pl_light(t_object	*hit_obj, t_ray	*cam_ray, float smallest_t);
 bool is_shadowed(t_world *w, t_point p);
-t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t);
+t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t, int remaining);
 t_vector	generate_cam_dir(t_camera	*cam, float scale, float ndcx, float ndcy);
 float sp_intersect(t_sphere *s, t_ray *ray);
 float pl_intersect(t_plane *pl, t_ray *ray);
-t_color intersect_world(t_world *w, t_ray *cam_ray);
+t_color intersect_world(t_world *w, t_ray *cam_ray, int remaining);
 int input(int key, void *d);
 void    rendering(void);
 
@@ -238,6 +256,8 @@ bool    vector_struct_filled(t_vector	*v, char  **args);
 bool    elem_added(t_core *d,char **args);
 
 
+void handle_pat(char *patt_name, char *patt_clrs, t_pattern  **pat, t_color main_clr);
+
 int get_color_value(t_color c);
 t_color add_colors(t_color c1, t_color c2, bool is_clampt);
 t_color clamp_color(t_color c1);
@@ -245,14 +265,12 @@ t_color sub_colors(t_color c1, t_color c2);
 t_color abs_sub_colors(t_color c1, t_color c2);
 t_color mul_colors(t_color c1, t_color c2);
 t_color increment_color(t_color c1, int amount);
-t_color neg_color(t_color c1);
 t_color zero_color();
 t_color scale_color(t_color v, float scale);
-t_color lerp_colors(t_color c1, t_color c2, float t);
 void print_color(t_color c, bool newline);
 t_color sum_colors(t_color amb, t_color dif, t_color   spc);
+float get_brightness(t_color c);
 t_color rgb_to_gray(t_color c);
-
 
 /* matrices */
 float **create_matrix_2x2(float a, float b, float c, float d);
@@ -327,10 +345,12 @@ t_vector normal_at(t_sphere s, t_point p);
 float deg_to_rad(float deg);
 float rad_to_rad(float rad);
 t_vector get_obj_norm(t_object	*o, t_point	pt_on_sphere);
+t_point get_obj_origin(t_object	*o);
 t_color get_obj_color(t_object *o);
 t_pattern	*get_obj_pattern(t_object	*o);
 void set_obj_pattern(t_object *o, t_pattern *p);
 void set_obj_color(t_object *o, t_color c);
+float get_obj_reflect(t_object *o);
 void	my_mlx_pixel_put(t_img *data, int x, int y, int color);
 
 

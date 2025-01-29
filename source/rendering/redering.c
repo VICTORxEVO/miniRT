@@ -1,60 +1,5 @@
 # include "miniRT.h"
 
-t_vector get_obj_norm(t_object	*o, t_point	pt_on_sphere)
-{
-	t_sphere *s;
-
-	if (o->type == PL_OBJ)
-		return (((t_plane *)o->data)->normal);
-	else if (o->type == SP_OBJ)
-	{
-		s = (t_sphere *)o->data;
-		return (normal(sub_points(pt_on_sphere, s->origin)));
-	}
-	return (t_vector) {0,0,0};
-}
-
-t_color	get_obj_color(t_object *o)
-{
-	if (o->type == SP_OBJ)
-		return ((t_sphere *)o->data)->c;
-	else
-		return ((t_plane *)o->data)->c;
-}
-void set_obj_color(t_object *o, t_color c)
-{
-	if (o->type == SP_OBJ)
-		((t_sphere *)o->data)->c = c;
-	else
-		((t_plane *)o->data)->c = c;
-
-}
-
-t_pattern	*get_obj_pattern(t_object	*o)
-{
-	if (o->type == SP_OBJ)
-		return ((t_sphere *)o->data)->pattern;
-	else if (o->type == PL_OBJ)
-		return ((t_plane *)o->data)->pattern;
-	else return (NULL);
-}
-void set_obj_pattern(t_object *o, t_pattern *p)
-{
-	if (o->type == SP_OBJ)
-		((t_sphere *)o->data)->pattern = p;
-	else
-		((t_plane *)o->data)->pattern = p;
-
-}
-
-void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
-{
-	char	*dst;
-
-	dst = img->addr + (y * img->line_length + x * (img->bits_per_pixel / 8));
-	*(unsigned int*)dst = color;
-}
-
 float get_intersect_dist(t_world *w, t_ray *ray)
 {
 	t_object	*node;
@@ -70,24 +15,19 @@ float get_intersect_dist(t_world *w, t_ray *ray)
 		{
 			sphere = (t_sphere *)(node->data);
 			t = sp_intersect(sphere, ray);
-			if (t < smallest_t && t >= 0)
+			if (t < smallest_t && t > 0)
 				smallest_t = t;
  		}
 		else if (node->type == PL_OBJ)
 		{
 			plane = (t_plane *)(node->data);
 			t = pl_intersect(plane, ray);
-			if (t < smallest_t && t >= 0)
+			if (t < smallest_t && t > 0)
 				smallest_t = t;
 		}
 		node = node->next;
 	}
 	return smallest_t;
-}
-
-inline t_vector	reflect (t_vector	light, t_vector	norm) // light is a vector from a point towards the light
-{
-	return sub_vectors(light, scale_vector(norm, 2 * dot(norm, light))); 
 }
 
 t_color handle_object_pat(t_object *hit_obj, t_point inter_point)
@@ -115,13 +55,19 @@ t_color handle_object_pat(t_object *hit_obj, t_point inter_point)
 	obj_color = hit_obj->get_color(hit_obj);
 	if (hit_obj->get_pattern)
 		pattern = hit_obj->get_pattern(hit_obj);
-	if (pattern && pattern->PATTERN_TYPE == CHECKER_PAT)
+	if (pattern && pattern->type == CHECKER_PAT)
 	{
 		moved_p = sub_points(inter_point, origin_p);
 		if (hit_obj->type == SP_OBJ)
 			p = v_to_p(moved_p);
 		else
 			p = inter_point;
+		if (hit_obj->type == PL_OBJ)
+		{
+			if (((int)floor(p.x * 0.5) + (int)floor(p.y * 0.5) + (int)floor(p.z * 0.5)) % 2 == 0)
+				return pattern->c1;
+			return pattern->c2;
+		}
 		// Normalize point to get direction vector
 		float length = get_len_vector(moved_p);
 		// Convert to UV coordinates
@@ -142,7 +88,7 @@ t_color handle_object_pat(t_object *hit_obj, t_point inter_point)
 		else
 			obj_color = pattern->c2;
 	}
-	else if (pattern && pattern->PATTERN_TYPE == STRIPE_X_PAT)
+	else if (pattern && pattern->type == STRIPE_X_PAT)
 	{
 		p = (v_to_p(sub_points(inter_point, origin_p)));
 		scale = 10;
@@ -152,7 +98,7 @@ t_color handle_object_pat(t_object *hit_obj, t_point inter_point)
 		else
 			obj_color = pattern->c2;
 	}
-	else if (pattern && pattern->PATTERN_TYPE == GRADIANT_Y)
+	else if (pattern && pattern->type == GRADIANT_Y)
 	{
 		float fraction;
 		p = v_to_p(sub_points(inter_point, origin_p));
@@ -166,7 +112,7 @@ t_color handle_object_pat(t_object *hit_obj, t_point inter_point)
 		obj_color.g = (int)(pattern->c1.g * (1 - fraction) + pattern->c2.g * fraction);
 		obj_color.b = (int)(pattern->c1.b * (1 - fraction) + pattern->c2.b * fraction);
 	}
-	else if (pattern && pattern->PATTERN_TYPE == SWIRL)
+	else if (pattern && pattern->type == SWIRL)
 	{
 		moved_p = sub_points(inter_point, origin_p);
 		p = v_to_p(moved_p);
@@ -188,25 +134,33 @@ t_color handle_object_pat(t_object *hit_obj, t_point inter_point)
 	return obj_color;
 }
 
-bool is_shadowed(t_world *w, t_point p)
+t_color	get_reflect_color(int remaining, t_object *hit_obj, t_vector pt_cam_vec, t_point	inter_point)
 {
-	t_light *light;
-	t_ray pt_to_light_ray;
+	t_vector	obj_norm;
+	t_ray	reflect_ray;
+	t_point offseted_p;
+	t_color reflected_clr;
+	t_color obj_clr;
 	t_vector offset;
-	float inter_dist;
-	float pt_to_light_dist;
-	light = w->lights->data;
-	offset = scale_vector(normal(sub_points(light->p, p)), EPSILON);
-	pt_to_light_ray.origin = add_points(p, v_to_p(offset));
-	pt_to_light_ray.direction = normal(sub_points(light->p, p));
-	pt_to_light_dist = get_len_vector(sub_points(light->p, p));
-	inter_dist = get_intersect_dist(w, &pt_to_light_ray);
-	if (inter_dist > EPSILON && inter_dist < pt_to_light_dist)
-		return true;
-	return false;
+
+	reflected_clr = zero_color();
+	// handle_object_pat()
+	if (getengine()->refl_on && remaining > 0)
+	{
+		obj_clr = hit_obj->get_color(hit_obj);
+		obj_norm = hit_obj->get_norm(hit_obj, inter_point);
+		offset = scale_vector(obj_norm, EPSILON);
+		offseted_p = add_points(inter_point, v_to_p(offset));
+		reflect_ray.origin = offseted_p;
+		reflect_ray.direction = reflect(pt_cam_vec, obj_norm);
+		reflected_clr = intersect_world(getengine()->w, &reflect_ray, remaining - 1);
+		float reflect_strength = hit_obj->get_reflect(hit_obj) * (get_brightness(obj_clr) / 255.f);
+		reflected_clr = scale_color(reflected_clr, reflect_strength);
+	}
+	return reflected_clr;
 }
 
-t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t)
+t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t, int remaining)
 {
 	if (!hit_obj)
 		return ((t_color) {10, 10, 10});
@@ -214,6 +168,7 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t)
 	t_color	speclar_color;
 	t_color	diffuse_color;
 	t_color	ambient_color;
+	t_color reflected_clr;
 	t_light		*light;
 	t_ambient	*ambient;
 	float light_dot_norm;
@@ -233,15 +188,16 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t)
 	ambient_color = zero_color();
 	inter_point = position_at(cam_ray, smallest_t);
 	obj_clr = handle_object_pat(hit_obj, inter_point);
-	ambient_color = scale_color(mul_colors(ambient->c, obj_clr), ambient->ratio * 0.1); // should this be a unified color or just a color to add to my objects's colors
+	ambient_color = scale_color(mul_colors(ambient->c, obj_clr), ambient->ratio * 0.1);
 	if (is_shadowed(getengine()->w, inter_point))
 		return ambient_color;
 	pt_cam_vec = normal(sub_points(inter_point, cam_ray->origin)); 
 	obj_norm = hit_obj->get_norm(hit_obj, inter_point);
 	cam_ray_surf_norm_dot = dot(pt_cam_vec, obj_norm);
-	if (cam_ray_surf_norm_dot >= 0)
+	if (cam_ray_surf_norm_dot > 0)
 		obj_norm = neg_vector(obj_norm);
-	pt_light_vec = normal(sub_points(light->p, inter_point)); // ray from point to light
+	reflected_clr = get_reflect_color(remaining, hit_obj, pt_cam_vec, inter_point);  // ! new
+	pt_light_vec = normal(sub_points(light->p, inter_point));
 	light_dot_norm = dot(obj_norm, pt_light_vec);
 	if (light_dot_norm >= 0)
 	{
@@ -249,158 +205,91 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t)
 		light_ref = reflect(pt_light_vec, obj_norm);
         refl_dot_cam = dot(normal(light_ref), pt_cam_vec);
         if (refl_dot_cam > 0 && light->brightness > 0)
-			speclar_color = scale_color(scale_color(light->c, light->brightness), powf(refl_dot_cam, light->brightness * 100));
+			speclar_color = scale_color(scale_color(light->c, light->brightness * (get_brightness(obj_clr) / 255.f)), powf(refl_dot_cam, light->brightness * 100));
     }
-	color = clamp_color(sum_colors(speclar_color ,diffuse_color, ambient_color));
+	color = sum_colors(speclar_color ,diffuse_color, ambient_color);
+	color = add_colors(color, reflected_clr, 1);
 	if (getengine()->w->gray_on)
 		return (rgb_to_gray(color));
 	return color;
 }
 
-float sp_intersect(t_sphere *s, t_ray *ray)
+t_color	get_px_color(double x, double y, int remaining)
 {
-    t_vector oc;
-    float a;
-    float b;
-    float c;
-    float d;
-    float t1, t2;
+	t_core *engine;
+	t_color	final_clr;
+	t_color	temp_clr;
+	t_camera	*cam;
+	double i;
+	double scale;
+	double ndc_x;
+	double ndc_y;
+	t_ray		ray;
 
-    oc = sub_points(ray->origin, s->origin);
-    a = dot(ray->direction, ray->direction);
-    b = 2.0f * dot(ray->direction, oc);
-    c = dot(oc, oc) - s->radius_squared;
-
-    d = (b * b) - (4.0f * a * c);
-	if (d < 0 || (a == 0.f))
-		return -1;
-    t1 = (-b - sqrtf(d)) / (2.0f * a);
-    t2 = (-b + sqrtf(d)) / (2.0f * a);
-	if (t1 < t2 && t1 >= 0)
-		return t1;
-	return t2;
-
-}
-
-float pl_intersect(t_plane *pl, t_ray *ray)
-{
-	float		t;
-	float		d_dot_n;
-	t_vector		d;
-	t_point	p0;
-	t_point	o;
-	t_vector	n;
-	t_vector	p0_o;
-
-	o = ray->origin;
-	p0 = pl->origin;
-	n = pl->normal;
-	d = ray->direction;
-	p0_o = sub_points(p0, o);
-	d_dot_n = dot(d, n);
-	if ((fabs(dot(sub_points(ray->origin, p0), n))) - EPSILON < 0)
-		return 0;
-	if (fabs(d_dot_n) < EPSILON)
-		return -1; // no intersection   divide by zero
-	t = dot(p0_o, n) / d_dot_n;
-	if (t < EPSILON)
-		return -1;
-	return t;
-}
-
-int move(void *ptr)
-{
-	static int count;
-	t_core	*engine;
-
-	engine = (t_core *) ptr;
-	count++;
-	if (count % 10000 == 0)
+	engine = getengine();
+	cam = engine->w->cam;
+	scale = tan(deg_to_rad(cam->fov) / 2.f);
+	ray.origin = cam->origin;
+	i = 0;
+	final_clr = zero_color();
+	if (!engine->aa_on)
 	{
-		((t_light *)engine->w->lights->data)->p.x += 0.02;
-		((t_light *)engine->w->lights->data)->p.y += 0.02;
-		((t_light *)engine->w->lights->data)->p.z -= 0.02;
-		rendering();
-		count = 0;
+		ndc_x = (2.f * ((x + (i + 0.5f)) / SCREEN_WIDTH)) - 1.f;
+		ndc_y = 1 - (2.f * (y + 0.5) / SCREEN_HEIGHT);			
+		ray.direction = generate_cam_dir(cam, scale, ndc_x, ndc_y);
+		final_clr = intersect_world(engine->w, &ray, remaining);
+		final_clr = clamp_color(final_clr);
 	}
-	return 1;
-}
-
-t_color intersect_world(t_world *w, t_ray *cam_ray)
-{
-	t_object	*node;
-	t_object	*hit_obj;
-	float smallest_t;
-	float t;
-	hit_obj = NULL;
-	node = w->objects;
-	smallest_t = __FLT_MAX__;
-	while (node)
+	else
 	{
-		if (node->type == SP_OBJ)
+		while (i < engine->rays_px)
 		{
-			t = sp_intersect(node->data, cam_ray);
-			if (t <= smallest_t && t > 0)
-			{
-				hit_obj = node;
-				smallest_t = t;
-			}
- 		}
-		else if (node->type == PL_OBJ)
-		{
-			t = pl_intersect(node->data, cam_ray);
-			if (t <= smallest_t && t >= 0)
-			{
-				hit_obj = node;
-				smallest_t = t;
-			}
+			double rand_x = x + ((double)rand() / RAND_MAX);
+			double rand_y = y + ((double)rand() / RAND_MAX);
+			ndc_x = (2.f * (rand_x / SCREEN_WIDTH)) - 1.f;
+			ndc_y = 1 - (2.f * (rand_y / SCREEN_HEIGHT));
+			ray.direction = generate_cam_dir(cam, scale, ndc_x, ndc_y);
+			temp_clr = intersect_world(engine->w, &ray, remaining);
+			final_clr = add_colors(final_clr, temp_clr, false);
+			i++;
 		}
-		node = node->next;
+		final_clr = scale_color(final_clr, 1.f / engine->rays_px);
 	}
-	return lighting(cam_ray, hit_obj, smallest_t);
+	return (final_clr);
+}
+
+void save_to_img(t_color px_color, int x, int y)
+{
+    t_core      *engine;
+
+	engine = getengine();
+	int index = (y * SCREEN_WIDTH + x) * 3;
+	engine->png[index] = px_color.r;
+	engine->png[index + 1] = px_color.g;
+	engine->png[index + 2] = px_color.b;
 }
 
 void    rendering(void)
 {
-    t_camera    *cam;
-	t_ray		ray;
-	t_color		final_clr;
-	t_color		temp_clr;
     t_core      *engine;
 	int	x;
 	int	y;
-	float scale;
-	float ndc_x;
-	float ndc_y;
-	float i;
+	t_color     px_color;
 
     engine = getengine();
 	init_hooks(engine);
 	engine->img.img = mlx_new_image(engine->m.mlx, SCREEN_WIDTH, SCREEN_HEIGHT);
 	engine->img.addr = mlx_get_data_addr(engine->img.img, &engine->img.bits_per_pixel, &engine->img.line_length,
 								&engine->img.endian);
-	cam = engine->w->cam;
-	scale = tan(deg_to_rad(cam->fov) / 2.f);
-	x = 0;
 	y = 0;
 	while (y < SCREEN_HEIGHT)
 	{
 		x = 0;
-		ndc_y = 1 - (2.f * (y + 0.5) / SCREEN_HEIGHT);			
 		while (x < SCREEN_WIDTH)
 		{
-			i = -1;
-			final_clr = zero_color();
-			while (++i < RAYS_PER_PX) /* this part is for super sampling (anti aliasing)*/
-			{
-				ndc_x = (2.f * (x + (0.5 + i / RAYS_PER_PX)) / SCREEN_WIDTH) - 1.f;
-				ray.origin = cam->origin;
-				ray.direction = generate_cam_dir(cam, scale, ndc_x, ndc_y);
-				temp_clr = intersect_world(engine->w, &ray);
-				final_clr = add_colors(final_clr, temp_clr, false);
-			}
-			final_clr = scale_color(final_clr, 1.f / RAYS_PER_PX);
-			my_mlx_pixel_put(&engine->img, x, y, get_rgb(final_clr));
+			px_color = get_px_color(x, y, 2);
+			my_mlx_pixel_put(&engine->img, x, y, get_rgb(px_color));
+			save_to_img(px_color, x, y);
 			x += engine->iter;
 		}
 		y += engine->iter;
@@ -409,8 +298,6 @@ void    rendering(void)
 	mlx_put_image_to_window(engine->m.mlx, engine->m.win, engine->img.img, 0, 0);
     mlx_hook(engine->m.win, KeyPress, KEY_PRESS, key_press, engine);
     mlx_hook(engine->m.win, KeyRelease, KEY_RELEASE, key_release, engine);
-	mlx_mouse_hook(engine->m.win, mouse_input, engine);
-	// mlx_loop_hook(engine->m.mlx, move, engine);
 	mlx_loop(engine->m.mlx);
     return ;
 }

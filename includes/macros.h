@@ -18,6 +18,7 @@
 #define CY_OBJ 2
 
 #define EPSILON 0.0001f
+#define SMALL_N 0.00000001f
 
 /** Program name displayed in error messages */
 # define PRGM_NAME "miniRT"
@@ -31,7 +32,7 @@
 # define NOAMB_ERR " there is no ambient!"
 # define WHITESPACE     " \t\n\r\v\f"  // space, tab, newline, carriage return, vtab, formfeed
 
-# define RAYS_PER_PX 50
+# define RAYS_PER_PX 4
 
 // #ifdef LINUX
     #define SCREEN_WIDTH 1800.f
