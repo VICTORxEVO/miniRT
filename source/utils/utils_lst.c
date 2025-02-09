@@ -17,16 +17,16 @@ void add_node(t_core *d, t_node **head, void *data, char type_macro)
     *head = new_node;
 }
 
-void add_float_node_sorted(t_core *d, t_node **head, float value)
+void add_float_node_sorted(t_core *d, t_node **head, double value)
 {
-    // Allocate heap memory for the float data
-    float *data_ptr = (float *)galloc(sizeof(float));
+    // Allocate heap memory for the double data
+    double *data_ptr = (double *)galloc(sizeof(double));
     *data_ptr = value;
 
     t_node *new_node = create_node(d, data_ptr);
 
     // If the list is empty or the new value should be placed before head
-    if (*head == NULL || *((float*)(*head)->data) >= value)
+    if (*head == NULL || *((double*)(*head)->data) >= value)
     {
         new_node->next = *head;
         *head = new_node;
@@ -35,7 +35,7 @@ void add_float_node_sorted(t_core *d, t_node **head, float value)
 
     // Otherwise find the correct position
     t_node *current = *head;
-    while (current->next != NULL && *((float*)current->next->data) < value)
+    while (current->next != NULL && *((double*)current->next->data) < value)
     {
         current = current->next;
     }
@@ -96,16 +96,16 @@ void add_obj(t_core *d, t_object **head, void *data, char type_macro)
     *head = new_obj;
 }
 
-void add_float_object_sorted(t_core *d, t_object **head, float value)
+void add_float_object_sorted(t_core *d, t_object **head, double value)
 {
-    // Allocate heap memory for the float data
-    float *data_ptr = (float *)galloc(sizeof(float));
+    // Allocate heap memory for the double data
+    double *data_ptr = (double *)galloc(sizeof(double));
     *data_ptr = value;
 
     t_object *new_obj = create_obj(d, data_ptr);
 
     // If the list is empty or the new value should be placed before head
-    if (*head == NULL || *((float*)(*head)->data) >= value)
+    if (*head == NULL || *((double*)(*head)->data) >= value)
     {
         new_obj->next = *head;
         *head = new_obj;
@@ -114,7 +114,7 @@ void add_float_object_sorted(t_core *d, t_object **head, float value)
 
     // Otherwise find the correct position
     t_object *current = *head;
-    while (current->next != NULL && *((float*)current->next->data) < value)
+    while (current->next != NULL && *((double*)current->next->data) < value)
     {
         current = current->next;
     }

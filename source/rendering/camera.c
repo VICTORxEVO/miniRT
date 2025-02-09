@@ -1,6 +1,6 @@
 #include "miniRT.h"
 
-t_vector	generate_cam_dir(t_camera	*cam, float scale, float ndcx, float ndcy)
+t_vector	generate_cam_dir(t_camera	*cam, double scale, double ndcx, double ndcy)
 {
 	t_vector	dir;
 

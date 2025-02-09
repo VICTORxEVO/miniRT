@@ -53,7 +53,7 @@ inline t_vector neg_vector(t_vector v1)
     return neg;
 }
 
-inline t_vector scale_vector(t_vector v, float scale)
+inline t_vector scale_vector(t_vector v, double scale)
 {
     t_vector scaled;
 
@@ -63,7 +63,7 @@ inline t_vector scale_vector(t_vector v, float scale)
     return scaled;
 }
 
-inline t_vector shrink_vector(t_vector v, float shrink)
+inline t_vector shrink_vector(t_vector v, double shrink)
 {
     t_vector shrinked;
 
@@ -73,9 +73,9 @@ inline t_vector shrink_vector(t_vector v, float shrink)
     return shrinked;
 }
 
-inline float get_len_vector(t_vector v1)
+inline double get_len_vector(t_vector v1)
 {
-    float len;
+    double len;
 
     len = sqrtf(pow(v1.x, 2) + pow(v1.y, 2)+ pow(v1.z, 2));
     return len;
@@ -89,7 +89,7 @@ inline void print_vector(t_vector v)
 inline t_vector normal(t_vector v)
 {
     t_vector normalized;
-    float len;
+    double len;
 
     len = get_len_vector(v);
     normalized.x = v.x / len;
@@ -98,7 +98,7 @@ inline t_vector normal(t_vector v)
     return normalized;
 }
 
-inline t_point	position_at(t_ray	*r, float t)
+inline t_point	position_at(t_ray	*r, double t)
 {
 	t_point	p;
 	p.x = r->direction.x * t + r->origin.x;
@@ -115,9 +115,9 @@ inline void print_point(t_point p)
 /*
     the dot product is commutive A x B = B x A
 */
-inline float dot(t_vector v1, t_vector v2)
+inline double dot(t_vector v1, t_vector v2)
 {
-    float dot;
+    double dot;
 
     dot = (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
     return dot;
@@ -155,42 +155,42 @@ t_point v_to_p(t_vector v)
     p.z = v.z;
     return p;
 }
-inline float deg_to_rad(float deg)
+inline double deg_to_rad(double deg)
 {
     return (deg * M_PI / 180);
     // deg -> 180
     // rad -> PIE
 }
 
-inline float rad_to_rad(float rad)
+inline double rad_to_rad(double rad)
 {
     return (rad * 180 / M_PI);
     // deg -> 180
     // rad -> PIE
 }
 
-float maxf(float a, float b)
+double maxf(double a, double b)
 {
     if (a > b)
         return (a);
     return (b);
 }
 
-float minf(float a, float b)
+double minf(double a, double b)
 {
     if (a < b)
         return (a);
     return (b);
 }
 
-float maxi(float a, float b)
+double maxi(double a, double b)
 {
     if (a > b)
         return (a);
     return (b);
 }
 
-float mini(float a, float b)
+double mini(double a, double b)
 {
     if (a > b)
         return (a);

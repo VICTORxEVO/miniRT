@@ -87,12 +87,14 @@ bool    elem_added(t_core *d, char **args)
         good = ambient_handled(d, args);
 	else if (ft_strncmp(args[0], "C", -1) == 0)
 		good = camera_handled(d, args);
-	else if (ft_strncmp(args[0], "L", -1) == 0)
+	else if (ft_strncmp(args[0], "L", -1) == 0 || ft_strncmp(args[0], "l", -1) == 0)
 		good = light_handled(d, args);
 	else if (ft_strncmp(args[0], "pl", -1) == 0)
 		good = plane_handled(d, args);
 	else if (ft_strncmp(args[0], "sp", -1) == 0)
 		good = sphere_handled(d, args);
+	else if (ft_strncmp(args[0], "cu", -1) == 0)
+        return (cube_handled(d, args));
 	else if (ft_strncmp(args[0], "cy", -1) == 0)
 		good = cylinder_handled(d, args);
     return (good);
@@ -101,7 +103,7 @@ bool    elem_added(t_core *d, char **args)
 bool    ambient_handled(t_core *d, char **args)
 {
     char		**clrs;
-    float   	ambient_ratio;
+    double   	ambient_ratio;
     t_ambient	*ambient;
     t_color	    ambient_color;
     bool		err;

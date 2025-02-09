@@ -1,13 +1,13 @@
 #include "miniRT.h"
 
-float **create_matrix_2x2(float a, float b, float c, float d)
+double **create_matrix_2x2(double a, double b, double c, double d)
 {
-    float **matrix;
+    double **matrix;
 
     int i = -1;
-    matrix = malloc(4 * sizeof(float *));
+    matrix = malloc(4 * sizeof(double *));
     while (++i < 4)
-        matrix[i] = malloc(4 * sizeof(float));
+        matrix[i] = malloc(4 * sizeof(double));
 
     matrix[0][0] = a;
     matrix[0][1] = b;
@@ -16,14 +16,14 @@ float **create_matrix_2x2(float a, float b, float c, float d)
     return matrix;
 }
 
-float **create_matrix_3x3(float a, float b, float c, float l, float m, float n, float x, float y, float z)
+double **create_matrix_3x3(double a, double b, double c, double l, double m, double n, double x, double y, double z)
 {
-    float **matrix;
+    double **matrix;
     int i = -1;
 
-    matrix = malloc(3 * sizeof(float *));
+    matrix = malloc(3 * sizeof(double *));
     while (++i < 3)
-        matrix[i] = malloc(3 * sizeof(float));
+        matrix[i] = malloc(3 * sizeof(double));
 
     matrix[0][0] = a;
     matrix[0][1] = b;
@@ -38,17 +38,17 @@ float **create_matrix_3x3(float a, float b, float c, float l, float m, float n, 
     return matrix;
 }
 
-float **create_matrix_4x4(float a, float b, float c, float d, 
-    float e, float f, float g, float h,
-    float i, float j, float k, float l,
-    float m, float n, float o, float q)
+double **create_matrix_4x4(double a, double b, double c, double d, 
+    double e, double f, double g, double h,
+    double i, double j, double k, double l,
+    double m, double n, double o, double q)
 {
-    float **matrix;
+    double **matrix;
     int x = -1;
 
-    matrix = malloc(4 * sizeof(float *));
+    matrix = malloc(4 * sizeof(double *));
     while (++x < 4)
-        matrix[x] = malloc(4 * sizeof(float));
+        matrix[x] = malloc(4 * sizeof(double));
 
     matrix[0][0] = a;
     matrix[0][1] = b;
@@ -74,7 +74,7 @@ float **create_matrix_4x4(float a, float b, float c, float d,
     return matrix;
 }
 
-void init_matrix_n(float **matrix, int n)
+void init_matrix_n(double **matrix, int n)
 {
     int i = -1;
     int j = -1;
@@ -85,7 +85,7 @@ void init_matrix_n(float **matrix, int n)
     }
 }
 
-void print_matrix_n(float **matrix, int n)
+void print_matrix_n(double **matrix, int n)
 {
     int i = -1;
     int j = -1;
@@ -109,7 +109,7 @@ void print_matrix_n(float **matrix, int n)
     printf("\n\n");
 }
 
-void print_matrix_row_col(float **matrix, int row, int col)
+void print_matrix_row_col(double **matrix, int row, int col)
 {
     int i = -1;
     int j = -1;
@@ -135,14 +135,14 @@ void print_matrix_row_col(float **matrix, int row, int col)
     printf("\n\n");
 }
 
-float **submatrix(float **matrix, int row, int col, int n)
+double **submatrix(double **matrix, int row, int col, int n)
 {
     if (n < 2)
     {
         printf("this matrix is too small to have a submatrix\n");
         return NULL;
     }
-    float **sub;
+    double **sub;
     sub = get_new_matrix_n(n - 1);
 
     int x = -1;
@@ -171,15 +171,15 @@ float **submatrix(float **matrix, int row, int col, int n)
     return sub;
 }
 
-float  **get_new_matrix_n(int n)
+double  **get_new_matrix_n(int n)
 {
-    float **m;
+    double **m;
     int i = -1;
     int j = -1;
 
-    m = malloc(n * sizeof(float *));
+    m = malloc(n * sizeof(double *));
     while (++i < n)
-        m[i] = malloc(n * sizeof(float));
+        m[i] = malloc(n * sizeof(double));
     i = 0;
     while (++i < n)
     {
@@ -189,15 +189,15 @@ float  **get_new_matrix_n(int n)
     return m;
 }
 
-float  **get_new_matrix_row_col(int row, int col)
+double  **get_new_matrix_row_col(int row, int col)
 {
-    float **m;
+    double **m;
     int i = -1;
     int j = -1;
 
-    m = malloc(row * sizeof(float *));
+    m = malloc(row * sizeof(double *));
     while (++i < row)
-        m[i] = malloc(col * sizeof(float));
+        m[i] = malloc(col * sizeof(double));
     i = -1;
     while (++i < row)
     {
@@ -208,9 +208,9 @@ float  **get_new_matrix_row_col(int row, int col)
     return m;
 }
 
-float **mul_matrix_n(float **m1, float **m2, int n)
+double **mul_matrix_n(double **m1, double **m2, int n)
 {
-    float **m3;
+    double **m3;
     int i = -1;
     int j = -1;
     m3 = get_new_matrix_n(n);
@@ -228,9 +228,9 @@ float **mul_matrix_n(float **m1, float **m2, int n)
     return m3;
 }
 
-float **mul_matrix_row_col(float **m1, float **m2, int row1, int col2)
+double **mul_matrix_row_col(double **m1, double **m2, int row1, int col2)
 {
-    float **m3;
+    double **m3;
     int i = -1;
     int j = -1;
     m3 = get_new_matrix_row_col(row1, col2);
@@ -248,21 +248,21 @@ float **mul_matrix_row_col(float **m1, float **m2, int row1, int col2)
     return m3;
 }
 
-float **get_transposed(float **m, int n)
+double **get_transposed(double **m, int n)
 {
-    float **t = get_new_matrix_n(n);
+    double **t = get_new_matrix_n(n);
     for (int i = 0; i < n; i++)
         for (int j = 0; j < n; j++)
             t[i][j] = m[j][i];
     return t;
 }
 
-void transpose(float **m, int n)
+void transpose(double **m, int n)
 {
     int i = -1;
     int j = -1;
 
-    float temp;
+    double temp;
     while (++i < n)
     {
         j = -1;
@@ -276,18 +276,18 @@ void transpose(float **m, int n)
     }
 }
 
-float get_determinant_2(float **m)
+double get_determinant_2(double **m)
 {
-    float det;
+    double det;
 
     det = m[0][0] * m[1][1] - m[0][1] * m[1][0];
     return det;       
 }
 
-float get_determinant_n(float **m, int n)
+double get_determinant_n(double **m, int n)
 {
-    float det;
-    float co;
+    double det;
+    double co;
     int i = -1;
 
     det = 0;
@@ -304,15 +304,15 @@ float get_determinant_n(float **m, int n)
     return det;
 }
 
-float **get_identity_matrix_n(int n)
+double **get_identity_matrix_n(int n)
 {
-    float **i_matrix;
+    double **i_matrix;
     int i = -1;
     int j = -1;
 
-    i_matrix = malloc(n * sizeof(float *));
+    i_matrix = malloc(n * sizeof(double *));
     while (++i < n)
-        i_matrix[i] = malloc(n * sizeof(float));
+        i_matrix[i] = malloc(n * sizeof(double));
     i = -1;
     while (++i < n)
     {
@@ -327,19 +327,19 @@ float **get_identity_matrix_n(int n)
     return i_matrix;
 }
 
-float get_minor_n(float **matrix, int row, int col, int n)
+double get_minor_n(double **matrix, int row, int col, int n)
 {
 
     // minor of an element at row i and col j is the get_determinant_n of the sub matrix at (i, j)
-    float **sub = submatrix(matrix, row, col, n);
-    float minor = get_determinant_n(sub, n - 1);
+    double **sub = submatrix(matrix, row, col, n);
+    double minor = get_determinant_n(sub, n - 1);
     return minor;
 }
 
-float get_cofactor_n(float **matrix, int row, int col, int n)
+double get_cofactor_n(double **matrix, int row, int col, int n)
 {
-    float minor = get_minor_n(matrix, row, col, n);
-    float cofactor = minor;
+    double minor = get_minor_n(matrix, row, col, n);
+    double cofactor = minor;
     if ((row + col) % 2 != 0)
     {
         cofactor *= -1;
@@ -347,11 +347,11 @@ float get_cofactor_n(float **matrix, int row, int col, int n)
     return cofactor;
 }
 
-float **get_inverted_n(float **matrix, int n)
+double **get_inverted_n(double **matrix, int n)
 {
-    float det;
-    float **inverted;
-    float co;
+    double det;
+    double **inverted;
+    double co;
     int i = -1;
     int j = -1;
 
@@ -375,9 +375,9 @@ float **get_inverted_n(float **matrix, int n)
 }
 
 
-float **get_4_1_matrix(float x, float y, float z, float w)
+double **get_4_1_matrix(double x, double y, double z, double w)
 {
-    float **matrix;
+    double **matrix;
     matrix = get_new_matrix_row_col(4, 1);
     matrix[0][0] = x;
     matrix[1][0] = y;
@@ -386,9 +386,9 @@ float **get_4_1_matrix(float x, float y, float z, float w)
     return matrix;
 }
 
-float **from_n_to_4_1_matrix(float **matrix_n)
+double **from_n_to_4_1_matrix(double **matrix_n)
 {
-    float **matrix;
+    double **matrix;
     matrix = get_new_matrix_row_col(4, 1);
     matrix[0][0] = matrix_n[0][0];
     matrix[1][0] = matrix_n[1][0];
@@ -397,9 +397,9 @@ float **from_n_to_4_1_matrix(float **matrix_n)
     return matrix;
 }
 
-float **from_4_1_to_n_matrix(float **matrix_4_1)
+double **from_4_1_to_n_matrix(double **matrix_4_1)
 {
-    float **matrix;
+    double **matrix;
     matrix = get_new_matrix_n(4);
     matrix[0][0] = matrix_4_1[0][0];
     matrix[1][0] = matrix_4_1[1][0];
@@ -408,9 +408,9 @@ float **from_4_1_to_n_matrix(float **matrix_4_1)
     return matrix;
 }
 
-float **get_translation_matrix(float x, float y, float z)
+double **get_translation_matrix(double x, double y, double z)
 {
-    float **matrix;
+    double **matrix;
 
     matrix = get_identity_matrix_n(4);
     matrix[0][3] = x;
@@ -421,9 +421,9 @@ float **get_translation_matrix(float x, float y, float z)
 
 /* for a t_point  we will have 1 at the end [3][3] */
 /* for a t_vector we will have 0 at the end [3][3] */
-float **get_scaling_matrix(float x, float y, float z, float w)
+double **get_scaling_matrix(double x, double y, double z, double w)
 {
-    float **matrix;
+    double **matrix;
 
     matrix = get_new_matrix_n(4);
     matrix[0][0] = x;
@@ -433,7 +433,7 @@ float **get_scaling_matrix(float x, float y, float z, float w)
     return matrix;
 }
 
-inline t_point translate_mx_to_point(float **m)
+inline t_point translate_mx_to_point(double **m)
 {
     t_point p;
     p.x = m[0][0];
@@ -442,7 +442,7 @@ inline t_point translate_mx_to_point(float **m)
     return p;
 }
 
-inline t_vector translate_mx_to_vector(float **m)
+inline t_vector translate_mx_to_vector(double **m)
 {
     t_vector v;
     v.x = m[0][0];
@@ -451,9 +451,9 @@ inline t_vector translate_mx_to_vector(float **m)
     return v;
 }
 
-float **rotate_x(float rad)
+double **rotate_x(double rad)
 {
-    float **matrix;
+    double **matrix;
 
     matrix = get_identity_matrix_n(4);
     matrix[1][1] = cos(rad);
@@ -463,9 +463,9 @@ float **rotate_x(float rad)
     return matrix;
 }
 
-float **rotate_y(float rad)
+double **rotate_y(double rad)
 {
-    float **matrix;
+    double **matrix;
 
     matrix = get_identity_matrix_n(4);
     matrix[0][0] = cos(rad);
@@ -476,9 +476,9 @@ float **rotate_y(float rad)
 }
 
 
-float **rotate_z(float rad)
+double **rotate_z(double rad)
 {
-    float **matrix;
+    double **matrix;
 
     matrix = get_identity_matrix_n(4);
     matrix[0][0] = cos(rad);
@@ -489,15 +489,15 @@ float **rotate_z(float rad)
 }
 
 
-t_ray transform_ray(t_ray old_r, float **transformation_mx)
+t_ray transform_ray(t_ray old_r, double **transformation_mx)
 {
     t_ray new_r;
     t_point ray_origin_res;
     t_vector ray_direction_res;
-    float  **ray_matrix_origin;
-    float  **ray_matrix_direction;
-    float **origin_mul_res_matrix;
-    float **direction_mul_res_matrix;
+    double  **ray_matrix_origin;
+    double  **ray_matrix_direction;
+    double **origin_mul_res_matrix;
+    double **direction_mul_res_matrix;
 
     if (!transformation_mx)
         return old_r;
@@ -530,9 +530,9 @@ t_ray transform_ray(t_ray old_r, float **transformation_mx)
     return new_r;
 }
 
-float **get_orientation_view_matrix(t_vector left, t_vector true_up, t_vector forward)
+double **get_orientation_view_matrix(t_vector left, t_vector true_up, t_vector forward)
 {
-    float **vm = get_new_matrix_n(4);
+    double **vm = get_new_matrix_n(4);
     vm[0][0] = left.x;
     vm[0][1] = left.y;
     vm[0][2] = left.z;
@@ -556,12 +556,12 @@ float **get_orientation_view_matrix(t_vector left, t_vector true_up, t_vector fo
     return vm;
 }
 
-// float **get_view_matrix(t_point from, t_point to, t_vector up)
+// double **get_view_matrix(t_point from, t_point to, t_vector up)
 // {
-//     float **orientation_mx;
-//     float **view_mx;
+//     double **orientation_mx;
+//     double **view_mx;
 //     t_vector forward;
-//     float **transformation_mx;
+//     double **transformation_mx;
 //     t_vector left;
 //     t_vector true_up;
 
@@ -575,11 +575,11 @@ float **get_orientation_view_matrix(t_vector left, t_vector true_up, t_vector fo
 //     return view_mx;
 // }
 
-t_sphere transform_sphere(t_sphere s, float **transformation_mx)
+t_sphere transform_sphere(t_sphere s, double **transformation_mx)
 {
     t_sphere new_sphere;
-    float  **sphere_matrix_origin;
-    float **origin_mul_res_matrix;
+    double  **sphere_matrix_origin;
+    double **origin_mul_res_matrix;
 
   
     sphere_matrix_origin = get_new_matrix_row_col(4, 1);

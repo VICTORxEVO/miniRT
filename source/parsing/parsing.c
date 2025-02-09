@@ -5,10 +5,12 @@ static bool validated_type(char *name, unsigned args_count)
     if ((!ft_strcmp(name, "A") && args_count == e_ambient) || 
     (!ft_strcmp(name, "C") && args_count == e_color) || 
     (!ft_strcmp(name, "L") && args_count == e_light) || 
+    (!ft_strcmp(name, "l") && args_count == e_light) ||
     (!ft_strcmp(name, "pl") && args_count == e_plain) || 
     (!ft_strcmp(name, "pl") && args_count == e_plain_pattern) || 
     (!ft_strcmp(name, "sp") && args_count == e_sphere) || 
     (!ft_strcmp(name, "sp") && args_count == e_sphere_pattern) || 
+    (!ft_strcmp(name, "cu") && args_count == e_cube) || 
     (!ft_strcmp(name, "cy") && args_count == e_cylinder))
         return (true);
     return (false);
@@ -47,7 +49,7 @@ void    loadline(char *line, int n_line, char *filename)
     if (args_count < 1)
         pexit(err_msg(filename, n_line), 3);
     if (!validated_type(words[0], args_count))
-        pexit("unknown type !", 1);
+        pexit(ft_strjoin("unknown type  -> ", words[0]), 1);
     if (!elem_added(getengine(), words))
         pexit("error !", 1);
 }
@@ -57,7 +59,6 @@ void setup_cam_dir(t_camera	*cam)
 	t_vector	temp_up;
 	// calc up, right vectors for where the cam is lookin (forward)
 	temp_up = (t_vector) {0, 1, 0};
-    cam->forward;
 	cam->right = normal(cross(temp_up, cam->forward)); 
 	cam->up = normal(cross(cam->forward, cam->right)); // now reset up
     cam->aspect = (SCREEN_WIDTH / SCREEN_HEIGHT);
@@ -88,7 +89,8 @@ void parsing(int ac, char *filename)
     engine->aa_on = false;
     engine->iter = 1;
 	engine->png = galloc(SCREEN_WIDTH * SCREEN_HEIGHT * 3);
-    engine->refl_on = false;
+    engine->refl_on = true;
 	engine->counter = 0;
+
     close(fd);
 }

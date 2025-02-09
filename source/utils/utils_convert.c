@@ -1,15 +1,25 @@
 #include "miniRT.h"
 
-bool between(float n, float min, float max)
+bool between(double n, double min, double max)
 {
 	return (n >= min && n <= max);
 }
 
-float	ft_atof(const char *s, bool *err)
+inline	void swapf(double *t1, double *t2)
 {
-	float	res;
+	double temp;
+
+	temp = *t1;
+	*t1 = *t2;
+	*t2 = temp;
+
+}
+
+double	ft_atof(const char *s, bool *err)
+{
+	double	res;
 	int		sign;
-	float	dot_pow;
+	double	dot_pow;
 	dot_pow = 0;
 	res = 0;
 	sign = 1;

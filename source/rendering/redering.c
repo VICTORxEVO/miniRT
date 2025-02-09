@@ -1,12 +1,15 @@
 # include "miniRT.h"
 
-float get_intersect_dist(t_world *w, t_ray *ray)
+double get_intersect_dist(t_world *w, t_ray *ray)
 {
 	t_object	*node;
 	t_sphere	*sphere;
 	t_plane		*plane;
-	float smallest_t;
-	float t;
+	t_cylinder	*cylinder;
+	t_cube		*cube;
+	t_inter it;
+	double smallest_t;
+	double t;
 	node = w->objects;
 	smallest_t = __FLT_MAX__;
 	while (node)
@@ -14,16 +17,30 @@ float get_intersect_dist(t_world *w, t_ray *ray)
 		if (node->type == SP_OBJ)
 		{
 			sphere = (t_sphere *)(node->data);
-			t = sp_intersect(sphere, ray);
-			if (t < smallest_t && t > 0)
-				smallest_t = t;
+			it = sp_intersect(sphere, ray);
+			if (it.t1 < smallest_t && it.t1 > 0)
+				smallest_t = it.t1;
  		}
 		else if (node->type == PL_OBJ)
 		{
 			plane = (t_plane *)(node->data);
-			t = pl_intersect(plane, ray);
-			if (t < smallest_t && t > 0)
-				smallest_t = t;
+			it = pl_intersect(plane, ray);
+			if (it.t1 < smallest_t && it.t1 > 0)
+				smallest_t = it.t1;
+		}
+		else if (node->type == CB_OBJ)
+		{
+			cube = (t_cube *)(node->data);
+			it = cube_intersect(cube, ray);
+			if (it.t1 < smallest_t && it.t1 > 0)
+				smallest_t = it.t1;
+		}
+		else if (node->type == CY_OBJ)
+		{
+			cylinder = (t_cylinder *)(node->data);
+			it = cy_intersect(cylinder, ray);
+			if (it.t1 < smallest_t && it.t1 > 0)
+				smallest_t = it.t1;
 		}
 		node = node->next;
 	}
@@ -33,14 +50,16 @@ float get_intersect_dist(t_world *w, t_ray *ray)
 t_color handle_object_pat(t_object *hit_obj, t_point inter_point)
 {
 	t_color	obj_color;
-	float scale;
-	float scaled_x;
+	double scale;
+	double scaled_x;
 	t_vector	moved_p;
 	t_point p;
 	t_pattern	*pattern;
 	t_point	origin_p;
-	float	diameter;
+	double	diameter;
 
+	if (hit_obj->type == CB_OBJ || hit_obj->type == CY_OBJ)
+		return hit_obj->get_color(hit_obj);
 	if (hit_obj->type == SP_OBJ)
 	{
 		origin_p = ((t_sphere *)hit_obj->data)->origin;
@@ -69,17 +88,17 @@ t_color handle_object_pat(t_object *hit_obj, t_point inter_point)
 			return pattern->c2;
 		}
 		// Normalize point to get direction vector
-		float length = get_len_vector(moved_p);
+		double length = get_len_vector(moved_p);
 		// Convert to UV coordinates
-		float nx = p.x / length;
-		float ny = p.y / length;
-		float nz = p.z / length;
+		double nx = p.x / length;
+		double ny = p.y / length;
+		double nz = p.z / length;
 
-		float u = 0.5f + (atan2f(nz, nx) / (2.0f * M_PI));
-		float v = 0.5f - (asinf(ny) / M_PI);
+		double u = 0.5f + (atan2f(nz, nx) / (2.0f * M_PI));
+		double v = 0.5f - (asinf(ny) / M_PI);
 		
 		// Create checkerboard pattern
-		float scale = diameter * diameter;  // Adjust for checker size
+		double scale = diameter * diameter;  // Adjust for checker size
 		int check_u = (int)(u * scale);
 		int check_v = (int)(v * scale);
 		
@@ -100,7 +119,7 @@ t_color handle_object_pat(t_object *hit_obj, t_point inter_point)
 	}
 	else if (pattern && pattern->type == GRADIANT_Y)
 	{
-		float fraction;
+		double fraction;
 		p = v_to_p(sub_points(inter_point, origin_p));
 		// Map to [-1,1] range first, then to [0,1]
 		fraction = p.x / diameter;     // This gives us [-0.5, 0.5]
@@ -118,11 +137,11 @@ t_color handle_object_pat(t_object *hit_obj, t_point inter_point)
 		p = v_to_p(moved_p);
 
 		// Compute angle and distance for the swirl
-		float angle = atan2f(p.y, p.x);
-		float dist = sqrtf(p.x * p.x + p.y * p.y);
+		double angle = atan2f(p.y, p.x);
+		double dist = sqrtf(p.x * p.x + p.y * p.y);
 		
 		// Swirl pattern factor
-		float swirl = sinf(5.0f * angle + 3.0f * dist);
+		double swirl = sinf(5.0f * angle + 3.0f * dist);
 		// map swirl [-1,1] to [0,1]
 		swirl = 0.5f * (swirl + 1.0f);
 
@@ -154,13 +173,13 @@ t_color	get_reflect_color(int remaining, t_object *hit_obj, t_vector pt_cam_vec,
 		reflect_ray.origin = offseted_p;
 		reflect_ray.direction = reflect(pt_cam_vec, obj_norm);
 		reflected_clr = intersect_world(getengine()->w, &reflect_ray, remaining - 1);
-		float reflect_strength = hit_obj->get_reflect(hit_obj) * (get_brightness(obj_clr) / 255.f);
+		double reflect_strength = hit_obj->get_reflect(hit_obj) * (get_brightness(obj_clr) / 255.f);
 		reflected_clr = scale_color(reflected_clr, reflect_strength);
 	}
 	return reflected_clr;
 }
 
-t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t, int remaining)
+t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, int remaining)
 {
 	if (!hit_obj)
 		return ((t_color) {10, 10, 10});
@@ -171,10 +190,10 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, float smallest_t, int remain
 	t_color reflected_clr;
 	t_light		*light;
 	t_ambient	*ambient;
-	float light_dot_norm;
+	double light_dot_norm;
 	t_color	obj_clr;
-	float cam_ray_surf_norm_dot;
-	float refl_dot_cam;
+	double cam_ray_surf_norm_dot;
+	double refl_dot_cam;
 	t_vector	pt_cam_vec;   // ray from camera to a point
 	t_vector	obj_norm; // ray from object origin to a point
 	t_vector	pt_light_vec; // ray from point to light

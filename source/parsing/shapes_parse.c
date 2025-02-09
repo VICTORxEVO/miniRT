@@ -4,7 +4,7 @@ bool    camera_handled(t_core *d, char **args)
 {
     char		**cord;
     char		**vctr;
-    float   	FOV;
+    double   	FOV;
     t_vector	vec3d;
     t_point		pcord;
     bool		err;
@@ -39,7 +39,7 @@ bool    camera_handled(t_core *d, char **args)
 bool    light_handled(t_core *d, char **args)
 {
     char		**clrs;
-    float	    light_value;
+    double	    light_value;
     t_color		light_color;
     t_point		light_cord;
 	t_light		*light;
@@ -69,7 +69,6 @@ bool    plane_handled(t_core *d, char **args)
     char		**clrs;
     char		**vctr;
     t_color		plane_color;
-    t_color		plane_pattern_color;
     t_point		plane_cord;
     t_vector	plane_norm;
 	t_plane		*plane;
@@ -89,10 +88,11 @@ bool    plane_handled(t_core *d, char **args)
     plane->c = plane_color;
     plane->origin = plane_cord;
     plane->normal = plane_norm;
-    plane->reflect = 1;
+    plane->reflect = 0.4;
     if (args[4])
         handle_pat(args[4], args[5], &plane->pattern, plane->c);
-	add_obj(d, &d->w->objects, plane, PL_OBJ);
+
+    add_obj(d, &d->w->objects, plane, PL_OBJ);
 	return (true);
 }
 
@@ -103,8 +103,8 @@ bool    cylinder_handled(t_core *d, char **args)
     t_color		cylinder_color;
     t_point		cylinder_cord;
     t_vector	cylinder_norm;
-    float       diameter;
-    float       height;
+    double       diameter;
+    double       height;
 	t_cylinder  *cylinder;
     char		**cord;
     bool		err;
@@ -132,6 +132,7 @@ bool    cylinder_handled(t_core *d, char **args)
     cylinder->normal = cylinder_norm;
     cylinder->diameter = diameter;
     cylinder->height = height;
+    cylinder->reflect = 0;
 	add_obj(d, &d->w->objects, cylinder, CY_OBJ);
 	return (true);
 }
@@ -140,9 +141,8 @@ bool    sphere_handled(t_core *d, char **args)
 {
     char		**clrs;
     t_color		sphere_color;
-    t_color		sphere_pattern_color;
     t_point		sphere_cord;
-    float       diameter;
+    double       diameter;
 	t_sphere  *sphere;
     char		**cord;
     bool		err;
@@ -160,12 +160,87 @@ bool    sphere_handled(t_core *d, char **args)
     sphere->origin = sphere_cord;
     sphere->diameter = diameter;
     sphere->radius_squared = (diameter / 2) * (diameter / 2);
-    sphere->reflect = 0.6;
+    sphere->reflect = 0.2;
     sphere->pattern = NULL;
     if (args[4])
         handle_pat(args[4], args[5], &sphere->pattern, sphere->c);
-	add_obj(d, &d->w->objects, sphere, SP_OBJ);
+
+    add_obj(d, &d->w->objects, sphere, SP_OBJ);
 	return (true);
+}
+t_vector get_cube_norm(t_object *o, t_point pt_on_cube)
+{
+    t_cube *cube = (t_cube *)o->data;
+    t_point local_point = v_to_p(sub_points(pt_on_cube, cube->origin));
+    
+    double maxc = maxf(fabs(local_point.x), maxf(fabs(local_point.y), fabs(local_point.z)));
+    
+    if (maxc == fabs(local_point.x))
+        return (t_vector){local_point.x > 0 ? 1 : -1, 0, 0};
+    else if (maxc == fabs(local_point.y))
+        return (t_vector){0, local_point.y > 0 ? 1 : -1, 0};
+    return (t_vector){0, 0, local_point.z > 0 ? 1 : -1};
+}
+
+t_point get_cube_origin(t_object *o)
+{
+    return ((t_cube *)o->data)->origin;
+}
+
+t_color get_cube_color(t_object *o)
+{
+    return ((t_cube *)o->data)->c;
+}
+
+t_pattern *get_cube_pattern(t_object *o)
+{
+    return ((t_cube *)o->data)->pattern;
+}
+
+void set_cube_pattern(t_object *o, t_pattern *p)
+{
+    ((t_cube *)o->data)->pattern = p;
+}
+
+void set_cube_color(t_object *o, t_color c)
+{
+    ((t_cube *)o->data)->c = c;
+}
+
+double get_cube_reflect(t_object *o)
+{
+    return ((t_cube *)o->data)->reflect;
+}
+bool cube_handled(t_core *d, char **args)
+{
+    t_cube *cube;
+    unsigned count;
+    char		**cord;
+    char		**clrs;
+
+    cord = ft_split(args[1], ',');
+    clrs = ft_split(args[2], ',');
+    count = count_args(args);
+    if (count != e_cube)
+        return (false);
+    cube = galloc(sizeof(t_cube));
+    if (!point_struct_filled(&cube->origin, cord))
+        return (false);
+    if (!color_struct_filled(&cube->c, clrs))
+        return (false);
+    cube->pattern = NULL;
+    cube->reflect = 0.7;
+    t_object *obj = create_obj(d, cube);
+    obj->type = CB_OBJ;
+    obj->get_norm = get_cube_norm;
+    obj->get_origin = get_cube_origin;
+    obj->get_color = get_cube_color;
+    obj->get_pattern = get_cube_pattern;
+    obj->set_pattern = set_cube_pattern;
+    obj->set_color = set_cube_color;
+    obj->get_reflect = get_cube_reflect;
+    add_obj(d, &d->w->objects, cube, CB_OBJ);
+    return (true);
 }
 
 

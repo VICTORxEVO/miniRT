@@ -25,10 +25,10 @@ int key_press(int key, t_core *engine)
     t_vector cam_dir = engine->w->cam->forward;
     t_point cam_pos = engine->w->cam->origin;
     t_point light_pos = ((t_light *)(engine->w->lights->data))->p;
-    float **cam_pos_mx;
-    float **cam_dir_mx;
-    float **trans_mx;
-    float **mul_res;
+    double **cam_pos_mx;
+    double **cam_dir_mx;
+    double **trans_mx;
+    double **mul_res;
 
     if (key == XK_RIGHT_CTRL)
     {
@@ -214,7 +214,7 @@ int key_press(int key, t_core *engine)
         else
         {
             engine->aa_on = true;
-            engine->rays_px = 200;
+            engine->rays_px = 100;
         }
         rendering();
     }

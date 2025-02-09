@@ -48,7 +48,7 @@ USAGE:
      int stbi_write_bmp(char const *filename, int w, int h, int comp, const void *data);
      int stbi_write_tga(char const *filename, int w, int h, int comp, const void *data);
      int stbi_write_jpg(char const *filename, int w, int h, int comp, const void *data, int quality);
-     int stbi_write_hdr(char const *filename, int w, int h, int comp, const float *data);
+     int stbi_write_hdr(char const *filename, int w, int h, int comp, const double *data);
 
      void stbi_flip_vertically_on_write(int flag); // flag is non-zero to flip data vertically
 
@@ -58,7 +58,7 @@ USAGE:
      int stbi_write_png_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data, int stride_in_bytes);
      int stbi_write_bmp_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data);
      int stbi_write_tga_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data);
-     int stbi_write_hdr_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const float *data);
+     int stbi_write_hdr_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const double *data);
      int stbi_write_jpg_to_func(stbi_write_func *func, void *context, int x, int y, int comp, const void *data, int quality);
 
    where the callback is:
@@ -99,7 +99,7 @@ USAGE:
    PNG allows you to set the deflate compression level by setting the global
    variable 'stbi_write_png_compression_level' (it defaults to 8).
 
-   HDR expects linear float data. Since the format is always 32-bit rgb(e)
+   HDR expects linear double data. Since the format is always 32-bit rgb(e)
    data, alpha (if provided) is discarded, and for monochrome data it is
    replicated across all three channels.
 
@@ -176,7 +176,7 @@ STBIWDEF int stbi_write_force_png_filter;
 STBIWDEF int stbi_write_png(char const *filename, int w, int h, int comp, const void  *data, int stride_in_bytes);
 STBIWDEF int stbi_write_bmp(char const *filename, int w, int h, int comp, const void  *data);
 STBIWDEF int stbi_write_tga(char const *filename, int w, int h, int comp, const void  *data);
-STBIWDEF int stbi_write_hdr(char const *filename, int w, int h, int comp, const float *data);
+STBIWDEF int stbi_write_hdr(char const *filename, int w, int h, int comp, const double *data);
 STBIWDEF int stbi_write_jpg(char const *filename, int x, int y, int comp, const void  *data, int quality);
 
 #ifdef STBIW_WINDOWS_UTF8
@@ -189,7 +189,7 @@ typedef void stbi_write_func(void *context, void *data, int size);
 STBIWDEF int stbi_write_png_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data, int stride_in_bytes);
 STBIWDEF int stbi_write_bmp_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data);
 STBIWDEF int stbi_write_tga_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const void  *data);
-STBIWDEF int stbi_write_hdr_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const float *data);
+STBIWDEF int stbi_write_hdr_to_func(stbi_write_func *func, void *context, int w, int h, int comp, const double *data);
 STBIWDEF int stbi_write_jpg_to_func(stbi_write_func *func, void *context, int x, int y, int comp, const void  *data, int quality);
 
 STBIWDEF void stbi_flip_vertically_on_write(int flip_boolean);
@@ -636,15 +636,15 @@ STBIWDEF int stbi_write_tga(char const *filename, int x, int y, int comp, const 
 
 #ifndef STBI_WRITE_NO_STDIO
 
-static void stbiw__linear_to_rgbe(unsigned char *rgbe, float *linear)
+static void stbiw__linear_to_rgbe(unsigned char *rgbe, double *linear)
 {
    int exponent;
-   float maxcomp = stbiw__max(linear[0], stbiw__max(linear[1], linear[2]));
+   double maxcomp = stbiw__max(linear[0], stbiw__max(linear[1], linear[2]));
 
    if (maxcomp < 1e-32f) {
       rgbe[0] = rgbe[1] = rgbe[2] = rgbe[3] = 0;
    } else {
-      float normalize = (float) frexp(maxcomp, &exponent) * 256.0f/maxcomp;
+      double normalize = (double) frexp(maxcomp, &exponent) * 256.0f/maxcomp;
 
       rgbe[0] = (unsigned char)(linear[0] * normalize);
       rgbe[1] = (unsigned char)(linear[1] * normalize);
@@ -669,11 +669,11 @@ static void stbiw__write_dump_data(stbi__write_context *s, int length, unsigned 
    s->func(s->context, data, length);
 }
 
-static void stbiw__write_hdr_scanline(stbi__write_context *s, int width, int ncomp, unsigned char *scratch, float *scanline)
+static void stbiw__write_hdr_scanline(stbi__write_context *s, int width, int ncomp, unsigned char *scratch, double *scanline)
 {
    unsigned char scanlineheader[4] = { 2, 2, 0, 0 };
    unsigned char rgbe[4];
-   float linear[3];
+   double linear[3];
    int x;
 
    scanlineheader[2] = (width&0xff00)>>8;
@@ -758,7 +758,7 @@ static void stbiw__write_hdr_scanline(stbi__write_context *s, int width, int nco
    }
 }
 
-static int stbi_write_hdr_core(stbi__write_context *s, int x, int y, int comp, float *data)
+static int stbi_write_hdr_core(stbi__write_context *s, int x, int y, int comp, double *data)
 {
    if (y <= 0 || x <= 0 || data == NULL)
       return 0;
@@ -784,18 +784,18 @@ static int stbi_write_hdr_core(stbi__write_context *s, int x, int y, int comp, f
    }
 }
 
-STBIWDEF int stbi_write_hdr_to_func(stbi_write_func *func, void *context, int x, int y, int comp, const float *data)
+STBIWDEF int stbi_write_hdr_to_func(stbi_write_func *func, void *context, int x, int y, int comp, const double *data)
 {
    stbi__write_context s = { 0 };
    stbi__start_write_callbacks(&s, func, context);
-   return stbi_write_hdr_core(&s, x, y, comp, (float *) data);
+   return stbi_write_hdr_core(&s, x, y, comp, (double *) data);
 }
 
-STBIWDEF int stbi_write_hdr(char const *filename, int x, int y, int comp, const float *data)
+STBIWDEF int stbi_write_hdr(char const *filename, int x, int y, int comp, const double *data)
 {
    stbi__write_context s = { 0 };
    if (stbi__start_write_file(&s,filename)) {
-      int r = stbi_write_hdr_core(&s, x, y, comp, (float *) data);
+      int r = stbi_write_hdr_core(&s, x, y, comp, (double *) data);
       stbi__end_write_file(&s);
       return r;
    } else
@@ -1267,24 +1267,24 @@ static void stbiw__jpg_writeBits(stbi__write_context *s, int *bitBufP, int *bitC
    *bitCntP = bitCnt;
 }
 
-static void stbiw__jpg_DCT(float *d0p, float *d1p, float *d2p, float *d3p, float *d4p, float *d5p, float *d6p, float *d7p) {
-   float d0 = *d0p, d1 = *d1p, d2 = *d2p, d3 = *d3p, d4 = *d4p, d5 = *d5p, d6 = *d6p, d7 = *d7p;
-   float z1, z2, z3, z4, z5, z11, z13;
+static void stbiw__jpg_DCT(double *d0p, double *d1p, double *d2p, double *d3p, double *d4p, double *d5p, double *d6p, double *d7p) {
+   double d0 = *d0p, d1 = *d1p, d2 = *d2p, d3 = *d3p, d4 = *d4p, d5 = *d5p, d6 = *d6p, d7 = *d7p;
+   double z1, z2, z3, z4, z5, z11, z13;
 
-   float tmp0 = d0 + d7;
-   float tmp7 = d0 - d7;
-   float tmp1 = d1 + d6;
-   float tmp6 = d1 - d6;
-   float tmp2 = d2 + d5;
-   float tmp5 = d2 - d5;
-   float tmp3 = d3 + d4;
-   float tmp4 = d3 - d4;
+   double tmp0 = d0 + d7;
+   double tmp7 = d0 - d7;
+   double tmp1 = d1 + d6;
+   double tmp6 = d1 - d6;
+   double tmp2 = d2 + d5;
+   double tmp5 = d2 - d5;
+   double tmp3 = d3 + d4;
+   double tmp4 = d3 - d4;
 
    // Even part
-   float tmp10 = tmp0 + tmp3;   // phase 2
-   float tmp13 = tmp0 - tmp3;
-   float tmp11 = tmp1 + tmp2;
-   float tmp12 = tmp1 - tmp2;
+   double tmp10 = tmp0 + tmp3;   // phase 2
+   double tmp13 = tmp0 - tmp3;
+   double tmp11 = tmp1 + tmp2;
+   double tmp12 = tmp1 - tmp2;
 
    d0 = tmp10 + tmp11;       // phase 3
    d4 = tmp10 - tmp11;
@@ -1325,7 +1325,7 @@ static void stbiw__jpg_calcBits(int val, unsigned short bits[2]) {
    bits[0] = val & ((1<<bits[1])-1);
 }
 
-static int stbiw__jpg_processDU(stbi__write_context *s, int *bitBuf, int *bitCnt, float *CDU, int du_stride, float *fdtbl, int DC, const unsigned short HTDC[256][2], const unsigned short HTAC[256][2]) {
+static int stbiw__jpg_processDU(stbi__write_context *s, int *bitBuf, int *bitCnt, double *CDU, int du_stride, double *fdtbl, int DC, const unsigned short HTDC[256][2], const unsigned short HTAC[256][2]) {
    const unsigned short EOB[2] = { HTAC[0x00][0], HTAC[0x00][1] };
    const unsigned short M16zeroes[2] = { HTAC[0xF0][0], HTAC[0xF0][1] };
    int dataOff, i, j, n, diff, end0pos, x, y;
@@ -1343,7 +1343,7 @@ static int stbiw__jpg_processDU(stbi__write_context *s, int *bitBuf, int *bitCnt
    // Quantize/descale/zigzag the coefficients
    for(y = 0, j=0; y < 8; ++y) {
       for(x = 0; x < 8; ++x,++j) {
-         float v;
+         double v;
          i = y*du_stride+x;
          v = CDU[i]*fdtbl[j];
          // DU[stbiw__jpg_ZigZag[j]] = (int)(v < 0 ? ceilf(v - 0.5f) : floorf(v + 0.5f));
@@ -1464,11 +1464,11 @@ static int stbi_write_jpg_core(stbi__write_context *s, int width, int height, in
                              37,56,68,109,103,77,24,35,55,64,81,104,113,92,49,64,78,87,103,121,120,101,72,92,95,98,112,100,103,99};
    static const int UVQT[] = {17,18,24,47,99,99,99,99,18,21,26,66,99,99,99,99,24,26,56,99,99,99,99,99,47,66,99,99,99,99,99,99,
                               99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99};
-   static const float aasf[] = { 1.0f * 2.828427125f, 1.387039845f * 2.828427125f, 1.306562965f * 2.828427125f, 1.175875602f * 2.828427125f,
+   static const double aasf[] = { 1.0f * 2.828427125f, 1.387039845f * 2.828427125f, 1.306562965f * 2.828427125f, 1.175875602f * 2.828427125f,
                                  1.0f * 2.828427125f, 0.785694958f * 2.828427125f, 0.541196100f * 2.828427125f, 0.275899379f * 2.828427125f };
 
    int row, col, i, k, subsample;
-   float fdtbl_Y[64], fdtbl_UV[64];
+   double fdtbl_Y[64], fdtbl_UV[64];
    unsigned char YTable[64], UVTable[64];
 
    if(!data || !width || !height || comp > 4 || comp < 1) {
@@ -1533,7 +1533,7 @@ static int stbi_write_jpg_core(stbi__write_context *s, int width, int height, in
       if(subsample) {
          for(y = 0; y < height; y += 16) {
             for(x = 0; x < width; x += 16) {
-               float Y[256], U[256], V[256];
+               double Y[256], U[256], V[256];
                for(row = y, pos = 0; row < y+16; ++row) {
                   // row >= height => use last input row
                   int clamped_row = (row < height) ? row : height - 1;
@@ -1541,7 +1541,7 @@ static int stbi_write_jpg_core(stbi__write_context *s, int width, int height, in
                   for(col = x; col < x+16; ++col, ++pos) {
                      // if col >= width => use pixel from last input column
                      int p = base_p + ((col < width) ? col : (width-1))*comp;
-                     float r = dataR[p], g = dataG[p], b = dataB[p];
+                     double r = dataR[p], g = dataG[p], b = dataB[p];
                      Y[pos]= +0.29900f*r + 0.58700f*g + 0.11400f*b - 128;
                      U[pos]= -0.16874f*r - 0.33126f*g + 0.50000f*b;
                      V[pos]= +0.50000f*r - 0.41869f*g - 0.08131f*b;
@@ -1554,7 +1554,7 @@ static int stbi_write_jpg_core(stbi__write_context *s, int width, int height, in
 
                // subsample U,V
                {
-                  float subU[64], subV[64];
+                  double subU[64], subV[64];
                   int yy, xx;
                   for(yy = 0, pos = 0; yy < 8; ++yy) {
                      for(xx = 0; xx < 8; ++xx, ++pos) {
@@ -1571,7 +1571,7 @@ static int stbi_write_jpg_core(stbi__write_context *s, int width, int height, in
       } else {
          for(y = 0; y < height; y += 8) {
             for(x = 0; x < width; x += 8) {
-               float Y[64], U[64], V[64];
+               double Y[64], U[64], V[64];
                for(row = y, pos = 0; row < y+8; ++row) {
                   // row >= height => use last input row
                   int clamped_row = (row < height) ? row : height - 1;
@@ -1579,7 +1579,7 @@ static int stbi_write_jpg_core(stbi__write_context *s, int width, int height, in
                   for(col = x; col < x+8; ++col, ++pos) {
                      // if col >= width => use pixel from last input column
                      int p = base_p + ((col < width) ? col : (width-1))*comp;
-                     float r = dataR[p], g = dataG[p], b = dataB[p];
+                     double r = dataR[p], g = dataG[p], b = dataB[p];
                      Y[pos]= +0.29900f*r + 0.58700f*g + 0.11400f*b - 128;
                      U[pos]= -0.16874f*r - 0.33126f*g + 0.50000f*b;
                      V[pos]= +0.50000f*r - 0.41869f*g - 0.08131f*b;

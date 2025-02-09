@@ -7,16 +7,16 @@
 
 typedef struct s_vector
 {
-    float x; // 1
-    float y; // 0
-    float z; // 0
+    double x; // 1
+    double y; // 0
+    double z; // 0
 } t_vector;
 
 typedef struct s_point
 {
-    float x;
-    float y;
-    float z;
+    double x;
+    double y;
+    double z;
 } t_point;
 
 typedef struct s_ray
