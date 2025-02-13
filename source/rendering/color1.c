@@ -13,9 +13,9 @@ inline t_color add_colors(t_color c1, t_color c2, bool is_clampt)
     res_color.r = c1.r + c2.r;
     res_color.g = c1.g + c2.g;
     res_color.b = c1.b + c2.b;
-    if (!is_clampt)
-        return res_color;
-    return clamp_color(res_color);
+    if (is_clampt)
+        return clamp_color(res_color);
+    return res_color;
 }
 
 inline t_color increment_color(t_color c1, int amount)

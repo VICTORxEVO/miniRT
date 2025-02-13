@@ -88,7 +88,7 @@ bool    plane_handled(t_core *d, char **args)
     plane->c = plane_color;
     plane->origin = plane_cord;
     plane->normal = plane_norm;
-    plane->reflect = 0.4;
+    plane->reflect = 0;
     if (args[4])
         handle_pat(args[4], args[5], &plane->pattern, plane->c);
 
@@ -160,7 +160,7 @@ bool    sphere_handled(t_core *d, char **args)
     sphere->origin = sphere_cord;
     sphere->diameter = diameter;
     sphere->radius_squared = (diameter / 2) * (diameter / 2);
-    sphere->reflect = 0.2;
+    sphere->reflect = 0;
     sphere->pattern = NULL;
     if (args[4])
         handle_pat(args[4], args[5], &sphere->pattern, sphere->c);
@@ -229,7 +229,7 @@ bool cube_handled(t_core *d, char **args)
     if (!color_struct_filled(&cube->c, clrs))
         return (false);
     cube->pattern = NULL;
-    cube->reflect = 0.7;
+    cube->reflect = 0;
     t_object *obj = create_obj(d, cube);
     obj->type = CB_OBJ;
     obj->get_norm = get_cube_norm;

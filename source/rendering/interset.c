@@ -185,13 +185,20 @@ inline t_hit set_hit(double t1, double t2, t_object	*o)
 t_color intersect_world(t_world *w, t_ray *cam_ray, int remaining)
 {
 	t_hit	hit;
+    t_color color;
+    t_color final;
 	t_inter	it;
 	hit.obj = NULL;
 	t_object	*node;
+	t_node	*light_node;
+    t_light *light;
 	double t;
+	unsigned n_lights;
 	hit.t1 = __FLT_MAX__;
 	hit.t2 = __FLT_MAX__;
+    light_node = w->lights;
 	node = w->objects;
+    final = zero_color();
 	while (node)
 	{
 		if (node->type == SP_OBJ)
@@ -206,23 +213,31 @@ t_color intersect_world(t_world *w, t_ray *cam_ray, int remaining)
 			hit = set_hit(it.t1, it.t2, node);
 		node = node->next;
 	}
-	return lighting(cam_ray, hit.obj, hit.t1, remaining);
+    n_lights = 0;
+    while (light_node)
+    {
+        light = light_node->data;
+        color = lighting(cam_ray, hit.obj, hit.t1, remaining, light);
+        final = add_colors(final, color, false);
+        light_node = light_node->next;
+        n_lights++;
+    }
+    final = scale_color(final, 1.f / n_lights, 0);
+	return final;
 }
 
-bool is_shadowed(t_world *w, t_point p)
+bool is_shadowed(t_world *w, t_point p, t_light *light)
 {
-	t_light *light;
 	t_ray offseted_p;
 	t_vector offset;
 	double inter_dist;
 	double pt_to_light_dist;
-	light = w->lights->data;
-	offset = scale_vector(normal(sub_points(light->p, p)), EPSILON);
-	offseted_p.origin = add_points(p, v_to_p(offset));
-	offseted_p.direction = normal(sub_points(light->p, p));
-	pt_to_light_dist = get_len_vector(sub_points(light->p, p));
-	inter_dist = get_intersect_dist(w, &offseted_p);
-	if (inter_dist > EPSILON && inter_dist < pt_to_light_dist)
-		return true;
+    offset = scale_vector(normal(sub_points(light->p, p)), EPSILON);
+    offseted_p.origin = add_points(p, v_to_p(offset));
+    offseted_p.direction = normal(sub_points(light->p, p));
+    pt_to_light_dist = get_len_vector(sub_points(light->p, p));
+    inter_dist = get_intersect_dist(w, &offseted_p);
+    if (inter_dist > EPSILON && inter_dist < pt_to_light_dist)
+        return true;
 	return false;
 }
