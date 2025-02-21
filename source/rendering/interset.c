@@ -136,7 +136,8 @@ t_inter cy_intersect(t_cylinder *cy, t_ray *r)
     double denom = dot(r->direction, cy->normal);
     if (fabs(denom) > EPSILON) {
         double t = -dot(X, cy->normal) / denom;
-        if (t > 0) {
+        if (t > 0)
+        {
             t_point P = add_points(r->origin, v_to_p(scale_vector(r->direction, t)));
             if (get_len_vector(sub_points(P, cy->origin)) <= radius)
                 bottom_hit = t;
@@ -222,7 +223,7 @@ t_color intersect_world(t_world *w, t_ray *cam_ray, int remaining)
         light_node = light_node->next;
         n_lights++;
     }
-    final = scale_color(final, 1.f / n_lights, 0);
+    final = sclamp_color(final, 1.f / n_lights);
 	return final;
 }
 

@@ -11,7 +11,7 @@ inline t_color zero_color()
 	return zero;
 }
 
-inline t_color scale_color(t_color v, double scale, bool is_clampt)
+inline t_color scale_color(t_color v, double scale)
 {
     t_color scaled;
 
@@ -19,9 +19,18 @@ inline t_color scale_color(t_color v, double scale, bool is_clampt)
     scaled.g = v.g * scale;
     scaled.b = v.b * scale;
 
-    if (is_clampt)
-        return clamp_color(scaled);
     return scaled;
+}
+
+inline t_color sclamp_color(t_color v, double scale)
+{
+    t_color scaled;
+
+    scaled.r = v.r * scale;
+    scaled.g = v.g * scale;
+    scaled.b = v.b * scale;
+
+    return clamp_color(scaled);
 }
 
 void print_color(t_color c, bool newline)

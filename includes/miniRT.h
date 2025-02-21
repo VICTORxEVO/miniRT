@@ -281,7 +281,8 @@ t_color abs_sub_colors(t_color c1, t_color c2);
 t_color mul_colors(t_color c1, t_color c2);
 t_color increment_color(t_color c1, int amount);
 t_color zero_color();
-t_color scale_color(t_color v, double scale, bool is_clampt);
+t_color scale_color(t_color v, double scale);
+t_color sclamp_color(t_color v, double scale);
 void print_color(t_color c, bool newline);
 t_color sum_colors(t_color amb, t_color dif, t_color   spc);
 double get_brightness(t_color c);
@@ -388,5 +389,11 @@ bool cube_handled(t_core *d, char **args);
 
 
 void swapf(double *t1, double *t2);
+
+/* will be deleted */
+void save_to_img(t_color px_color, int x, int y);
+t_color handle_object_pat(t_object *hit_obj, t_point inter_point);
+t_color	get_reflect_color(int remaining, t_object *hit_obj, t_vector pt_cam_vec, t_point	inter_point);
+
 
 #endif

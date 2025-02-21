@@ -107,81 +107,10 @@ t_color handle_object_pat(t_object *hit_obj, t_point inter_point)
 		else
 			obj_color = pattern->c2;
 	}
-	else if (pattern && pattern->type == STRIPE_X_PAT)
-	{
-		p = (v_to_p(sub_points(inter_point, origin_p)));
-		scale = 10;
-		scaled_x = (int)((p.x / diameter) * scale);
-		if ((int)scaled_x % 2 == 0)
-			obj_color = pattern->c1;
-		else
-			obj_color = pattern->c2;
-	}
-	else if (pattern && pattern->type == GRADIANT_Y)
-	{
-		double fraction;
-		p = v_to_p(sub_points(inter_point, origin_p));
-		// Map to [-1,1] range first, then to [0,1]
-		fraction = p.x / diameter;     // This gives us [-0.5, 0.5]
-		fraction = fraction + 0.5;                     // Now [0,1]
-		// Clamp fraction between 0 and 1
-		fraction = fraction < 0 ? 0 : (fraction > 1 ? 1 : fraction);
-		
-		obj_color.r = (int)(pattern->c1.r * (1 - fraction) + pattern->c2.r * fraction);
-		obj_color.g = (int)(pattern->c1.g * (1 - fraction) + pattern->c2.g * fraction);
-		obj_color.b = (int)(pattern->c1.b * (1 - fraction) + pattern->c2.b * fraction);
-	}
-	else if (pattern && pattern->type == SWIRL)
-	{
-		moved_p = sub_points(inter_point, origin_p);
-		p = v_to_p(moved_p);
-
-		// Compute angle and distance for the swirl
-		double angle = atan2f(p.y, p.x);
-		double dist = sqrtf(p.x * p.x + p.y * p.y);
-		
-		// Swirl pattern factor
-		double swirl = sinf(5.0f * angle + 3.0f * dist);
-		// map swirl [-1,1] to [0,1]
-		swirl = 0.5f * (swirl + 1.0f);
-
-		// Blend colors
-		obj_color.r = (int)(pattern->c1.r * (1.0f - swirl) + pattern->c2.r * swirl);
-		obj_color.g = (int)(pattern->c1.g * (1.0f - swirl) + pattern->c2.g * swirl);
-		obj_color.b = (int)(pattern->c1.b * (1.0f - swirl) + pattern->c2.b * swirl);
-	}
 	return obj_color;
 }
 
-t_color	get_reflect_color(int remaining, t_object *hit_obj, t_vector pt_cam_vec, t_point	inter_point)
-{
-	t_vector	obj_norm;
-	t_ray	reflect_ray;
-	t_point offseted_p;
-	t_color reflected_clr;
-	t_color obj_clr;
-	t_vector offset;
-	float	obj_refl;
 
-	reflected_clr = zero_color();
-	obj_refl = hit_obj->get_reflect(hit_obj);
-	// handle_object_pat()
-	if (getengine()->refl_on && remaining > 0 && obj_refl > 0.)
-	{
-		printf("refle\n");
-
-		obj_clr = hit_obj->get_color(hit_obj);
-		obj_norm = hit_obj->get_norm(hit_obj, inter_point);
-		offset = scale_vector(obj_norm, EPSILON);
-		offseted_p = add_points(inter_point, v_to_p(offset));
-		reflect_ray.origin = offseted_p;
-		reflect_ray.direction = reflect(pt_cam_vec, obj_norm);
-		reflected_clr = intersect_world(getengine()->w, &reflect_ray, remaining - 1);
-		double reflect_strength = hit_obj->get_reflect(hit_obj) * (get_brightness(obj_clr) / 255.f);
-		reflected_clr = scale_color(reflected_clr, reflect_strength, 0);
-	}
-	return reflected_clr;
-}
 t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, int remaining, t_light	*light)
 {
 	if (!hit_obj)
@@ -189,8 +118,8 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, int remai
 	t_color	color;
 	t_color	speclar_color;
 	t_color	diffuse_color;
+	t_color	mylight_color;
 	t_color	ambient_color;
-	t_color reflected_clr;
 	t_ambient	*ambient;
 	double light_dot_norm;
 	t_color	obj_clr;
@@ -208,7 +137,7 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, int remai
 	ambient_color = zero_color();
 	inter_point = position_at(cam_ray, smallest_t);
 	obj_clr = handle_object_pat(hit_obj, inter_point);
-	ambient_color = scale_color(mul_colors(ambient->c, obj_clr), ambient->ratio * 0.1, 0);
+	ambient_color = scale_color(mul_colors(ambient->c, obj_clr), ambient->ratio * 0.1);
 	if (is_shadowed(getengine()->w, inter_point, light))
 		return ambient_color;
 	pt_cam_vec = normal(sub_points(inter_point, cam_ray->origin)); 
@@ -216,23 +145,23 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, int remai
 	cam_ray_surf_norm_dot = dot(pt_cam_vec, obj_norm);
 	if (cam_ray_surf_norm_dot > 0)
 		obj_norm = neg_vector(obj_norm);
-	reflected_clr = get_reflect_color(remaining, hit_obj, pt_cam_vec, inter_point);  // ! new
 	pt_light_vec = normal(sub_points(light->p, inter_point));
 	light_dot_norm = dot(obj_norm, pt_light_vec);
 	if (light_dot_norm >= 0)
 	{
-		diffuse_color = scale_color(scale_color(add_colors(obj_clr, light->c, 0), 0.5, 1), light_dot_norm * light->brightness, 0);
+		diffuse_color = add_colors(obj_clr, scale_color(light->c, light_dot_norm * light->brightness), 0);
+		diffuse_color = scale_color(diffuse_color, 1./2.);
 		light_ref = reflect(pt_light_vec, obj_norm);
         refl_dot_cam = dot(normal(light_ref), pt_cam_vec);
         if (refl_dot_cam > 0 && light->brightness > 0)
-			speclar_color = scale_color(scale_color(light->c, light->brightness * (get_brightness(obj_clr) / 255.f), 0), powf(refl_dot_cam, light->brightness * 100), 0);
+			speclar_color = scale_color(scale_color(light->c, light->brightness * (get_brightness(obj_clr) / 255.f)), powf(refl_dot_cam, light->brightness * 100));
     }
 	color = sum_colors(speclar_color ,diffuse_color, ambient_color);
-	color = add_colors(color, reflected_clr, 0);
 	if (getengine()->w->gray_on)
 		return (rgb_to_gray(color));
 	return color;
 }
+
 t_color	get_px_color(double x, double y, int remaining)
 {
 	t_core *engine;
@@ -272,21 +201,11 @@ t_color	get_px_color(double x, double y, int remaining)
 			final_clr = add_colors(final_clr, temp_clr, false);
 			i++;
 		}
-		final_clr = scale_color(final_clr, 1.f / engine->rays_px, 0);
+		final_clr = scale_color(final_clr, 1.f / engine->rays_px);
 	}
 	return (final_clr);
 }
 
-void save_to_img(t_color px_color, int x, int y)
-{
-    t_core      *engine;
-
-	engine = getengine();
-	int index = (y * SCREEN_WIDTH + x) * 3;
-	engine->png[index] = px_color.r;
-	engine->png[index + 1] = px_color.g;
-	engine->png[index + 2] = px_color.b;
-}
 
 void    rendering(void)
 {
