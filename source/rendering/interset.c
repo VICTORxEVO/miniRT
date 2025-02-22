@@ -1,68 +1,20 @@
 #include "miniRT.h"
 
-t_vector cube_normal_at(t_cube *cube, t_point world_point)
-{
-    // Transform point to object space
-    t_point local_point = v_to_p(sub_points(world_point, cube->origin));
-    
-    // Find the largest component
-    double maxc = maxf(fabs(local_point.x), maxf(fabs(local_point.y), fabs(local_point.z)));
-    
-    if (maxc == fabs(local_point.x))
-        return (t_vector){local_point.x > 0 ? 1 : -1, 0, 0};
-    else if (maxc == fabs(local_point.y))
-        return (t_vector){0, local_point.y > 0 ? 1 : -1, 0};
-    else
-        return (t_vector){0, 0, local_point.z > 0 ? 1 : -1};
-}
-
-t_inter cube_intersect(t_cube *cube, t_ray *ray)
-{
-    // Transform ray to object space
-	t_inter	it;
-    t_vector oc = sub_points(ray->origin, cube->origin);
-    
-    // Check intersections with all three axis pairs
-    double xtmin, xtmax, ytmin, ytmax, ztmin, ztmax;
-    it.t1 = -1;
-    it.t2 = -1;
-    check_axis(oc.x, ray->direction.x, &xtmin, &xtmax);
-    check_axis(oc.y, ray->direction.y, &ytmin, &ytmax);
-    check_axis(oc.z, ray->direction.z, &ztmin, &ztmax);
-    
-    // Find largest minimum t value
-    double tmin = maxf(xtmin, maxf(ytmin, ztmin));
-    // Find smallest maximum t value
-    double tmax = minf(xtmax, minf(ytmax, ztmax));
-    
-    // If tmin > tmax, ray misses cube
-	
-    if (tmin > tmax || tmax < 0)
-        return it;
-    it.t1 = tmin;
-    it.t2 = tmax;
-    // Return nearest intersection
-	if (tmin < 0)
-		swapf(&it.t1, &it.t2);
-    return it;
-}
-
 t_inter sp_intersect(t_sphere *s, t_ray *ray)
 {
-    t_vector oc;
+    t_vec oc;
     double a;
     double b;
     double c;
     double d;
 	t_inter	it;
-	double tp;
 
 	it.t1 = -1;
 	it.t2 = -1;
-    oc = sub_points(ray->origin, s->origin);
-    a = dot(ray->direction, ray->direction);
-    b = 2.0f * dot(ray->direction, oc);
-    c = dot(oc, oc) - s->radius_squared;
+    oc = vec_sub(ray->origin, s->origin);
+    a = vec_dot(ray->direction, ray->direction);
+    b = 2.0f * vec_dot(ray->direction, oc);
+    c = vec_dot(oc, oc) - s->radius_squared;
 
     d = (b * b) - (4.0f * a * c);
 	if (d <= 0 || fabs(a) < EPSILON)
@@ -79,15 +31,15 @@ t_inter pl_intersect(t_plane *pl, t_ray *ray)
 	double    denom;
     double t;
 	t_inter	it;
-    t_vector pl_to_ray;
+    t_vec pl_to_ray;
 
 	it.t1 = -1;
 	it.t2 = -1;
-    denom = dot(pl->normal, ray->direction);
+    denom = vec_dot(pl->normal, ray->direction);
     if (fabs(denom) < EPSILON)
         return it;
-    pl_to_ray = sub_points(pl->origin, ray->origin);
-    t = dot(pl_to_ray, pl->normal) / denom;
+    pl_to_ray = vec_sub(pl->origin, ray->origin);
+    t = vec_dot(pl_to_ray, pl->normal) / denom;
     if (t >= EPSILON)
 	{
 		it.t1 = t;
@@ -105,12 +57,12 @@ t_inter cy_intersect(t_cylinder *cy, t_ray *r)
     double top_hit = -1;
     t_inter it = {-1, -1};
 
-    t_vector X = sub_points(r->origin, cy->origin);
+    t_vec X = vec_sub(r->origin, cy->origin);
 
     // Cylinder body intersection
-    a = dot(r->direction, r->direction) - pow(dot(r->direction, cy->normal), 2);
-    b = 2 * (dot(r->direction, X) - dot(r->direction, cy->normal) * dot(X, cy->normal));
-    c = dot(X, X) - pow(dot(X, cy->normal), 2) - (radius * radius);
+    a = vec_dot(r->direction, r->direction) - pow(vec_dot(r->direction, cy->normal), 2);
+    b = 2 * (vec_dot(r->direction, X) - vec_dot(r->direction, cy->normal) * vec_dot(X, cy->normal));
+    c = vec_dot(X, X) - pow(vec_dot(X, cy->normal), 2) - (radius * radius);
     d = b*b - 4*a*c;
 
     if (d >= 0) {
@@ -124,36 +76,37 @@ t_inter cy_intersect(t_cylinder *cy, t_ray *r)
 			body_hit = t2;
 
         // Validate body hit height
-        if (body_hit > 0) {
-            t_point hit_point = add_points(r->origin, v_to_p(scale_vector(r->direction, body_hit)));
-            double height = dot(sub_points(hit_point, cy->origin), cy->normal);
+        if (body_hit > 0)
+        {
+            t_vec hit_point = vec_add(r->origin, (vec_scl(r->direction, body_hit)));
+            double height = vec_dot(vec_sub(hit_point, cy->origin), cy->normal);
             if (height < 0 || height > cy->height)
 				body_hit = -1;
         }
     }
 
     // Bottom cap intersection
-    double denom = dot(r->direction, cy->normal);
+    double denom = vec_dot(r->direction, cy->normal);
     if (fabs(denom) > EPSILON) {
-        double t = -dot(X, cy->normal) / denom;
+        double t = -vec_dot(X, cy->normal) / denom;
         if (t > 0)
         {
-            t_point P = add_points(r->origin, v_to_p(scale_vector(r->direction, t)));
-            if (get_len_vector(sub_points(P, cy->origin)) <= radius)
+            t_vec P = vec_add(r->origin, (vec_scl(r->direction, t)));
+            if (vec_len(vec_sub(P, cy->origin)) <= radius)
                 bottom_hit = t;
         }
     }
 
     // Top cap intersection
-    t_point top_center = add_points(cy->origin, v_to_p(scale_vector(cy->normal, cy->height)));
-    X = sub_points(r->origin, top_center);
+    t_vec top_center = vec_add(cy->origin, (vec_scl(cy->normal, cy->height)));
+    X = vec_sub(r->origin, top_center);
     if (fabs(denom) > EPSILON)
 	{
-        double t = -dot(X, cy->normal) / denom;
+        double t = -vec_dot(X, cy->normal) / denom;
         if (t > 0)
 		{
-            t_point P = add_points(r->origin, v_to_p(scale_vector(r->direction, t)));
-            if (get_len_vector(sub_points(P, top_center)) <= radius)
+            t_vec P = vec_add(r->origin, (vec_scl(r->direction, t)));
+            if (vec_len(vec_sub(P, top_center)) <= radius)
                 top_hit = t;
         }
     }
@@ -183,62 +136,114 @@ inline t_hit set_hit(double t1, double t2, t_object	*o)
 	return hit;
 }
 
-t_color intersect_world(t_world *w, t_ray *cam_ray, int remaining)
+t_hit get_intersection(t_ray *cam_ray)
 {
+	t_object	*node;
 	t_hit	hit;
-    t_color color;
-    t_color final;
+    t_world *w;
 	t_inter	it;
 	hit.obj = NULL;
-	t_object	*node;
-	t_node	*light_node;
-    t_light *light;
-	double t;
-	unsigned n_lights;
-	hit.t1 = __FLT_MAX__;
-	hit.t2 = __FLT_MAX__;
-    light_node = w->lights;
+	hit.t1 = INFINITY;
+	hit.t2 = INFINITY;
+
+    w = getengine()->w;
 	node = w->objects;
-    final = zero_color();
-	while (node)
-	{
-		if (node->type == SP_OBJ)
-			it = sp_intersect(node->data, cam_ray);
-		else if (node->type == PL_OBJ)
-			it = pl_intersect(node->data, cam_ray);
-		else if (node->type == CB_OBJ)
-			it = cube_intersect(node->data, cam_ray);
-		else if (node->type == CY_OBJ)
-			it = cy_intersect(node->data, cam_ray);
-		if (it.t1 <= hit.t1 && it.t1 > 0)
-			hit = set_hit(it.t1, it.t2, node);
-		node = node->next;
-	}
-    n_lights = 0;
-    while (light_node)
+    while (node)
     {
-        light = light_node->data;
-        color = lighting(cam_ray, hit.obj, hit.t1, remaining, light);
-        final = add_colors(final, color, false);
-        light_node = light_node->next;
-        n_lights++;
+        if (node->type == SP_OBJ)
+            it = sp_intersect(node->data, cam_ray);
+        else if (node->type == PL_OBJ)
+            it = pl_intersect(node->data, cam_ray);
+        else if (node->type == CY_OBJ)
+            it = cy_intersect(node->data, cam_ray);
+        if (it.t1 <= hit.t1 && it.t1 > 0)
+            hit = set_hit(it.t1, it.t2, node);
+        node = node->next;
     }
-    final = sclamp_color(final, 1.f / n_lights);
-	return final;
+    return hit;
 }
 
-bool is_shadowed(t_world *w, t_point p, t_light *light)
+// t_color get_final_color(t_color final, t_hit    hit)
+// {
+//     t_world *w;
+//     t_color ambient_color;
+//     t_ambient *ambient;
+
+//     w = getengine()->w;
+//     ambient = w->ambient;
+//     if (hit.obj)
+//     {
+// 	    ambient_color = rgb_scl(ambient->c, ambient->ratio * 0.1);
+//     }
+//     else
+//         ambient_color = zero_color();
+//     final = rgb_add(final, ambient_color, 1);
+//     final = clamp_color(final);
+//     return final;
+// }
+
+
+t_color intersect_world(t_world *w, t_ray *cam_ray)
+{
+    t_hit   hit;
+    t_color color;
+    t_color final;
+    t_color ambient_color;
+    t_inter it;
+    hit.obj = NULL;
+    t_object        *node;
+    t_node  *light_node;
+    t_light *light;
+    hit.t1 = __FLT_MAX__;
+    hit.t2 = __FLT_MAX__;
+    light_node = w->lights;
+    node = w->objects;
+    final = zero_color();
+    while (node)
+    {
+        if (node->type == SP_OBJ)
+            it = sp_intersect(node->data, cam_ray);
+        else if (node->type == PL_OBJ)
+            it = pl_intersect(node->data, cam_ray);
+        else if (node->type == CB_OBJ)
+            it = cube_intersect(node->data, cam_ray);
+        else if (node->type == CY_OBJ)
+            it = cy_intersect(node->data, cam_ray);
+        if (it.t1 <= hit.t1 && it.t1 > 0)
+            hit = set_hit(it.t1, it.t2, node);
+        node = node->next;
+    }
+    while (light_node && hit.obj)
+    {
+        light = light_node->data;
+        color = lighting(cam_ray, hit.obj, hit.t1, light);
+        if (getengine()->w->gray_on)
+		    color = (rgb_to_gray(color));
+        if (is_shadowed(getengine()->w, position_at(cam_ray, hit.t1), light))
+            color = rgb_scl(color, 0.25);
+        final = rgb_add(final, color, false);
+        light_node = light_node->next;
+    }
+	ambient_color = rgb_scl(w->ambient->c, w->ambient->ratio * 0.1);
+    final = rgb_add(final, ambient_color, 1);
+    final = clamp_color(final);
+    return final;
+}
+
+
+bool is_shadowed(t_world *w, t_vec p, t_light *light)
 {
 	t_ray offseted_p;
-	t_vector offset;
+	t_vec offset;
 	double inter_dist;
 	double pt_to_light_dist;
-    offset = scale_vector(normal(sub_points(light->p, p)), EPSILON);
-    offseted_p.origin = add_points(p, v_to_p(offset));
-    offseted_p.direction = normal(sub_points(light->p, p));
-    pt_to_light_dist = get_len_vector(sub_points(light->p, p));
+    offset = vec_scl(normal(vec_sub(light->p, p)), EPSILON);
+    offseted_p.origin = vec_add(p, (offset));
+    offseted_p.direction = normal(vec_sub(light->p, p));
+    pt_to_light_dist = vec_len(vec_sub(light->p, p));
     inter_dist = get_intersect_dist(w, &offseted_p);
     if (inter_dist > EPSILON && inter_dist < pt_to_light_dist)
         return true;
-	return false;
+	else
+        return false;
 }

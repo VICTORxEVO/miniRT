@@ -1,8 +1,8 @@
 #include "miniRT.h"
 
-t_vector	generate_cam_dir(t_camera	*cam, double scale, double ndcx, double ndcy)
+t_vec	generate_cam_dir(t_camera	*cam, double scale, double ndcx, double ndcy)
 {
-	t_vector	dir;
+	t_vec	dir;
 
 	dir = cam->forward;
 	dir.x += (ndcx * scale * cam->aspect * cam->right.x) + (ndcy * scale * cam->up.x);

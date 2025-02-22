@@ -31,13 +31,7 @@ void    readfile(int fd, char *filename)
 
 int check_file(char *filename)
 {
-    char *dot_pos;
     int fd;
-
-    dot_pos = ft_strchr(filename, '.');
-    // if (!dot_pos || *dot_pos == filename[0] 
-    //     || ft_strncmp(dot_pos, ".rt", -1) != 0)
-    //     pexit(RED FILEEXT_ER, 1);
     fd = open(filename, O_RDONLY);
     return(fd);
 }

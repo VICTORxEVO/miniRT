@@ -56,9 +56,9 @@ void    loadline(char *line, int n_line, char *filename)
 
 void setup_cam_dir(t_camera	*cam)
 {
-	t_vector	temp_up;
+	t_vec	temp_up;
 	// calc up, right vectors for where the cam is lookin (forward)
-	temp_up = (t_vector) {0, 1, 0};
+	temp_up = (t_vec) {0, 1, 0};
 	cam->right = normal(cross(temp_up, cam->forward)); 
 	cam->up = normal(cross(cam->forward, cam->right)); // now reset up
     cam->aspect = (SCREEN_WIDTH / SCREEN_HEIGHT);

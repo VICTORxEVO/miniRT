@@ -19,7 +19,7 @@ void handle_input()
     {
         s = galloc(sizeof(t_sphere));
         s->c = (t_color) {255,255,255};
-        s->origin = (t_point ) {0,0,0};
+        s->origin = (t_vec ) {0,0,0};
         s->diameter = 2;
         s->radius_squared = 4;
         s->reflect = 0;

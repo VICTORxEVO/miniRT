@@ -11,7 +11,7 @@ inline t_color zero_color()
 	return zero;
 }
 
-inline t_color scale_color(t_color v, double scale)
+inline t_color rgb_scl(t_color v, double scale)
 {
     t_color scaled;
 
@@ -40,7 +40,7 @@ void print_color(t_color c, bool newline)
 		printf("\n");
 }
 
-inline t_color sum_colors(t_color amb, t_color dif, t_color   spc)
+inline t_color rgb_sum(t_color amb, t_color dif, t_color   spc)
 {
     t_color res;
     res.r = amb.r + dif.r + spc.r;

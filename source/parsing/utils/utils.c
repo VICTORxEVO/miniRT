@@ -44,7 +44,7 @@ bool    color_struct_filled(t_color	*c, char  **args)
 	return (true);
 }
 
-bool    point_struct_filled(t_point	*p, char  **args)
+bool    point_struct_filled(t_vec	*p, char  **args)
 {
     bool error;
 
@@ -61,7 +61,7 @@ bool    point_struct_filled(t_point	*p, char  **args)
 	return (true);
 }
 
-bool    vector_struct_filled(t_vector	*v, char  **args)
+bool    vector_struct_filled(t_vec	*v, char  **args)
 {
     bool error;
     // for camera , one at least should be 1

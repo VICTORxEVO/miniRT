@@ -5,8 +5,8 @@ bool    camera_handled(t_core *d, char **args)
     char		**cord;
     char		**vctr;
     double   	FOV;
-    t_vector	vec3d;
-    t_point		pcord;
+    t_vec	vec3d;
+    t_vec		pcord;
     bool		err;
 
     err = false;
@@ -25,7 +25,7 @@ bool    camera_handled(t_core *d, char **args)
         return (printf("Error\nbad camera 3d vector"), false);
     }
     FOV = ft_atof(args[3], &err);
-    if (err || (FOV < 0 || FOV > 180))
+    if (err || (FOV < 0 || FOV > 170))
     {
         return (printf("Error\nbad fov value for camera"), false);
     }
@@ -41,7 +41,7 @@ bool    light_handled(t_core *d, char **args)
     char		**clrs;
     double	    light_value;
     t_color		light_color;
-    t_point		light_cord;
+    t_vec		light_cord;
 	t_light		*light;
     char		**cord;
     bool		err;
@@ -69,8 +69,8 @@ bool    plane_handled(t_core *d, char **args)
     char		**clrs;
     char		**vctr;
     t_color		plane_color;
-    t_point		plane_cord;
-    t_vector	plane_norm;
+    t_vec		plane_cord;
+    t_vec	plane_norm;
 	t_plane		*plane;
     char		**cord;
 
@@ -101,8 +101,8 @@ bool    cylinder_handled(t_core *d, char **args)
     char		**clrs;
     char		**vctr;
     t_color		cylinder_color;
-    t_point		cylinder_cord;
-    t_vector	cylinder_norm;
+    t_vec		cylinder_cord;
+    t_vec	cylinder_norm;
     double       diameter;
     double       height;
 	t_cylinder  *cylinder;
@@ -141,7 +141,7 @@ bool    sphere_handled(t_core *d, char **args)
 {
     char		**clrs;
     t_color		sphere_color;
-    t_point		sphere_cord;
+    t_vec		sphere_cord;
     double       diameter;
 	t_sphere  *sphere;
     char		**cord;
@@ -168,21 +168,8 @@ bool    sphere_handled(t_core *d, char **args)
     add_obj(d, &d->w->objects, sphere, SP_OBJ);
 	return (true);
 }
-t_vector get_cube_norm(t_object *o, t_point pt_on_cube)
-{
-    t_cube *cube = (t_cube *)o->data;
-    t_point local_point = v_to_p(sub_points(pt_on_cube, cube->origin));
-    
-    double maxc = maxf(fabs(local_point.x), maxf(fabs(local_point.y), fabs(local_point.z)));
-    
-    if (maxc == fabs(local_point.x))
-        return (t_vector){local_point.x > 0 ? 1 : -1, 0, 0};
-    else if (maxc == fabs(local_point.y))
-        return (t_vector){0, local_point.y > 0 ? 1 : -1, 0};
-    return (t_vector){0, 0, local_point.z > 0 ? 1 : -1};
-}
 
-t_point get_cube_origin(t_object *o)
+t_vec get_cube_origin(t_object *o)
 {
     return ((t_cube *)o->data)->origin;
 }

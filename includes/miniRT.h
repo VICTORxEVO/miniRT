@@ -12,6 +12,7 @@ typedef	struct s_inter
 	double t2;
 } t_inter;
 
+
 typedef struct s_node
 {
     void *data;
@@ -39,8 +40,8 @@ typedef struct s_object
     void *data;
     struct s_object *next;
 	char	type;
-	t_vector (*get_norm ) (struct s_object *o, t_point pt_on_sp);
-	t_point (*get_origin ) (struct s_object *o);
+	t_vec (*get_norm ) (struct s_object *o, t_vec pt_on_sp);
+	t_vec (*get_origin ) (struct s_object *o);
 	t_color	(*get_color) (struct s_object *o);
 	void (*set_color) (struct s_object *o, t_color new_color); 
 	t_pattern *(*get_pattern) (struct s_object *o); 
@@ -64,7 +65,7 @@ typedef struct s_mlx
 }  t_mlx;
 
 typedef struct s_cube {
-    t_point origin;
+    t_vec origin;
     t_color c;
     t_pattern *pattern;
     double reflect;
@@ -102,18 +103,18 @@ typedef struct s_ambient
 
 typedef struct s_light
 {
-	t_point	p;
+	t_vec	p;
 	double	brightness; // 0 -> 1
 	t_color	c;
 }	t_light;
 
 typedef struct s_camera
 {
-	t_point		origin;
-    t_vector	forward; // normalized
-    t_vector	right; // should be calculated
-    t_vector	up; // should be calculated
-	t_vector	direction;
+	t_vec		origin;
+    t_vec	forward; // normalized
+    t_vec	right; // should be calculated
+    t_vec	up; // should be calculated
+	t_vec	direction;
 	unsigned  fov; // field of view angle (how much of the cam we can see) when fov is small view is zoomed in
 	double		aspect;
 } t_camera;
@@ -133,7 +134,7 @@ typedef struct s_world
 
 typedef struct s_sphere
 {
-	t_point		origin;
+	t_vec		origin;
 	double		diameter;
 	double		radius_squared;
 	t_color		c;
@@ -144,8 +145,8 @@ typedef struct s_sphere
 
 typedef struct s_plane
 {
-	t_point		origin;
-	t_vector	normal;
+	t_vec		origin;
+	t_vec	normal;
 	t_color		c;
 	t_pattern *pattern;
     double reflect;
@@ -153,8 +154,8 @@ typedef struct s_plane
 
 typedef struct s_cylinder
 {
-	t_point		origin;
-	t_vector	normal;
+	t_vec		origin;
+	t_vec	normal;
 	double		diameter;
 	double		height;
 	double		reflect;
@@ -221,13 +222,13 @@ double get_intersect_dist(t_world *w, t_ray *ray);
 t_color	sp_light(t_object	*hit_sph, t_ray	*cam_ray, double smallest_t);
 // t_color	pl_light(t_plane	*hit_pl, t_ray	*cam_ray, double smallest_t);
 t_color	pl_light(t_object	*hit_obj, t_ray	*cam_ray, double smallest_t);
-bool is_shadowed(t_world *w, t_point p, t_light *light);
-t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, int remaining, t_light	*light);
-t_vector	generate_cam_dir(t_camera	*cam, double scale, double ndcx, double ndcy);
+bool is_shadowed(t_world *w, t_vec p, t_light *light);
+t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, t_light	*light);
+t_vec	generate_cam_dir(t_camera	*cam, double scale, double ndcx, double ndcy);
 t_inter sp_intersect(t_sphere *s, t_ray *ray);
 t_inter pl_intersect(t_plane *pl, t_ray *ray);
 t_inter cy_intersect(t_cylinder *cy, t_ray *r);
-t_color intersect_world(t_world *w, t_ray *cam_ray, int remaining);
+t_color intersect_world(t_world *w, t_ray *cam_ray);
 int input(int key, void *d);
 void    rendering(void);
 
@@ -266,25 +267,26 @@ bool    sphere_handled(t_core *d, char **args);
 bool    camera_handled(t_core *d, char **args);
 bool    ambient_handled(t_core *d, char **args);
 bool    color_struct_filled(t_color	*c, char  **args);
-bool    point_struct_filled(t_point	*p, char  **args);
-bool    vector_struct_filled(t_vector	*v, char  **args);
+bool    point_struct_filled(t_vec	*p, char  **args);
+bool    vector_struct_filled(t_vec	*v, char  **args);
 bool    elem_added(t_core *d,char **args);
 
 
 void handle_pat(char *patt_name, char *patt_clrs, t_pattern  **pat, t_color main_clr);
 
 int get_color_value(t_color c);
-t_color add_colors(t_color c1, t_color c2, bool is_clampt);
+t_color rgb_add(t_color c1, t_color c2, bool is_clampt);
 t_color clamp_color(t_color c1);
 t_color sub_colors(t_color c1, t_color c2);
 t_color abs_sub_colors(t_color c1, t_color c2);
-t_color mul_colors(t_color c1, t_color c2);
+t_color rgb_mul(t_color c1, t_color c2);
+t_color rgb_mad(t_color c1, t_color c2);
 t_color increment_color(t_color c1, int amount);
 t_color zero_color();
-t_color scale_color(t_color v, double scale);
+t_color rgb_scl(t_color v, double scale);
 t_color sclamp_color(t_color v, double scale);
 void print_color(t_color c, bool newline);
-t_color sum_colors(t_color amb, t_color dif, t_color   spc);
+t_color rgb_sum(t_color amb, t_color dif, t_color   spc);
 double get_brightness(t_color c);
 t_color rgb_to_gray(t_color c);
 
@@ -322,10 +324,10 @@ double **rotate_x(double rad);
 double **rotate_y(double rad);
 double **rotate_z(double rad);
 t_ray transform_ray(t_ray old_r, double **transformation_mx);
-double **get_orientation_view_matrix(t_vector left, t_vector true_up, t_vector forward);
+double **get_orientation_view_matrix(t_vec left, t_vec true_up, t_vec forward);
 t_sphere transform_sphere(t_sphere s, double **transformation_mx);
-t_point translate_mx_to_point(double **m);
-t_vector translate_mx_to_vector(double **m);
+t_vec translate_mx_to_point(double **m);
+t_vec translate_mx_to_vector(double **m);
 
 
 /*     >>>>>Utils funtions section<<<<<     */
@@ -340,28 +342,23 @@ void handle_input();
 int mouse_input(int key, int x, int y, void *d);
 
 int get_rgb(t_color color);
-t_vector	reflect (t_vector	light, t_vector	norm);
-t_vector add_vectors(t_vector v1, t_vector v2);
-t_vector sub_vectors(t_vector v1, t_vector v2);
-t_vector sub_points(t_point p1, t_point p2);
-t_vector neg_vector(t_vector v1);
-t_point add_points(t_point v1, t_point v2);
-t_vector p_to_v(t_point p);
-t_point v_to_p(t_vector v);
-t_vector scale_vector(t_vector v, double scale);
-t_vector shrink_vector(t_vector v, double shrink);
-double get_len_vector(t_vector v1);
-void print_vector(t_vector v);
-void print_point(t_point p);
-t_point	position_at(t_ray	*r, double t);
-t_vector normal(t_vector v);
-double dot(t_vector v1, t_vector v2);
-t_vector cross(t_vector v1, t_vector v2);
-t_vector normal_at(t_sphere s, t_point p);
+t_vec	reflect (t_vec	light, t_vec	norm);
+t_vec vec_sub(t_vec p1, t_vec p2);
+t_vec vec_neg(t_vec v1);
+t_vec vec_add(t_vec v1, t_vec v2);
+t_vec p_to_v(t_vec p);
+t_vec vec_scl(t_vec v, double scale);
+double vec_len(t_vec v1);
+void vec_log(t_vec v);
+t_vec	position_at(t_ray	*r, double t);
+t_vec normal(t_vec v);
+double vec_dot(t_vec v1, t_vec v2);
+t_vec cross(t_vec v1, t_vec v2);
+t_vec normal_at(t_sphere s, t_vec p);
 double deg_to_rad(double deg);
 double rad_to_rad(double rad);
-t_vector get_obj_norm(t_object	*o, t_point	pt_on_sphere);
-t_point get_obj_origin(t_object	*o);
+t_vec get_obj_norm(t_object	*o, t_vec	pt_on_sphere);
+t_vec get_obj_origin(t_object	*o);
 t_color get_obj_color(t_object *o);
 t_pattern	*get_obj_pattern(t_object	*o);
 void set_obj_pattern(t_object *o, t_pattern *p);
@@ -373,12 +370,12 @@ void	my_mlx_pixel_put(t_img *data, int x, int y, int color);
 
 
 
-t_vector cube_normal_at(t_cube *cube, t_point world_point);
+t_vec cube_normal_at(t_cube *cube, t_vec world_point);
 t_inter cube_intersect(t_cube *cube, t_ray *ray);
 void check_axis(double origin, double direction, double *tmin, double *tmax);
-t_vector get_obj_norm(t_object	*o, t_point	pt_on_sphere);
-t_vector get_cube_norm(t_object *o, t_point pt_on_cube);
-t_point get_cube_origin(t_object *o);
+t_vec get_obj_norm(t_object	*o, t_vec	pt_on_sphere);
+t_vec get_cube_norm(t_object *o, t_vec pt_on_cube);
+t_vec get_cube_origin(t_object *o);
 t_color get_cube_color(t_object *o);
 t_pattern *get_cube_pattern(t_object *o);
 void set_cube_pattern(t_object *o, t_pattern *p);
@@ -392,8 +389,8 @@ void swapf(double *t1, double *t2);
 
 /* will be deleted */
 void save_to_img(t_color px_color, int x, int y);
-t_color handle_object_pat(t_object *hit_obj, t_point inter_point);
-t_color	get_reflect_color(int remaining, t_object *hit_obj, t_vector pt_cam_vec, t_point	inter_point);
+t_color handle_object_pat(t_object *hit_obj, t_vec inter_point);
+t_color	get_reflect_color(int remaining, t_object *hit_obj, t_vec pt_cam_vec, t_vec	inter_point);
 
 
 #endif

@@ -419,8 +419,8 @@ double **get_translation_matrix(double x, double y, double z)
     return matrix;
 }
 
-/* for a t_point  we will have 1 at the end [3][3] */
-/* for a t_vector we will have 0 at the end [3][3] */
+/* for a t_vec  we will have 1 at the end [3][3] */
+/* for a t_vec we will have 0 at the end [3][3] */
 double **get_scaling_matrix(double x, double y, double z, double w)
 {
     double **matrix;
@@ -433,18 +433,18 @@ double **get_scaling_matrix(double x, double y, double z, double w)
     return matrix;
 }
 
-inline t_point translate_mx_to_point(double **m)
+inline t_vec translate_mx_to_point(double **m)
 {
-    t_point p;
+    t_vec p;
     p.x = m[0][0];
     p.y = m[1][0];
     p.z = m[2][0];
     return p;
 }
 
-inline t_vector translate_mx_to_vector(double **m)
+inline t_vec translate_mx_to_vector(double **m)
 {
-    t_vector v;
+    t_vec v;
     v.x = m[0][0];
     v.y = m[1][0];
     v.z = m[2][0];
@@ -492,8 +492,8 @@ double **rotate_z(double rad)
 t_ray transform_ray(t_ray old_r, double **transformation_mx)
 {
     t_ray new_r;
-    t_point ray_origin_res;
-    t_vector ray_direction_res;
+    t_vec ray_origin_res;
+    t_vec ray_direction_res;
     double  **ray_matrix_origin;
     double  **ray_matrix_direction;
     double **origin_mul_res_matrix;
@@ -530,7 +530,7 @@ t_ray transform_ray(t_ray old_r, double **transformation_mx)
     return new_r;
 }
 
-double **get_orientation_view_matrix(t_vector left, t_vector true_up, t_vector forward)
+double **get_orientation_view_matrix(t_vec left, t_vec true_up, t_vec forward)
 {
     double **vm = get_new_matrix_n(4);
     vm[0][0] = left.x;
@@ -556,14 +556,14 @@ double **get_orientation_view_matrix(t_vector left, t_vector true_up, t_vector f
     return vm;
 }
 
-// double **get_view_matrix(t_point from, t_point to, t_vector up)
+// double **get_view_matrix(t_vec from, t_vec to, t_vec up)
 // {
 //     double **orientation_mx;
 //     double **view_mx;
-//     t_vector forward;
+//     t_vec forward;
 //     double **transformation_mx;
-//     t_vector left;
-//     t_vector true_up;
+//     t_vec left;
+//     t_vec true_up;
 
 //     // forwad ->   sub 'from' from 'to'    normalized
 //     // forward = get_normalized(get_vector_2_pts(from, to));  

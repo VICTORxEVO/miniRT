@@ -1,8 +1,10 @@
 #include "../includes/miniRT.h"
 
-inline t_vector add_vectors(t_vector v1, t_vector v2)
+
+
+inline t_vec vec_add(t_vec v1, t_vec v2)
 {
-    t_vector res_v;
+    t_vec res_v;
 
     res_v.x = v1.x + v2.x;
     res_v.y = v1.y + v2.y;
@@ -11,20 +13,9 @@ inline t_vector add_vectors(t_vector v1, t_vector v2)
     return res_v;
 }
 
-inline t_point add_points(t_point v1, t_point v2)
+inline t_vec sub_vectors(t_vec v1, t_vec v2)
 {
-    t_point res_v;
-
-    res_v.x = v1.x + v2.x;
-    res_v.y = v1.y + v2.y;
-    res_v.z = v1.z + v2.z;
-
-    return res_v;
-}
-
-inline t_vector sub_vectors(t_vector v1, t_vector v2)
-{
-    t_vector res_v;
+    t_vec res_v;
 
     res_v.x = v1.x - v2.x;
     res_v.y = v1.y - v2.y;
@@ -34,18 +25,18 @@ inline t_vector sub_vectors(t_vector v1, t_vector v2)
 /*
     p1 - p2  ->  vector from p2 to p1
 */
-inline t_vector sub_points(t_point p1, t_point p2)
+inline t_vec vec_sub(t_vec p1, t_vec p2)
 {
-    t_vector res_p;
+    t_vec res_p;
 
     res_p.x = p1.x - p2.x;
     res_p.y = p1.y - p2.y;
     res_p.z = p1.z - p2.z;
     return res_p;
 }
-inline t_vector neg_vector(t_vector v1)
+inline t_vec vec_neg(t_vec v1)
 {
-    t_vector neg;
+    t_vec neg;
 
     neg.x = 0 - v1.x;
     neg.y = 0 - v1.y;
@@ -53,9 +44,9 @@ inline t_vector neg_vector(t_vector v1)
     return neg;
 }
 
-inline t_vector scale_vector(t_vector v, double scale)
+inline t_vec vec_scl(t_vec v, double scale)
 {
-    t_vector scaled;
+    t_vec scaled;
 
     scaled.x = v.x * scale;
     scaled.y = v.y * scale;
@@ -63,17 +54,7 @@ inline t_vector scale_vector(t_vector v, double scale)
     return scaled;
 }
 
-inline t_vector shrink_vector(t_vector v, double shrink)
-{
-    t_vector shrinked;
-
-    shrinked.x = v.x / shrink;
-    shrinked.y = v.y / shrink;
-    shrinked.z = v.z / shrink;
-    return shrinked;
-}
-
-inline double get_len_vector(t_vector v1)
+inline double vec_len(t_vec v1)
 {
     double len;
 
@@ -81,46 +62,41 @@ inline double get_len_vector(t_vector v1)
     return len;
 }
 
-inline void print_vector(t_vector v)
+inline void vec_log(t_vec v)
 {
-    printf("t_vector => {%f, %f, %f}\n", v.x, v.y, v.z);
+    printf("t_vec => {%f, %f, %f}\n", v.x, v.y, v.z);
 }
 
-inline t_vector normal(t_vector v)
+inline t_vec normal(t_vec v)
 {
-    t_vector normalized;
+    t_vec norm;
     double len;
 
-    len = get_len_vector(v);
-    normalized.x = v.x / len;
-    normalized.y = v.y / len;
-    normalized.z = v.z / len;
-    return normalized;
+    len = vec_len(v);
+    norm.x = v.x / len;
+    norm.y = v.y / len;
+    norm.z = v.z / len;
+    return norm;
 }
 
-inline t_point	position_at(t_ray	*r, double t)
+inline t_vec	position_at(t_ray	*r, double t)
 {
-	t_point	p;
+	t_vec	p;
 	p.x = r->direction.x * t + r->origin.x;
 	p.y = r->direction.y * t + r->origin.y;
 	p.z = r->direction.z * t + r->origin.z;
 	return p;
 }
 
-inline void print_point(t_point p)
-{
-    printf("t_point => {%f, %f, %f}\n", p.x, p.y, p.z);
-}
-
 /*
-    the dot product is commutive A x B = B x A
+    the vec_dot product is commutive A x B = B x A
 */
-inline double dot(t_vector v1, t_vector v2)
+inline double vec_dot(t_vec v1, t_vec v2)
 {
-    double dot;
+    double vec_dot;
 
-    dot = (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
-    return dot;
+    vec_dot = (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
+    return vec_dot;
 }
 
 /*  cross product -> 
@@ -128,33 +104,15 @@ inline double dot(t_vector v1, t_vector v2)
     the plane defined by the two original vectors. 
 */
 /* this works for right hand only */
-inline t_vector cross(t_vector v1, t_vector v2)
+inline t_vec cross(t_vec v1, t_vec v2)
 {
-    t_vector res;
+    t_vec res;
     res.x = v1.y * v2.z - v1.z * v2.y;
     res.y = v1.z * v2.x - v1.x * v2.z;
     res.z = v1.x * v2.y - v1.y * v2.x;
     return res;
 }
-t_vector p_to_v(t_point p)
-{
-    t_vector v;
 
-    v.x = p.x;
-    v.y = p.y;
-    v.z = p.z;
-    return v;
-}
-
-t_point v_to_p(t_vector v)
-{
-    t_point p;
-
-    p.x = v.x;
-    p.y = v.y;
-    p.z = v.z;
-    return p;
-}
 inline double deg_to_rad(double deg)
 {
     return (deg * M_PI / 180);
@@ -169,36 +127,7 @@ inline double rad_to_rad(double rad)
     // rad -> PIE
 }
 
-double maxf(double a, double b)
+inline t_vec	reflect (t_vec	light, t_vec	norm) // light is a vector from a point towards the light
 {
-    if (a > b)
-        return (a);
-    return (b);
-}
-
-double minf(double a, double b)
-{
-    if (a < b)
-        return (a);
-    return (b);
-}
-
-double maxi(double a, double b)
-{
-    if (a > b)
-        return (a);
-    return (b);
-}
-
-double mini(double a, double b)
-{
-    if (a > b)
-        return (a);
-    return (b);
-}
-
-
-inline t_vector	reflect (t_vector	light, t_vector	norm) // light is a vector from a point towards the light
-{
-	return sub_vectors(light, scale_vector(norm, 2 * dot(norm, light))); 
+	return vec_sub(light, vec_scl(norm, 2 * vec_dot(norm, light))); 
 }

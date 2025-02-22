@@ -11,7 +11,7 @@ int mouse_input(int key, int y, int x, void *d)
     printf("x -> %d     y -> %d\n", x, y);
     s = galloc(sizeof(t_sphere));
     s->c = (t_color) {0,0,255};
-    s->origin = (t_point ) {x,y,5};
+    s->origin = (t_vec ) {x,y,5};
     s->diameter = 10;
     s->radius_squared = 25;
     add_obj(engine, &engine->w->objects, s, SP_OBJ);
@@ -22,9 +22,9 @@ int mouse_input(int key, int y, int x, void *d)
 int key_press(int key, t_core *engine)
 {
     t_camera *cam = engine->w->cam;
-    t_vector cam_dir = engine->w->cam->forward;
-    t_point cam_pos = engine->w->cam->origin;
-    t_point light_pos = ((t_light *)(engine->w->lights->data))->p;
+    t_vec cam_dir = engine->w->cam->forward;
+    t_vec cam_pos = engine->w->cam->origin;
+    t_vec light_pos = ((t_light *)(engine->w->lights->data))->p;
     double **cam_pos_mx;
     double **cam_dir_mx;
     double **trans_mx;
