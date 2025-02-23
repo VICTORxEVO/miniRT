@@ -115,7 +115,7 @@ bool    ambient_handled(t_core *d, char **args)
     ambient_ratio = ft_atof(args[1], &err);
     if (err || !between(ambient_ratio, 0, 1))
         return (printf("Error\nambient ratio invalid\n"), false);
-    clrs = ft_split(args[2], ',');
+    clrs = ft_split(args[2], ",");
     if (count_args(clrs) != 3 || !color_struct_filled(&ambient_color, clrs))
     {
         return (printf("Error\nambient color invalid\n"), false);

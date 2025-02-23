@@ -44,7 +44,7 @@ void    loadline(char *line, int n_line, char *filename)
 
     if (is_wspace(line) || starts_with(line, "#"))
         return ;
-    words = ft_split(line, ' ');
+    words = ft_split(line, " \n\v\t");
     args_count = count_args(words);
     if (args_count < 1)
         pexit(err_msg(filename, n_line), 3);

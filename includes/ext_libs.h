@@ -71,7 +71,7 @@ char	*ft_strjoin(char const *s1, char const *s2);
 void	ft_striteri(char *s, void (*f)(unsigned int, char *));
 char	*ft_strdup(const char *s);
 char	*ft_strchr(const char *str, int c);
-char	**ft_split(const char *s, char c);
+char	**ft_split(const char *s, char *c);
 char	**ft_split_path(const char *s, char c);
 void	*ft_memmove(void *dest, const void *src, size_t count);
 void	*ft_memcpy(void *dest, const void *src, size_t n);

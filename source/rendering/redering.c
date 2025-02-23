@@ -135,8 +135,6 @@ t_color	get_px_color(double x, double y)
 	return (final_clr);
 }
 
-
-
 void    rendering(void)
 {
     t_core      *engine;

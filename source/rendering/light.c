@@ -16,12 +16,11 @@ t_color	calc_diffuse(t_vec point, t_light *light, t_object	*hit_obj)
 	diffuse_color = zero_color();
 	obj_norm = hit_obj->get_norm(hit_obj, point);
 	light_dot_norm = vec_dot(obj_norm, pt_light_vec_norm);
-
 	if (light_dot_norm >= 0)
 	{
 		light_point_dist = vec_len(pt_light_vec);
 		light_factor = light_dot_norm * light->brightness * LIGHT_FACTOR / light_point_dist;
-		diffuse_color = rgb_mad(obj_clr, light->c);
+		diffuse_color = rgb_mul(obj_clr, light->c);
 		diffuse_color = rgb_scl(diffuse_color, light_factor);
 	}
 	return diffuse_color;
@@ -92,7 +91,6 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, t_light	*
 	speclar_color = zero_color();
 	point = position_at(cam_ray, smallest_t);
 	obj_clr = handle_object_pat(hit_obj, point);
-	
 	pt_cam_vec_norm = normal(vec_sub(point, cam_ray->origin)); 
 	obj_norm = prepare_obj_norm(hit_obj, point, pt_cam_vec_norm);
 	diffuse_color = calc_diffuse(point, light, hit_obj);

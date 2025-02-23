@@ -13,19 +13,31 @@
 #include "ext_libs.h"
 #include "gc.h"
 
-static int	word_num(const char *s, const char x)
+static bool	includes(const char c, const char *set)	
+{
+	int i  = 0;
+	while (set[i])
+	{
+		if (set[i] == c)
+			return true;
+		i++;
+	}
+	return false;
+}
+
+static int	word_num(const char *s, const char *x)
 {
 	int	wn;
 
 	wn = 0;
 	while (*s)
 	{
-		if (*s == x)
+		if (includes(*s, x))
 			s++;
 		else
 		{
 			wn++;
-			while (*s && *s != x)
+			while (*s && !includes(*s, x))
 				s++;
 		}
 	}
@@ -46,23 +58,23 @@ static char	**mem_error(char **arr)
 	return (NULL);
 }
 
-static char	*do_word(const char *s, const char x, int *q_resume)
+static char	*do_word(const char *s, const char *x, int *q_resume)
 {
 	int		len;
 	char	*word;
 	int		i;
 
 	len = 0;
-	while (s[*q_resume] == x)
+	while (includes(s[*q_resume], x))
 		(*q_resume)++;
 	i = *q_resume;
-	while (s[i] && s[i++] != x)
+	while (s[i] && !includes(s[i++], x))
 		len++;
 	word = (char *)galloc(sizeof(char) * (len + 1));
 	if (!word)
 		return (NULL);
 	i = 0;
-	while (s[*q_resume] && s[*q_resume] != x)
+	while (s[*q_resume] && !includes(s[*q_resume], x))
 	{
 		word[i] = s[*q_resume];
 		(*q_resume)++;
@@ -72,7 +84,7 @@ static char	*do_word(const char *s, const char x, int *q_resume)
 	return (word);
 }
 
-char	**ft_split(const char *s, char c)
+char	**ft_split(const char *s, char *c)
 {
 	char	**arr;
 	int		q_res;
