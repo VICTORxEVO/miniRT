@@ -223,7 +223,7 @@ t_color	sp_light(t_object	*hit_sph, t_ray	*cam_ray, double smallest_t);
 // t_color	pl_light(t_plane	*hit_pl, t_ray	*cam_ray, double smallest_t);
 t_color	pl_light(t_object	*hit_obj, t_ray	*cam_ray, double smallest_t);
 bool is_shadowed(t_world *w, t_vec p, t_light *light);
-t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, t_light	*light);
+t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, t_light	*light, bool *lighted, t_color *obj_clr_with_pat);
 t_vec	generate_cam_dir(t_camera	*cam, double scale, double ndcx, double ndcy);
 t_inter sp_intersect(t_sphere *s, t_ray *ray);
 t_inter pl_intersect(t_plane *pl, t_ray *ray);

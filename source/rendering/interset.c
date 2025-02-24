@@ -17,12 +17,12 @@ t_inter sp_intersect(t_sphere *s, t_ray *ray)
     c = vec_dot(oc, oc) - s->radius_squared;
 
     d = (b * b) - (4.0f * a * c);
-	if (d <= 0 || fabs(a) < EPSILON)
+	if (d < 0 || fabs(a) < EPSILON)
 		return it;
     it.t1 = (-b - sqrtf(d)) / (2.0f * a);
     it.t2 = (-b + sqrtf(d)) / (2.0f * a);
-	if (it.t1 > it.t2)
-		swapf(&it.t1, &it.t2);
+    if (it.t1 < 0 && it.t2 > 0)
+        it.t1 = it.t2;
 	return it;
 }
 
@@ -136,69 +136,16 @@ inline t_hit set_hit(double t1, double t2, t_object	*o)
 	return hit;
 }
 
-t_hit get_intersection(t_ray *cam_ray)
-{
-	t_object	*node;
-	t_hit	hit;
-    t_world *w;
-	t_inter	it;
-	hit.obj = NULL;
-	hit.t1 = INFINITY;
-	hit.t2 = INFINITY;
-
-    w = getengine()->w;
-	node = w->objects;
-    while (node)
-    {
-        if (node->type == SP_OBJ)
-            it = sp_intersect(node->data, cam_ray);
-        else if (node->type == PL_OBJ)
-            it = pl_intersect(node->data, cam_ray);
-        else if (node->type == CY_OBJ)
-            it = cy_intersect(node->data, cam_ray);
-        if (it.t1 <= hit.t1 && it.t1 > 0)
-            hit = set_hit(it.t1, it.t2, node);
-        node = node->next;
-    }
-    return hit;
-}
-
-// t_color get_final_color(t_color final, t_hit    hit)
-// {
-//     t_world *w;
-//     t_color ambient_color;
-//     t_ambient *ambient;
-
-//     w = getengine()->w;
-//     ambient = w->ambient;
-//     if (hit.obj)
-//     {
-// 	    ambient_color = rgb_scl(ambient->c, ambient->ratio * 0.1);
-//     }
-//     else
-//         ambient_color = zero_color();
-//     final = rgb_add(final, ambient_color, 1);
-//     final = clamp_color(final);
-//     return final;
-// }
-
-
-t_color intersect_world(t_world *w, t_ray *cam_ray)
+t_hit find_hit(t_world *w, t_ray *cam_ray)
 {
     t_hit   hit;
-    t_color color;
-    t_color final;
-    t_color ambient_color;
     t_inter it;
-    hit.obj = NULL;
     t_object        *node;
-    t_node  *light_node;
-    t_light *light;
+
+    hit.obj = NULL;
     hit.t1 = __FLT_MAX__;
     hit.t2 = __FLT_MAX__;
-    light_node = w->lights;
     node = w->objects;
-    final = zero_color();
     while (node)
     {
         if (node->type == SP_OBJ)
@@ -213,19 +160,36 @@ t_color intersect_world(t_world *w, t_ray *cam_ray)
             hit = set_hit(it.t1, it.t2, node);
         node = node->next;
     }
+    return hit;
+}
+
+t_color intersect_world(t_world *w, t_ray *cam_ray)
+{
+    t_hit   hit;
+    t_color color;
+    t_color final;
+    t_color obj_clr;
+    t_color ambient_color;
+    t_node  *light_node;
+    t_light *light;
+    bool    lighted = false;
+    light_node = w->lights;
+    final = zero_color();
+    hit = find_hit(w, cam_ray);
     while (light_node && hit.obj)
     {
         light = light_node->data;
-        color = lighting(cam_ray, hit.obj, hit.t1, light);
-        if (getengine()->w->gray_on)
-		    color = (rgb_to_gray(color));
-        if (is_shadowed(getengine()->w, position_at(cam_ray, hit.t1), light))
-            color = rgb_scl(color, 0.25);
+        color = lighting(cam_ray, hit.obj, hit.t1, light, &lighted, &obj_clr);
         final = rgb_add(final, color, false);
         light_node = light_node->next;
     }
-	ambient_color = rgb_scl(w->ambient->c, w->ambient->ratio * 0.1);
-    final = rgb_add(final, ambient_color, 1);
+    if (lighted)
+    {
+        ambient_color = rgb_scl(rgb_mul(w->ambient->c, obj_clr), 0.1);
+    }
+    else
+        ambient_color = rgb_scl(rgb_mul(w->ambient->c, obj_clr), 0.1);
+    final = rgb_add(final, ambient_color, true);
     final = clamp_color(final);
     return final;
 }
@@ -235,12 +199,18 @@ bool is_shadowed(t_world *w, t_vec p, t_light *light)
 {
 	t_ray offseted_p;
 	t_vec offset;
+	t_vec to_light;
+	t_vec to_light_norm;
 	double inter_dist;
 	double pt_to_light_dist;
-    offset = vec_scl(normal(vec_sub(light->p, p)), EPSILON);
+
+    to_light = vec_sub(light->p, p);
+    to_light_norm = normal(to_light);
+    pt_to_light_dist = vec_len(to_light);
+
+    offset = vec_scl(to_light_norm, EPSILON);
     offseted_p.origin = vec_add(p, (offset));
-    offseted_p.direction = normal(vec_sub(light->p, p));
-    pt_to_light_dist = vec_len(vec_sub(light->p, p));
+    offseted_p.direction = to_light_norm;
     inter_dist = get_intersect_dist(w, &offseted_p);
     if (inter_dist > EPSILON && inter_dist < pt_to_light_dist)
         return true;
