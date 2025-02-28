@@ -10,8 +10,9 @@ static bool validated_type(char *name, unsigned args_count)
     (!ft_strcmp(name, "pl") && args_count == e_plain_pattern) || 
     (!ft_strcmp(name, "sp") && args_count == e_sphere) || 
     (!ft_strcmp(name, "sp") && args_count == e_sphere_pattern) || 
-    (!ft_strcmp(name, "cu") && args_count == e_cube) || 
-    (!ft_strcmp(name, "cy") && args_count == e_cylinder))
+    (!ft_strcmp(name, "cy") && args_count == e_cylinder) || 
+    (!ft_strcmp(name, "cu") && args_count == e_cube) ||
+    (!ft_strcmp(name, "co") && args_count == e_cone))
         return (true);
     return (false);
 }

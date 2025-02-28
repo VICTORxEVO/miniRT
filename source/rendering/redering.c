@@ -6,6 +6,7 @@ double get_intersect_dist(t_world *w, t_ray *ray)
 	t_sphere	*sphere;
 	t_plane		*plane;
 	t_cylinder	*cylinder;
+	t_cone	*cone;
 	t_inter it;
 	double smallest_t;
 	node = w->objects;
@@ -30,6 +31,13 @@ double get_intersect_dist(t_world *w, t_ray *ray)
 		{
 			cylinder = (t_cylinder *)(node->data);
 			it = cy_intersect(cylinder, ray);
+			if (it.t1 < smallest_t && it.t1 > 0)
+				smallest_t = it.t1;
+		}
+		else if (node->type == CO_OBJ)
+		{
+			cone = (t_cone *)(node->data);
+			it = co_intersect(cone, ray);
 			if (it.t1 < smallest_t && it.t1 > 0)
 				smallest_t = it.t1;
 		}

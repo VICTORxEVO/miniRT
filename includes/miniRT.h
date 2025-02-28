@@ -71,6 +71,19 @@ typedef struct s_cube {
     double reflect;
 } t_cube;
 
+typedef struct t_cone 
+{
+	t_vec	tip;
+	t_vec	norm;
+	t_color	c;
+	double	height;
+	double	angle;
+	double	cosangle;
+	double	cosangle2;
+	double	sec_squared;
+
+} t_cone;
+
 enum e_types
 {
 	e_ambient = 3,
@@ -79,8 +92,9 @@ enum e_types
 	e_color = 4,
 	e_light = 4,
 	e_plain = 4,
-	e_plain_pattern = 6,
 	e_sphere = 4,
+	e_cone = 5,
+	e_plain_pattern = 6,
 	e_sphere_pattern = 6,
 	e_cylinder = 6,
 };
@@ -228,11 +242,13 @@ t_vec	generate_cam_dir(t_camera	*cam, double scale, double ndcx, double ndcy);
 t_inter sp_intersect(t_sphere *s, t_ray *ray);
 t_inter pl_intersect(t_plane *pl, t_ray *ray);
 t_inter cy_intersect(t_cylinder *cy, t_ray *r);
+t_inter co_intersect(t_cone *co, t_ray *r);
 t_color intersect_world(t_world *w, t_ray *cam_ray);
 int input(int key, void *d);
 void    rendering(void);
 
-
+t_vec co_normal(t_cone *cone, t_vec hit_point);
+t_vec cy_normal(t_cylinder *cy, t_vec world_point) ;
 
 
 /*
@@ -263,6 +279,7 @@ double mini(double a, double b);
 bool    light_handled(t_core *d, char **args);
 bool    plane_handled(t_core *d, char **args);
 bool    cylinder_handled(t_core *d, char **args);
+bool    cone_handled(t_core *d, char **args);
 bool    sphere_handled(t_core *d, char **args);
 bool    camera_handled(t_core *d, char **args);
 bool    ambient_handled(t_core *d, char **args);
@@ -357,7 +374,6 @@ t_vec cross(t_vec v1, t_vec v2);
 t_vec normal_at(t_sphere s, t_vec p);
 double deg_to_rad(double deg);
 double rad_to_rad(double rad);
-t_vec get_obj_norm(t_object	*o, t_vec	pt_on_sphere);
 t_vec get_obj_origin(t_object	*o);
 t_color get_obj_color(t_object *o);
 t_pattern	*get_obj_pattern(t_object	*o);

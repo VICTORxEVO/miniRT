@@ -17,6 +17,7 @@
 #define PL_OBJ 1
 #define CY_OBJ 2
 #define CB_OBJ 3
+#define CO_OBJ 4
 
 #define EPSILON 0.0001f
 #define SMALL_N 0.00000001f

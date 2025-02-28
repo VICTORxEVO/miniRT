@@ -1,7 +1,22 @@
 #include "miniRT.h"
 
 
-t_vec get_cylinder_normal(t_cylinder *cy, t_vec world_point) 
+t_vec co_normal(t_cone *cone, t_vec hit_point)
+{
+    double dist_along_axis = vec_dot(vec_sub(hit_point, cone->tip), cone->norm);
+    
+    // Corrected: Cap normal points OUTWARD (not inward)
+    if (fabs(dist_along_axis - cone->height) < EPSILON)
+        return cone->norm; // <- Changed from -cone->norm
+    
+    t_vec axis_point = vec_add(cone->tip, vec_scl(cone->norm, dist_along_axis));
+    t_vec lateral = vec_sub(hit_point, axis_point);
+    t_vec normal_dir = vec_sub(lateral, vec_scl(cone->norm, tan(cone->angle) * vec_len(lateral)));
+    
+    return normal(normal_dir);
+}
+
+t_vec cy_normal(t_cylinder *cy, t_vec world_point) 
 {
     t_vec camera_pos = getengine()->w->cam->origin;
 	t_vec local_point = vec_sub(world_point, cy->origin);
@@ -38,6 +53,9 @@ t_vec get_cylinder_normal(t_cylinder *cy, t_vec world_point)
     return norm;
 }
 
+
+
+
 t_vec get_obj_norm(t_object	*o, t_vec	pt_on_obj)
 {
 	t_sphere 	*s;
@@ -52,7 +70,11 @@ t_vec get_obj_norm(t_object	*o, t_vec	pt_on_obj)
 	else if (o->type == CB_OBJ)
         return cube_normal_at((t_cube *)o->data, pt_on_obj);
 	else if (o->type == CY_OBJ)
-		return (get_cylinder_normal(o->data, pt_on_obj));
+		return (cy_normal(o->data, pt_on_obj));
+	else if (o->type == CO_OBJ)
+    {
+		return (co_normal(o->data, pt_on_obj));
+    }
 	return (t_vec) {0,0,0};
 }
 
@@ -64,6 +86,8 @@ t_color	get_obj_color(t_object *o)
 		return ((t_plane *)o->data)->c;
 	else if (o->type == CY_OBJ)
 		return ((t_cylinder *)o->data)->c;
+	else if (o->type == CO_OBJ)
+		return ((t_cone *)o->data)->c;
 	else return ((t_cube *)o->data)->c;
 }
 void set_obj_color(t_object *o, t_color c)
@@ -72,7 +96,9 @@ void set_obj_color(t_object *o, t_color c)
 		((t_sphere *)o->data)->c = c;
 	else if (o->type == PL_OBJ)
 		((t_plane *)o->data)->c = c;
-	else
+	else if (o->type == CO_OBJ)
+		((t_cone *)o->data)->c = c;
+    else
 		((t_cube *)o->data)->c = c;
 
 }

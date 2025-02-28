@@ -25,7 +25,7 @@ bool    camera_handled(t_core *d, char **args)
         return (printf("Error\nbad camera 3d vector"), false);
     }
     FOV = ft_atof(args[3], &err);
-    if (err || (FOV < 0 || FOV > 170))
+    if (err || (FOV < 0 || FOV > 180))
     {
         return (printf("Error\nbad fov value for camera"), false);
     }
@@ -129,7 +129,7 @@ bool    cylinder_handled(t_core *d, char **args)
     cylinder = galloc(sizeof(t_cylinder));
     cylinder->c = cylinder_color;
     cylinder->origin = cylinder_cord;
-    cylinder->normal = cylinder_norm;
+    cylinder->normal = normal(cylinder_norm);
     cylinder->diameter = diameter;
     cylinder->height = height;
     cylinder->reflect = 0;
@@ -198,6 +198,7 @@ double get_cube_reflect(t_object *o)
 {
     return ((t_cube *)o->data)->reflect;
 }
+
 bool cube_handled(t_core *d, char **args)
 {
     t_cube *cube;
@@ -230,6 +231,40 @@ bool cube_handled(t_core *d, char **args)
     return (true);
 }
 
+bool cone_handled(t_core *d, char **args)
+{
+    t_cone *cone;
+    double count;
+    bool		err;
+    char		**cord;
+    char		**clrs;
+    char		**norm;
+
+    count = count_args(args);
+    if (count != e_cone)
+        return (false);
+    cord = ft_split(args[1], ",");
+    norm = ft_split(args[2], ",");
+    clrs = ft_split(args[3], ",");
+    cone = galloc(sizeof(t_cone));
+    // printf("-> after galloec \n");
+    if (!point_struct_filled(&cone->tip, cord))
+        return (false);
+    if (!point_struct_filled(&cone->norm, norm))
+        return (false);
+    cone->norm = normal(cone->norm);
+    if (!color_struct_filled(&cone->c, clrs))
+        return (false);
+    cone->height = ft_atof(args[4], &err);
+    cone->angle = 45 * (M_PI / 180.0) / 2.0;
+    cone->cosangle = cos(cone->angle);
+    cone->cosangle2 = cone->cosangle * cone->cosangle;
+    cone->sec_squared = 1.0 / cone->cosangle2;
+    t_object *obj = create_obj(d, cone);
+    obj->type = CO_OBJ;
+    add_obj(d, &d->w->objects, cone, CO_OBJ);
+    return (true);
+}
 
 void handle_pat(char *patt_name, char *patt_clrs, t_pattern  **pat, t_color main_clr)
 {

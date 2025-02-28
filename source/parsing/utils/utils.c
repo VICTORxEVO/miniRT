@@ -97,6 +97,8 @@ bool    elem_added(t_core *d, char **args)
         return (cube_handled(d, args));
 	else if (ft_strncmp(args[0], "cy", -1) == 0)
 		good = cylinder_handled(d, args);
+	else if (ft_strncmp(args[0], "co", -1) == 0)
+		good = cone_handled(d, args);
     return (good);
 }
 

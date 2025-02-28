@@ -19,8 +19,8 @@ t_inter sp_intersect(t_sphere *s, t_ray *ray)
     d = (b * b) - (4.0f * a * c);
 	if (d < 0 || fabs(a) < EPSILON)
 		return it;
-    it.t1 = (-b - sqrtf(d)) / (2.0f * a);
-    it.t2 = (-b + sqrtf(d)) / (2.0f * a);
+    it.t1 = (-b - sqrt(d)) / (2.0f * a);
+    it.t2 = (-b + sqrt(d)) / (2.0f * a);
     if (it.t1 < 0 && it.t2 > 0)
         it.t1 = it.t2;
 	return it;
@@ -32,7 +32,6 @@ t_inter pl_intersect(t_plane *pl, t_ray *ray)
     double t;
 	t_inter	it;
     t_vec pl_to_ray;
-
 	it.t1 = -1;
 	it.t2 = -1;
     denom = vec_dot(pl->normal, ray->direction);
@@ -66,7 +65,7 @@ t_inter cy_intersect(t_cylinder *cy, t_ray *r)
     d = b*b - 4*a*c;
 
     if (d >= 0) {
-        double sqrt_d = sqrtf(d);
+        double sqrt_d = sqrt(d);
         double t1 = (-b - sqrt_d) / (2 * a);
         double t2 = (-b + sqrt_d) / (2 * a);
 
@@ -126,6 +125,149 @@ t_inter cy_intersect(t_cylinder *cy, t_ray *r)
     return it;
 }
 
+t_inter co_intersect(t_cone *cone, t_ray *r)
+{
+    t_inter inter = {-1, -1};
+    // First, calculate cone body intersections
+    double a, b, c, discriminant;
+    double t_body1 = -1;
+    double t_body2 = -1;
+    
+    // Vector from origin to tip
+    t_vec co = vec_sub(r->origin, cone->tip);
+    
+    // Useful dot products
+    double cosangle = cone->cosangle;
+    double cosangle2 = cone->cosangle2;
+    double sec_squared = cone->sec_squared;
+    double v_dot_d = vec_dot(cone->norm, r->direction);
+    double v_dot_co = vec_dot(cone->norm, co);
+    
+    // Quadratic coefficients for cone body intersection
+    a = vec_dot(r->direction, r->direction) - (v_dot_d * v_dot_d) * sec_squared;
+    b = 2 * (vec_dot(r->direction, co) - (v_dot_d * v_dot_co) * sec_squared);   
+    c = vec_dot(co, co) - (v_dot_co * v_dot_co) * sec_squared;                  
+
+    discriminant = b * b - 4 * a * c;
+    // Find the cone body intersections
+    if (fabs(a) < EPSILON && fabs(b) > EPSILON)
+        t_body1 = -c / b;
+    else if (discriminant >= 0){
+        double sqrt_d = sqrt(discriminant);
+        t_body1 = (-b - sqrt_d) / (2 * a);
+        t_body2 = (-b + sqrt_d) / (2 * a);
+        if (t_body1 > t_body2) {
+            double temp = t_body1;
+            t_body1 = t_body2;
+            t_body2 = temp;
+        }
+    }
+    
+    // Calculate the base (cap) center and radius
+    t_vec base_center = vec_add(cone->tip, vec_scl(cone->norm, cone->height));
+    double base_radius = cone->height * tan(cone->angle);
+    
+    // Check height constraints for body intersections
+    if (t_body1 > EPSILON) {
+        t_vec hit_point = vec_add(r->origin, vec_scl(r->direction, t_body1));
+        double height = vec_dot(vec_sub(hit_point, cone->tip), cone->norm);
+        if (height < 0 || height > cone->height) {
+            t_body1 = -1;
+        }
+    }
+    
+    if (t_body2 > EPSILON) {
+        t_vec hit_point = vec_add(r->origin, vec_scl(r->direction, t_body2));
+        double height = vec_dot(vec_sub(hit_point, cone->tip), cone->norm);
+        if (height < 0 || height > cone->height) {
+            t_body2 = -1;
+        }
+    }
+    
+    // Calculate the plane intersection for the cap
+    double t_cap = -1;
+    double denom = vec_dot(r->direction, cone->norm);
+    
+    // Important: Make sure we always check for cap intersection
+    if (fabs(denom) > EPSILON) {
+        t_vec oc = vec_sub(base_center, r->origin);
+        t_cap = vec_dot(oc, cone->norm) / denom;
+        
+        if (t_cap > EPSILON) {
+            t_vec hit_point = vec_add(r->origin, vec_scl(r->direction, t_cap));
+            t_vec to_center = vec_sub(hit_point, base_center);
+            
+            // Calculate the lateral distance from the hit point to the center axis
+            // by removing the component in the direction of the normal
+            double along_normal = vec_dot(to_center, cone->norm);
+            t_vec lateral = vec_sub(to_center, vec_scl(cone->norm, along_normal));
+            double dist_sq = vec_dot(lateral, lateral);
+            
+            if (dist_sq > (base_radius * base_radius)) {
+                t_cap = -1;  // Outside the cap radius
+            }
+        } else {
+            t_cap = -1;  // Behind the ray
+        }
+    }
+    
+    // Check if we're inside the cone
+    double cam_height = vec_dot(vec_sub(r->origin, cone->tip), cone->norm);
+    bool inside_cone = false;
+    
+    if (cam_height > 0 && cam_height < cone->height) {
+        // Check radial distance from axis
+        t_vec axis_point = vec_add(cone->tip, vec_scl(cone->norm, cam_height));
+        t_vec to_axis = vec_sub(r->origin, axis_point);
+        double dist_sq = vec_dot(to_axis, to_axis);
+        double max_radius = cam_height * tan(cone->angle);
+        
+        if (dist_sq < (max_radius * max_radius)) {
+            inside_cone = true;
+        }
+    }
+    
+    // Collect all valid intersection times
+    double t_values[3] = {t_body1, t_body2, t_cap};
+    double min_t = __FLT_MAX__;
+    
+    for (int i = 0; i < 3; i++) {
+        if (t_values[i] > EPSILON && t_values[i] < min_t) {
+            min_t = t_values[i];
+        }
+    }
+    
+    if (min_t != __FLT_MAX__) {
+        inter.t1 = min_t;
+        
+        // For determining inside/outside
+        if (inside_cone) {
+            // Find next closest intersection for inside case
+            double next_t = __FLT_MAX__;
+            for (int i = 0; i < 3; i++) {
+                if (t_values[i] > min_t && t_values[i] < next_t) {
+                    next_t = t_values[i];
+                }
+            }
+            
+            if (next_t != __FLT_MAX__) {
+                inter.t2 = next_t;
+            } else {
+                inter.t2 = min_t;
+            }
+        } else {
+            // Normal case - use the second body hit if available
+            if (t_body1 > EPSILON && t_body2 > EPSILON) {
+                inter.t2 = (min_t == t_body1) ? t_body2 : t_body1;
+            } else {
+                inter.t2 = min_t;
+            }
+        }
+    }
+    
+    return inter;
+}
+
 inline t_hit set_hit(double t1, double t2, t_object	*o)
 {
 	t_hit	hit;
@@ -156,6 +298,8 @@ t_hit find_hit(t_world *w, t_ray *cam_ray)
             it = cube_intersect(node->data, cam_ray);
         else if (node->type == CY_OBJ)
             it = cy_intersect(node->data, cam_ray);
+        else if (node->type == CO_OBJ)
+            it = co_intersect(node->data, cam_ray);
         if (it.t1 <= hit.t1 && it.t1 > 0)
             hit = set_hit(it.t1, it.t2, node);
         node = node->next;
@@ -184,11 +328,14 @@ t_color intersect_world(t_world *w, t_ray *cam_ray)
         light_node = light_node->next;
     }
     if (lighted)
-    {
         ambient_color = rgb_scl(rgb_mul(w->ambient->c, obj_clr), 0.1);
-    }
     else
-        ambient_color = rgb_scl(rgb_mul(w->ambient->c, obj_clr), 0.1);
+    {
+        if (hit.obj)
+            ambient_color = rgb_scl(rgb_mul(w->ambient->c, obj_clr), 0.1);
+        else
+            ambient_color = rgb_scl((w->ambient->c), 0.1);
+    }
     final = rgb_add(final, ambient_color, true);
     final = clamp_color(final);
     return final;
