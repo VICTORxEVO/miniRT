@@ -33,11 +33,9 @@ inline t_color sclamp_color(t_color v, double scale)
     return clamp_color(scaled);
 }
 
-void print_color(t_color c, bool newline)
+void print_color(t_color c)
 {
-    printf("{%u, %u, %u}      ", c.r, c.g, c.b);
-	if (newline)
-		printf("\n");
+    printf("{%u, %u, %u}      \n", c.r, c.g, c.b);
 }
 
 inline t_color rgb_sum(t_color amb, t_color dif, t_color   spc)

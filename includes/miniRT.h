@@ -12,6 +12,11 @@ typedef	struct s_inter
 	double t2;
 } t_inter;
 
+typedef struct s_uv
+{
+	double u;
+	double v;
+}	t_uv;
 
 typedef struct s_node
 {
@@ -34,6 +39,19 @@ typedef struct s_pattern
 	t_color c2;
 	char	type;
 }	t_pattern;
+
+typedef struct s_texture
+{
+	t_color *colors;
+	char *img_data;
+	void *img_ptr;
+	int width;
+	int height;
+	int size_line;
+	int bpp;
+	int endian;
+}	t_texture;
+
 
 typedef struct s_object
 {
@@ -95,6 +113,7 @@ enum e_types
 	e_sphere = 4,
 	e_cone = 5,
 	e_plain_pattern = 6,
+	e_sphere_texture = 5,
 	e_sphere_pattern = 6,
 	e_cylinder = 6,
 };
@@ -146,6 +165,7 @@ typedef struct s_world
 } t_world;
 
 
+
 typedef struct s_sphere
 {
 	t_vec		origin;
@@ -153,6 +173,7 @@ typedef struct s_sphere
 	double		radius_squared;
 	t_color		c;
 	t_pattern	*pattern;
+	t_texture	*texture;
     double reflect;
 
 } t_sphere;
@@ -218,6 +239,8 @@ t_core			*getengine(void);
 
 /*     >>>>>Parsing Funtions Section<<<<<     */
 void parsing(int ac, char *filename);
+bool    starts_with(char *small, char *big);
+bool    ends_with(char *small, char *big);
 unsigned count_args(char   **args);
 bool	between(double n, double min, double max);
 double	ft_atof(const char *s, bool *err);
@@ -289,9 +312,8 @@ bool    vector_struct_filled(t_vec	*v, char  **args);
 bool    elem_added(t_core *d,char **args);
 
 
-void handle_pat(char *patt_name, char *patt_clrs, t_pattern  **pat, t_color main_clr);
+void handle_pat(char **args, void *obj, int type);
 
-int get_color_value(t_color c);
 t_color rgb_add(t_color c1, t_color c2, bool is_clampt);
 t_color clamp_color(t_color c1);
 t_color sub_colors(t_color c1, t_color c2);
@@ -302,7 +324,7 @@ t_color increment_color(t_color c1, int amount);
 t_color zero_color();
 t_color rgb_scl(t_color v, double scale);
 t_color sclamp_color(t_color v, double scale);
-void print_color(t_color c, bool newline);
+void print_color(t_color c);
 t_color rgb_sum(t_color amb, t_color dif, t_color   spc);
 double get_brightness(t_color c);
 t_color rgb_to_gray(t_color c);
@@ -358,7 +380,8 @@ int input(int key, void *d);
 void handle_input();
 int mouse_input(int key, int x, int y, void *d);
 
-int get_rgb(t_color color);
+int 	get_clr_int(t_color color);
+t_color get_clr_struct(int color);
 t_vec	reflect (t_vec	light, t_vec	norm);
 t_vec vec_sub(t_vec p1, t_vec p2);
 t_vec vec_neg(t_vec v1);
@@ -383,7 +406,7 @@ double get_obj_reflect(t_object *o);
 void	my_mlx_pixel_put(t_img *data, int x, int y, int color);
 
 
-
+int get_pixel_color(char *img_data, int x, int y, int size_line, int bits_per_pixel);
 
 
 t_vec cube_normal_at(t_cube *cube, t_vec world_point);
@@ -405,7 +428,7 @@ void swapf(double *t1, double *t2);
 
 /* will be deleted */
 void save_to_img(t_color px_color, int x, int y);
-t_color handle_object_pat(t_object *hit_obj, t_vec inter_point);
+t_color handle_object_pat(t_object *hit_obj, t_vec inter_point, t_vec	*obj_norm);
 t_color	get_reflect_color(int remaining, t_object *hit_obj, t_vec pt_cam_vec, t_vec	inter_point);
 
 

@@ -101,21 +101,97 @@ t_color get_checker_value(t_object *hit_obj, t_pattern *pattern, t_vec	origin, t
 	}
 }
 
-t_color handle_object_pat(t_object *hit_obj, t_vec inter_point)
+
+
+t_color get_color_texture(t_sphere *sphere, t_vec *norm)
+{
+    t_texture *t = sphere->texture;
+    double width = t->width;
+    double height = t->height;
+    int tex_x, tex_y;
+    t_color color;
+	t_vec	n;
+
+	n = *norm;
+    double rotation_offset = M_PI / 2; // 90 degrees
+    double longitude = atan2(n.z, n.x) + rotation_offset;
+    double latitude = asin(n.y);
+    double u = 1.0 - ((longitude + M_PI) / (2.0 * M_PI));
+    double v = 0.5 - (latitude / (M_PI));
+    tex_x = (int)(u * (width - 1));
+    tex_y = (int)(v * (height - 1));
+    if (tex_x > width - 1)
+        tex_x = width - 1;
+    else if (tex_x < 0)
+        tex_x = 0;
+    if (tex_y > height - 1)
+        tex_y = height - 1;
+    else if (tex_y < 0)
+        tex_y = 0;
+    
+	int x = (int)(u * (t->width - 1));
+	int y = (int)(v * (t->height - 1));
+	if (x > t->width - 1)
+		x = t->width - 1;
+	else if (x < 0)
+		x = 0;
+	if (y > t->height - 1)
+		y = t->height - 1;
+	else if (y < 0)
+		y = 0;
+	int h_center = (get_pixel_color(t->img_data, x, y, t->size_line, t->bpp) & 0xFF);
+    int x_right = (x + 1 < t->width) ? x + 1 : x;
+    int y_up = (y + 1 < t->height) ? y + 1 : y;
+	int h_right = (get_pixel_color(t->img_data, x_right, y, t->size_line, t->bpp) & 0xFF);
+    int h_up = (get_pixel_color(t->img_data, x, y_up, t->size_line, t->bpp) & 0xFF);
+    float dh_dx = (h_right - h_center) * 5 / 255.0;
+    float dh_dy = (h_up - h_center) * 5 / 255.0;
+	t_vec tangent, bitangent;
+	t_vec up = getengine()->w->cam->up;
+    tangent = cross(up, n);
+    tangent = normal(tangent);
+    bitangent = cross(n, tangent);
+    bitangent = normal(bitangent);
+	t_vec perturbed_normal;
+    perturbed_normal.x = n.x - dh_dx * tangent.x - dh_dy * bitangent.x;
+    perturbed_normal.y = n.y - dh_dx * tangent.y - dh_dy * bitangent.y;
+    perturbed_normal.z = n.z - dh_dx * tangent.z - dh_dy * bitangent.z;
+	*norm = perturbed_normal;
+	int color_int = get_pixel_color(t->img_data, tex_x, tex_y, t->size_line, t->bpp);
+    color = get_clr_struct(color_int);
+	return color;
+}
+
+t_color handle_object_pat(t_object *hit_obj, t_vec inter_point, t_vec	*obj_norm)
 {
 	t_color	obj_color;
+	t_color color;
 	t_pattern	*pattern;
 	t_vec	origin;
-	pattern = NULL;
-	obj_color = hit_obj->get_color(hit_obj);
-	if (hit_obj->type != SP_OBJ || !hit_obj->get_pattern(hit_obj))
-		return (obj_color);
-	origin = ((t_sphere *)hit_obj->data)->origin;
-	if (hit_obj->get_pattern)
-		pattern = hit_obj->get_pattern(hit_obj);
-	if (pattern && pattern->type == CHECKER_PAT)
-		return get_checker_value(hit_obj, pattern, origin, inter_point);
-	return obj_color;
+	t_vec	norm;
+
+    if (hit_obj->type == SP_OBJ && ((t_sphere *)hit_obj->data)->texture)
+    {
+        color = get_color_texture(hit_obj->data, obj_norm);
+        return color;
+    }
+	else
+	{
+		pattern = NULL;
+		obj_color = hit_obj->get_color(hit_obj);
+		
+		if (hit_obj->type != SP_OBJ || !hit_obj->get_pattern(hit_obj))
+			return (obj_color);
+		origin = ((t_sphere *)hit_obj->data)->origin;
+		if (hit_obj->get_pattern)
+			pattern = hit_obj->get_pattern(hit_obj);
+		if (pattern && pattern->type == CHECKER_PAT)
+		{
+			print_color(obj_color);
+			return get_checker_value(hit_obj, pattern, origin, inter_point);
+		}
+		return obj_color;
+	}
 }
 
 
@@ -162,7 +238,7 @@ void    rendering(void)
 		while (x < SCREEN_WIDTH)
 		{
 			px_color = get_px_color(x, y);
-			my_mlx_pixel_put(&engine->img, x, y, get_rgb(px_color));
+			my_mlx_pixel_put(&engine->img, x, y, get_clr_int(px_color));
 			save_to_img(px_color, x, y);
 			x += engine->iter;
 		}

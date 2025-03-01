@@ -1,6 +1,20 @@
 #include "miniRT.h"
 
-int get_rgb(t_color color)
+
+t_color get_clr_struct(int color)
+{
+    t_color result;
+    
+    // The exact order depends on your MLX's endianness
+    // This assumes ARGB format (typical for MLX)
+    result.r = (color >> 16) & 0xFF;
+    result.g = (color >> 8) & 0xFF;
+    result.b = color & 0xFF;
+
+    return result;
+}
+
+int get_clr_int(t_color color)
 {
     // Bitwise shift each component to its position and combine with OR
     return (color.r << 16) | (color.g << 8) | color.b;

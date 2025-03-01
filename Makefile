@@ -62,6 +62,7 @@ $(NAME): $(OBJ)
 		@echo "linking..."
 		@sleep 0.5
 		@echo "$(NAME) is ready"
+		./miniRT maps/texture.rt
 
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c

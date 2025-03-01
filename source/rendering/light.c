@@ -55,6 +55,16 @@ t_color	calc_specular(t_vec point, t_vec	pt_cam_vec_norm,  t_light	*light, t_obj
 	return (speclar_color);
 }
 
+void handle_texture_map(t_object	*hit_obj, t_vec *obj_norm, t_vec	point)
+{
+	t_texture	*texture;
+
+	if (hit_obj->type != SP_OBJ || !((t_sphere *)hit_obj->data)->texture)
+		return;
+
+	texture = ((t_sphere *)hit_obj->data)->texture;
+}
+
 t_vec	prepare_obj_norm(t_object	*hit_obj, t_vec	point, t_vec	pt_cam_vec_norm)
 {
 	double cam_ray_surf_norm_dot;
@@ -83,10 +93,10 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, t_light	*
 	ambient_color = rgb_scl(w->ambient->c, w->ambient->ratio * 0.1);
 	speclar_color = zero_color();
 	point = position_at(cam_ray, smallest_t);
-	obj_clr = handle_object_pat(hit_obj, point);
-	*obj_clr_with_pat = obj_clr;
 	pt_cam_vec_norm = normal(vec_sub(point, cam_ray->origin)); 
 	obj_norm = prepare_obj_norm(hit_obj, point, pt_cam_vec_norm);
+	obj_clr = handle_object_pat(hit_obj, point, &obj_norm);
+	*obj_clr_with_pat = obj_clr;
 	if (is_shadowed(w, position_at(cam_ray, smallest_t), light))
 		return rgb_scl(rgb_mul(obj_clr, ambient_color), 0.1);
 	*lighted = true;

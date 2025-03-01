@@ -9,6 +9,7 @@ static bool validated_type(char *name, unsigned args_count)
     (!ft_strcmp(name, "pl") && args_count == e_plain) || 
     (!ft_strcmp(name, "pl") && args_count == e_plain_pattern) || 
     (!ft_strcmp(name, "sp") && args_count == e_sphere) || 
+    (!ft_strcmp(name, "sp") && args_count == e_sphere_texture) || 
     (!ft_strcmp(name, "sp") && args_count == e_sphere_pattern) || 
     (!ft_strcmp(name, "cy") && args_count == e_cylinder) || 
     (!ft_strcmp(name, "cu") && args_count == e_cube) ||
@@ -64,6 +65,24 @@ void setup_cam_dir(t_camera	*cam)
 	cam->up = normal(cross(cam->forward, cam->right)); // now reset up
     cam->aspect = (SCREEN_WIDTH / SCREEN_HEIGHT);
 
+}
+
+bool    ends_with(char *small, char *big)
+{
+    int i;
+    int j;
+    i = strlen(small) - 1;
+    j = strlen(big) - 1;
+    if (j < i)
+        return false;
+    while (i > 0)
+    {
+        if (small[i] != big[j])
+            return false;
+        i--;
+        j--;
+    }
+    return (i == 0);
 }
 
 void parsing(int ac, char *filename)

@@ -90,8 +90,7 @@ bool    plane_handled(t_core *d, char **args)
     plane->normal = plane_norm;
     plane->reflect = 0;
     if (args[4])
-        handle_pat(args[4], args[5], &plane->pattern, plane->c);
-
+        handle_pat(args, plane, PL_OBJ);
     add_obj(d, &d->w->objects, plane, PL_OBJ);
 	return (true);
 }
@@ -162,9 +161,16 @@ bool    sphere_handled(t_core *d, char **args)
     sphere->radius_squared = (diameter / 2) * (diameter / 2);
     sphere->reflect = 0;
     sphere->pattern = NULL;
+    sphere->texture = NULL;
+    valid_pat(args);
     if (args[4])
-        handle_pat(args[4], args[5], &sphere->pattern, sphere->c);
-
+    {
+        handle_pat(args, sphere, SP_OBJ);
+    }
+    else
+    {
+        print_color(sphere->c);
+    }
     add_obj(d, &d->w->objects, sphere, SP_OBJ);
 	return (true);
 }
@@ -266,38 +272,118 @@ bool cone_handled(t_core *d, char **args)
     return (true);
 }
 
-void handle_pat(char *patt_name, char *patt_clrs, t_pattern  **pat, t_color main_clr)
+void    valid_pat(char **args)
+{
+    
+    char *patt_name;
+    char *patt_clrs;
+
+    patt_name = args[4];
+    if (patt_name)
+        patt_clrs = args[5];
+    else
+        patt_clrs = NULL;
+    if (patt_name && !patt_clrs && !ends_with(".xpm", patt_name))
+        pexit("Error\n texture settings invalid\n", BadValue);
+    if (patt_name && (ft_strcmp(patt_name, "checkered")) != 0 && 
+    (ft_strcmp(patt_name, "striped_x")) != 0 && 
+    (ft_strcmp(patt_name, "gradient_y")) != 0 &&
+    (ft_strcmp(patt_name, "ring_z")) != 0 &&
+    (ft_strcmp(patt_name, "swirl") != 0 ) && 
+    (patt_clrs) && (patt_clrs[0]))
+        pexit("Error\n pattern settings invalid\n", BadValue);
+    return true;
+}
+
+int get_pixel_color(char *img_data, int x, int y, int size_line, int bits_per_pixel)
+{
+    // Boundary checks
+    if (!img_data || x < 0 || y < 0)
+        return (0);  // Return black or some default color
+    
+    int bytes_per_pixel = bits_per_pixel / 8;
+    int index = y * size_line + x * bytes_per_pixel;
+    
+    // Safety check - don't read beyond data
+    if (index < 0)
+        return (0);
+    
+    // For RGBA format, read each byte separately to avoid alignment issues
+    unsigned char b = img_data[index];
+    unsigned char g = img_data[index + 1];
+    unsigned char r = img_data[index + 2];
+    
+    // Combine into a single integer
+    return (r << 16) | (g << 8) | b;
+}
+
+void handle_texture(t_sphere *sphere, char *texture_name)
+{
+    int fd = open(texture_name, O_RDONLY);
+    if (fd < 0)
+        pexit("Error\n bad texture file\n", BadValue);
+    close(fd);
+    sphere->texture = galloc(sizeof(t_texture));
+    void *img_ptr;
+    char *img_data;
+    int w;
+    int h;
+    img_ptr = mlx_xpm_file_to_image(getengine()->m.mlx, texture_name, &w, &h);
+    if (!img_ptr)
+        pexit("problem loading the texture\n", BadAlloc);
+    printf("w -> %d  h -> %d\n", w, h);
+    int bits_per_pixel, size_line, endian;
+    img_data = mlx_get_data_addr(img_ptr, &bits_per_pixel, &size_line, &endian);
+    // printf("size_line -> %d  bits_per_pixel -> %d   endian -> %d\n", size_line, bits_per_pixel, endian);
+    sphere->texture->img_ptr = img_ptr;
+    sphere->texture->img_data = img_data;
+    sphere->texture->height = h;
+    sphere->texture->width = w;
+    sphere->texture->bpp = bits_per_pixel;
+    sphere->texture->size_line = size_line;
+    sphere->texture->endian = endian;
+}
+
+void handle_pat(char **args, void *obj, int type)
 {
     t_color scnd_clr;
+    t_color main_clr;
+    t_pattern   *pat;
     char    **clrs;
-
-    if ((ft_strcmp(patt_name, "checkered")) != 0 && 
-        (ft_strcmp(patt_name, "striped_x")) != 0 && 
-        (ft_strcmp(patt_name, "gradient_y")) != 0 &&
-        (ft_strcmp(patt_name, "ring_z")) != 0 &&
-        (ft_strcmp(patt_name, "swirl") != 0 ) && 
-        (patt_clrs) && (patt_clrs[0]))
-        pexit("Error\n pattern settings invalid\n", BadValue);
-        
+    if (args[4] && !args[5] && type == SP_OBJ)
+    {
+        handle_texture(obj, args[4]);
+        printf("size_line -> %d  bits_per_pixel -> %d   endian -> %d\n", ((t_sphere *)obj)->texture->size_line, ((t_sphere *)obj)->texture->bpp, ((t_sphere *)obj)->texture->endian);
+    }
     else
     {
+        char    *patt_clrs = args[5];
+        char    *patt_name = args[4];
+        if (type == SP_OBJ)
+            main_clr = ((t_sphere *)obj)->c;
+        else 
+            main_clr = ((t_plane *)obj)->c;
         clrs = ft_split(patt_clrs, ",");
         if (count_args(clrs) != 3 || !color_struct_filled(&scnd_clr, clrs))
             pexit("Error\n pattern color invalid\n", BadValue);
-        (*pat) = galloc(sizeof(t_pattern));
+        pat = galloc(sizeof(t_pattern));
         if (ft_strcmp(patt_name, "checkered") == 0)
-            (*pat)->type = CHECKER_PAT;
+            pat->type = CHECKER_PAT;
         else if (ft_strcmp(patt_name, "striped_x") == 0)
-            (*pat)->type = STRIPE_X_PAT;
+            pat->type = STRIPE_X_PAT;
         else if (ft_strcmp(patt_name, "gradient_y") == 0)
-            (*pat)->type = GRADIANT_Y;
+            pat->type = GRADIANT_Y;
         else if (ft_strcmp(patt_name, "ring_z") == 0)
-            (*pat)->type = RING_Z_PAT;
+            pat->type = RING_Z_PAT;
         else if (ft_strcmp(patt_name, "swirl") == 0)
-            (*pat)->type = SWIRL;
+            pat->type = SWIRL;
         else
             pexit("Error\n pattern type invalid\n", BadValue);
-        (*pat)->c1 = main_clr;
-        (*pat)->c2 = scnd_clr;
+        pat->c1 = main_clr;
+        pat->c2 = scnd_clr;
+        if (type == SP_OBJ)
+            ((t_sphere *)obj)->pattern = pat;
+        else 
+            ((t_plane *)obj)->pattern = pat;
     }
 }
