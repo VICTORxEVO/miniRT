@@ -34,15 +34,14 @@
 # define NOAMB_ERR " there is no ambient!"
 # define WHITESPACE     " \t\n\r\v\f"  // space, tab, newline, carriage return, vtab, formfeed
 
+
 #define LIGHT_FACTOR 10
 
-# define RAYS_PER_PX 4
 
 // #ifdef LINUX
     #define SCREEN_WIDTH 1800.f
     #define SCREEN_HEIGHT 1200.f
 // #endif
-
 
 #define STRIPE_X_PAT 1
 #define STRIPE_Y_PAT 2

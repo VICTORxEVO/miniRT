@@ -224,7 +224,7 @@ typedef struct s_core
 	bool	refl_on; // maybe add a command line to handle adding spheres and light ... ?
 	int		iter; // if 1 it iterates throught each pixel, as big as it gets, the quality goes down
 	int		counter;
-
+	int		bump;
 	unsigned char *png;
 } t_core;
 
@@ -260,13 +260,13 @@ t_color	sp_light(t_object	*hit_sph, t_ray	*cam_ray, double smallest_t);
 // t_color	pl_light(t_plane	*hit_pl, t_ray	*cam_ray, double smallest_t);
 t_color	pl_light(t_object	*hit_obj, t_ray	*cam_ray, double smallest_t);
 bool is_shadowed(t_world *w, t_vec p, t_light *light);
-t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, t_light	*light, bool *lighted, t_color *obj_clr_with_pat);
+t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, t_light	*light, bool *lighted, t_color *obj_clr_with_pat, int rem);
 t_vec	generate_cam_dir(t_camera	*cam, double scale, double ndcx, double ndcy);
 t_inter sp_intersect(t_sphere *s, t_ray *ray);
 t_inter pl_intersect(t_plane *pl, t_ray *ray);
 t_inter cy_intersect(t_cylinder *cy, t_ray *r);
 t_inter co_intersect(t_cone *co, t_ray *r);
-t_color intersect_world(t_world *w, t_ray *cam_ray);
+t_color intersect_world(t_world *w, t_ray *cam_ray, int rem);
 int input(int key, void *d);
 void    rendering(void);
 
@@ -293,9 +293,9 @@ void setup_cam_dir(t_camera	*cam);
 
 double maxf(double a, double b);
 double minf(double a, double b);
-double maxi(double a, double b);
-double mini(double a, double b);
-
+int maxi(int a, int b);
+int mini(int a, int b);
+int clampi(int val, int min, int max);
 /*
 	shapes handling 
 */
@@ -406,8 +406,8 @@ double get_obj_reflect(t_object *o);
 void	my_mlx_pixel_put(t_img *data, int x, int y, int color);
 
 
-int get_pixel_color(char *img_data, int x, int y, int size_line, int bits_per_pixel);
 
+int get_pixel_color(char *img_data, int x, int y, int w, int h, int size_line, int bits_per_pixel);
 
 t_vec cube_normal_at(t_cube *cube, t_vec world_point);
 t_inter cube_intersect(t_cube *cube, t_ray *ray);
@@ -423,7 +423,7 @@ double get_cube_reflect(t_object *o);
 bool cube_handled(t_core *d, char **args);
 
 
-
+void    valid_pat(char **args);
 void swapf(double *t1, double *t2);
 
 /* will be deleted */

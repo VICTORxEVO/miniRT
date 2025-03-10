@@ -15,16 +15,25 @@ double minf(double a, double b)
     return (b);
 }
 
-double maxi(double a, double b)
+int maxi(int a, int b)
 {
     if (a > b)
         return (a);
     return (b);
 }
 
-double mini(double a, double b)
+int mini(int a, int b)
 {
     if (a > b)
         return (a);
     return (b);
+}
+
+int clampi(int val, int min, int max)
+{
+    if (val > max)
+        val = max;
+    else if (val < min)
+        val = min;
+    return val;
 }

@@ -101,7 +101,15 @@ t_color get_checker_value(t_object *hit_obj, t_pattern *pattern, t_vec	origin, t
 	}
 }
 
+int get_pixel_intensity(t_texture	*t, int x, int y)
+{
+	int w;
+	int h;
 
+	w = t->width;
+	h = t->height;
+	return get_pixel_color(t->img_data, x, y, w, h, t->size_line, t->bpp) & 0xFF;
+}
 
 t_color get_color_texture(t_sphere *sphere, t_vec *norm)
 {
@@ -109,55 +117,54 @@ t_color get_color_texture(t_sphere *sphere, t_vec *norm)
     double width = t->width;
     double height = t->height;
     int tex_x, tex_y;
+	int h_center;
+	int x_right;
+	int y_up;
+	int h_right;
+	int h_up;
+	float dh_dx;
+	float dh_dy;
     t_color color;
 	t_vec	n;
-
+	t_vec up;
+	t_vec tangent;
+	t_vec bitangent;
+	t_vec perturbed_normal;
+	int x;
+	int y;
+	int color_int;
+	int bump;
+	bump = getengine()->bump;
 	n = *norm;
-    double rotation_offset = M_PI / 2; // 90 degrees
-    double longitude = atan2(n.z, n.x) + rotation_offset;
+    double longitude = atan2(n.z, n.x) + (M_PI / 2);
     double latitude = asin(n.y);
     double u = 1.0 - ((longitude + M_PI) / (2.0 * M_PI));
     double v = 0.5 - (latitude / (M_PI));
     tex_x = (int)(u * (width - 1));
     tex_y = (int)(v * (height - 1));
-    if (tex_x > width - 1)
-        tex_x = width - 1;
-    else if (tex_x < 0)
-        tex_x = 0;
-    if (tex_y > height - 1)
-        tex_y = height - 1;
-    else if (tex_y < 0)
-        tex_y = 0;
-    
-	int x = (int)(u * (t->width - 1));
-	int y = (int)(v * (t->height - 1));
-	if (x > t->width - 1)
-		x = t->width - 1;
-	else if (x < 0)
-		x = 0;
-	if (y > t->height - 1)
-		y = t->height - 1;
-	else if (y < 0)
-		y = 0;
-	int h_center = (get_pixel_color(t->img_data, x, y, t->size_line, t->bpp) & 0xFF);
-    int x_right = (x + 1 < t->width) ? x + 1 : x;
-    int y_up = (y + 1 < t->height) ? y + 1 : y;
-	int h_right = (get_pixel_color(t->img_data, x_right, y, t->size_line, t->bpp) & 0xFF);
-    int h_up = (get_pixel_color(t->img_data, x, y_up, t->size_line, t->bpp) & 0xFF);
-    float dh_dx = (h_right - h_center) * 5 / 255.0;
-    float dh_dy = (h_up - h_center) * 5 / 255.0;
-	t_vec tangent, bitangent;
-	t_vec up = getengine()->w->cam->up;
+	tex_x = clampi(tex_x, 0, width - 1);
+	tex_y = clampi(tex_y, 0, height - 1);
+	x = (int)(u * (t->width - 1));
+	y = (int)(v * (t->height - 1));
+	x = clampi(x, 0, width - 1);
+	y = clampi(y, 0, height - 1);
+	h_center = get_pixel_intensity(t, x, y);
+	x_right = clampi(x + 1, 0, width - 1);
+	y_up = clampi(y + 1, 0, height - 1);
+	h_right = get_pixel_intensity(t, x_right, y);
+	h_up = get_pixel_intensity(t, x, y_up);
+    dh_dx = (h_right - h_center) * bump / 255.0;
+    dh_dy = (h_up - h_center) * bump / 255.0;
+	up = getengine()->w->cam->up;
     tangent = cross(up, n);
     tangent = normal(tangent);
     bitangent = cross(n, tangent);
     bitangent = normal(bitangent);
-	t_vec perturbed_normal;
     perturbed_normal.x = n.x - dh_dx * tangent.x - dh_dy * bitangent.x;
     perturbed_normal.y = n.y - dh_dx * tangent.y - dh_dy * bitangent.y;
     perturbed_normal.z = n.z - dh_dx * tangent.z - dh_dy * bitangent.z;
-	*norm = perturbed_normal;
-	int color_int = get_pixel_color(t->img_data, tex_x, tex_y, t->size_line, t->bpp);
+	*norm = normal(perturbed_normal);
+	color_int = get_pixel_color(t->img_data, tex_x, tex_y, width, height, t->size_line, t->bpp);
     color = get_clr_struct(color_int);
 	return color;
 }
@@ -168,7 +175,6 @@ t_color handle_object_pat(t_object *hit_obj, t_vec inter_point, t_vec	*obj_norm)
 	t_color color;
 	t_pattern	*pattern;
 	t_vec	origin;
-	t_vec	norm;
 
     if (hit_obj->type == SP_OBJ && ((t_sphere *)hit_obj->data)->texture)
     {
@@ -187,35 +193,74 @@ t_color handle_object_pat(t_object *hit_obj, t_vec inter_point, t_vec	*obj_norm)
 			pattern = hit_obj->get_pattern(hit_obj);
 		if (pattern && pattern->type == CHECKER_PAT)
 		{
-			print_color(obj_color);
 			return get_checker_value(hit_obj, pattern, origin, inter_point);
 		}
 		return obj_color;
 	}
 }
 
-
-t_color	get_px_color(double x, double y)
+t_color	get_anti_aliased_color(double x, double y, int rem)
 {
 	t_core *engine;
 	t_color	final_clr;
+	t_color	color;
 	t_camera	*cam;
 	double i;
 	double scale;
 	double ndc_x;
 	double ndc_y;
-	t_ray		ray;
+	double aa_factor;
 
+	t_ray		ray;
+	i = -1;
+	engine = getengine();
+	cam = engine->w->cam;
+	scale = tan(deg_to_rad(cam->fov) / 2.f);
+	aa_factor = 1 / engine->rays_px;
+	final_clr = zero_color();
+	ray.origin = cam->origin;
+	while (++i < engine->rays_px)
+	{
+		ndc_x = (2.f * ((x + ((i * aa_factor) + 0.5f)) / SCREEN_WIDTH)) - 1.f;
+		ndc_y = 1 - (2.f * (y + 0.5) / SCREEN_HEIGHT);		
+		ray.direction = generate_cam_dir(cam, scale, ndc_x, ndc_y);
+		color = intersect_world(engine->w, &ray, rem);
+		final_clr = rgb_add(final_clr, color, 0);
+	}
+	final_clr = rgb_scl(final_clr, 1 / i);
+	return final_clr;
+}
+
+t_color get_non_aa_color(double x, double y, int rem)
+{
+	t_core *engine;
+	t_color	final_clr;
+	t_camera	*cam;
+	double scale;
+	double ndc_x;
+	double ndc_y;
+	t_ray		ray;
 	engine = getengine();
 	cam = engine->w->cam;
 	scale = tan(deg_to_rad(cam->fov) / 2.f);
 	ray.origin = cam->origin;
-	i = 0;
-	ndc_x = (2.f * ((x + (i + 0.5f)) / SCREEN_WIDTH)) - 1.f;
+	ndc_x = (2.f * ((x + 0.5f) / SCREEN_WIDTH)) - 1.f;
 	ndc_y = 1 - (2.f * (y + 0.5) / SCREEN_HEIGHT);			
 	ray.direction = generate_cam_dir(cam, scale, ndc_x, ndc_y);
-	final_clr = intersect_world(engine->w, &ray);
+	final_clr = intersect_world(engine->w, &ray, rem);
 	final_clr = clamp_color(final_clr);
+	return final_clr;
+}
+
+t_color	get_px_color(double x, double y, int rem)
+{
+	t_core *engine;
+	t_color	final_clr;
+	engine = getengine();
+	if (engine->aa_on)
+		final_clr = get_anti_aliased_color(x, y, rem);
+	else
+		final_clr = get_non_aa_color(x, y, rem);
 	return (final_clr);
 }
 
@@ -237,7 +282,7 @@ void    rendering(void)
 		x = 0;
 		while (x < SCREEN_WIDTH)
 		{
-			px_color = get_px_color(x, y);
+			px_color = get_px_color(x, y, 2);
 			my_mlx_pixel_put(&engine->img, x, y, get_clr_int(px_color));
 			save_to_img(px_color, x, y);
 			x += engine->iter;

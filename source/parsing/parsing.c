@@ -96,6 +96,7 @@ void parsing(int ac, char *filename)
     engine->m.mlx = mlx_init();
 	engine->m.win = mlx_new_window(engine->m.mlx, SCREEN_WIDTH, SCREEN_HEIGHT, "miniRT");
     engine->m.ctrl_pressed = false;
+    engine->bump = 2;
     if (ac != 2)
         pexit(YELLOW USAGE_WARN, 1);
     fd = check_file(filename);
@@ -105,12 +106,11 @@ void parsing(int ac, char *filename)
 	setup_cam_dir(engine->w->cam);
     engine->w->gray_on = false;
     engine->cmd_on = true;
-    engine->rays_px = 1.f;
-    engine->aa_on = false;
+    engine->rays_px = 1;
+    engine->aa_on = true;
     engine->iter = 1;
 	engine->png = galloc(SCREEN_WIDTH * SCREEN_HEIGHT * 3);
     engine->refl_on = true;
 	engine->counter = 0;
-
     close(fd);
 }

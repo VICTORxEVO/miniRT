@@ -137,8 +137,6 @@ t_inter co_intersect(t_cone *cone, t_ray *r)
     t_vec co = vec_sub(r->origin, cone->tip);
     
     // Useful dot products
-    double cosangle = cone->cosangle;
-    double cosangle2 = cone->cosangle2;
     double sec_squared = cone->sec_squared;
     double v_dot_d = vec_dot(cone->norm, r->direction);
     double v_dot_co = vec_dot(cone->norm, co);
@@ -306,8 +304,31 @@ t_hit find_hit(t_world *w, t_ray *cam_ray)
     }
     return hit;
 }
+// Add this function to create stars
+t_color generate_stars(t_vec direction)
+{
+    t_color black = {0.0, 0.0, 0.0}; // Black background
+    
+    // Normalize the direction vector
+    t_vec dir = normal(direction);
+    
+    // Use the direction vector to create a pseudo-random value
+    double random_val = fabs(sin(dir.x * 100) * cos(dir.y * 100) * sin(dir.z * 100));
+    double random_threshold = 0.988 + ((double)rand() / RAND_MAX) * 0.02;
+    // Stars appear only at certain random values (adjust threshold for star density)
+    if (random_val > random_threshold) {
+        // Determine star brightness (brighter for higher values)
+        double brightness = 0.5 + (random_val - 0.9995) * 200;
+        if (brightness > 1.0) brightness = 1.0;
+        
+        // Create white/slightly blue stars
+        return (t_color){brightness, brightness, brightness * 1.05};
+    }
+    
+    return black;
+}
 
-t_color intersect_world(t_world *w, t_ray *cam_ray)
+t_color intersect_world(t_world *w, t_ray *cam_ray, int rem)
 {
     t_hit   hit;
     t_color color;
@@ -320,10 +341,14 @@ t_color intersect_world(t_world *w, t_ray *cam_ray)
     light_node = w->lights;
     final = zero_color();
     hit = find_hit(w, cam_ray);
+
+    if (!hit.obj) {
+        return generate_stars(cam_ray->direction);
+    }
     while (light_node && hit.obj)
     {
         light = light_node->data;
-        color = lighting(cam_ray, hit.obj, hit.t1, light, &lighted, &obj_clr);
+        color = lighting(cam_ray, hit.obj, hit.t1, light, &lighted, &obj_clr, rem);
         final = rgb_add(final, color, false);
         light_node = light_node->next;
     }

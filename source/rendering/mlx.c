@@ -214,7 +214,7 @@ int key_press(int key, t_core *engine)
         else
         {
             engine->aa_on = true;
-            engine->rays_px = 100;
+            engine->rays_px = 20;
         }
         rendering();
     }
@@ -225,8 +225,8 @@ int key_press(int key, t_core *engine)
     }
     else if (key == XK_k)
     {
-        if (engine->rays_px > 10)
-            engine->rays_px -= 10;
+        if (engine->rays_px > 1)
+            engine->rays_px -= 1;
         rendering();
     }
     else if (key == XK_KP_Add && engine->iter > 1)
@@ -285,7 +285,18 @@ int key_press(int key, t_core *engine)
             engine->aa_on = true;
         }
         rendering(); // Re-render the scene
-
+    }
+    if (key == XK_j)
+    {
+        // save_img()
+        engine->bump++;
+        rendering(); // Re-render the scene
+    }
+    if (key == XK_h)
+    {
+        // save_img()
+        engine->bump--;
+        rendering(); // Re-render the scene
     }
     return 0;
     return 0;

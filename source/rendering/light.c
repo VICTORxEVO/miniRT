@@ -46,9 +46,9 @@ t_color	calc_specular(t_vec point, t_vec	pt_cam_vec_norm,  t_light	*light, t_obj
 	{
 		brightness_factor = get_brightness(obj_clr) / 255.f;
 		light_dist = vec_len(pt_light_vec);
-		brightness_factor  = brightness_factor * 100 / light_dist;
+		brightness_factor  = brightness_factor * pow(LIGHT_FACTOR, 2) / light_dist;
 		light_color = rgb_scl(light->c, light->brightness * brightness_factor);
-		specular_factor = powf(refl_dot_cam, light->brightness * 100);
+		specular_factor = powf(refl_dot_cam, light->brightness * pow(LIGHT_FACTOR, 2));
 		speclar_color = rgb_mul(light_color, obj_clr);
 		speclar_color = rgb_scl(speclar_color, specular_factor);
  	}
@@ -77,11 +77,40 @@ t_vec	prepare_obj_norm(t_object	*hit_obj, t_vec	point, t_vec	pt_cam_vec_norm)
 	return obj_norm;
 }
 
-t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, t_light	*light, bool *lighted, t_color *obj_clr_with_pat)
+t_color	get_reflect_color(int remaining, t_object *hit_obj, t_vec pt_cam_vec, t_vec	inter_point)
+{
+	t_vec	obj_norm;
+	t_ray	reflect_ray;
+	t_vec offseted_p;
+	t_color reflected_clr;
+	t_color obj_clr;
+	t_vec offset;
+	float	obj_refl;
+
+	reflected_clr = zero_color();
+	obj_refl = hit_obj->get_reflect(hit_obj);
+	// handle_object_pat()
+	if (getengine()->refl_on && remaining > 0 && obj_refl > 0.)
+	{
+		obj_clr = hit_obj->get_color(hit_obj);
+		obj_norm = hit_obj->get_norm(hit_obj, inter_point);
+		offset = vec_scl(obj_norm, EPSILON);
+		offseted_p = vec_add(inter_point, offset);
+		reflect_ray.origin = offseted_p;
+		reflect_ray.direction = reflect(pt_cam_vec, obj_norm);
+		reflected_clr = intersect_world(getengine()->w, &reflect_ray, remaining - 1);
+		double reflect_strength = hit_obj->get_reflect(hit_obj) * (get_brightness(obj_clr) / 255.f);
+		reflected_clr = rgb_scl(reflected_clr, reflect_strength);
+	}
+	return reflected_clr;
+}
+
+t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, t_light	*light, bool *lighted, t_color *obj_clr_with_pat, int rem)
 {
 	t_color	color;
     t_color ambient_color;
-	t_color	speclar_color;
+    t_color speclar_color;
+	t_color	reflected_clr;
 	t_color	diffuse_color;
 	t_color	obj_clr;
 	t_world	*w;
@@ -100,8 +129,10 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, double smallest_t, t_light	*
 	if (is_shadowed(w, position_at(cam_ray, smallest_t), light))
 		return rgb_scl(rgb_mul(obj_clr, ambient_color), 0.1);
 	*lighted = true;
+	reflected_clr = get_reflect_color(rem, hit_obj, vec_sub(point, cam_ray->origin), point);
 	diffuse_color = calc_diffuse(point, light, hit_obj, obj_clr, obj_norm);
 	speclar_color = calc_specular(point, pt_cam_vec_norm, light, hit_obj, obj_clr, obj_norm);
 	color = rgb_add(speclar_color , diffuse_color, false);
+	color = rgb_add(color, reflected_clr, 1);
 	return color;
 }
