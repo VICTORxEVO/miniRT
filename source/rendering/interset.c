@@ -262,7 +262,6 @@ t_inter co_intersect(t_cone *cone, t_ray *r)
             }
         }
     }
-    
     return inter;
 }
 
@@ -305,6 +304,7 @@ t_hit find_hit(t_world *w, t_ray *cam_ray)
     return hit;
 }
 // Add this function to create stars
+
 t_color generate_stars(t_vec direction)
 {
     t_color black = {0.0, 0.0, 0.0}; // Black background
@@ -365,7 +365,6 @@ t_color intersect_world(t_world *w, t_ray *cam_ray, int rem)
     final = clamp_color(final);
     return final;
 }
-
 
 bool is_shadowed(t_world *w, t_vec p, t_light *light)
 {
