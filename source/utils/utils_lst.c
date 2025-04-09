@@ -35,10 +35,6 @@ void	add_obj(t_object **head, void *data, char type_macro)
 	t_object	*new_obj;
 
 	new_obj = create_obj(data);
-	new_obj->get_norm = get_obj_norm;
-	new_obj->get_color = get_obj_color;
-	new_obj->set_color = set_obj_color;
-	new_obj->get_origin = get_obj_origin;
 	new_obj->type = type_macro;
 	new_obj->next = *head;
 	*head = new_obj;

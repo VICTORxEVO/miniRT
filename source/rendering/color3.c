@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   color3.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/09 18:09:55 by sgouzi            #+#    #+#             */
+/*   Updated: 2025/04/09 18:11:37 by sgouzi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "miniRT.h"
 
 inline t_color	rgb_mul(t_color c1, t_color c2)
@@ -31,6 +43,8 @@ inline t_color	rgb_mad(t_color c1, t_color c2)
 
 inline t_color	rgb_to_gray(t_color c)
 {
-	int gray = (0.299 * c.r + 0.587 * c.g + 0.114 * c.b);
+	int	gray;
+
+	gray = (0.299 * c.r + 0.587 * c.g + 0.114 * c.b);
 	return ((t_color){gray, gray, gray});
 }

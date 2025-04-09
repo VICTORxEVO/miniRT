@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   getters.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/09 18:09:56 by sgouzi            #+#    #+#             */
+/*   Updated: 2025/04/09 18:14:22 by sgouzi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "miniRT.h"
 
 t_vec	cy_normal(t_cylinder *cy, t_vec world_point)
@@ -26,24 +38,16 @@ t_vec	cy_normal(t_cylinder *cy, t_vec world_point)
 	dist_to_bottom = vec_dot(local_point, cy->normal);
 	// Cap normals
 	if (fabs(dist_to_top) < EPSILON)
-	{
 		norm = cy->normal;
-	}
 	else if (fabs(dist_to_bottom) < EPSILON)
-	{
 		norm = vec_neg(cy->normal);
-	}
 	else
 	{
-		// Body norm
 		projected = vec_scl(cy->normal, vec_dot(local_point, cy->normal));
 		norm = normal(vec_sub(local_point, (projected)));
 	}
-	// Flip normal if camera is inside
 	if (camera_inside)
-	{
 		norm = vec_neg(norm);
-	}
 	return (norm);
 }
 
@@ -73,22 +77,5 @@ t_color	get_obj_color(t_object *o)
 		return (((t_cylinder *)o->data)->c);
 }
 
-void	set_obj_color(t_object *o, t_color c)
-{
-	if (o->type == SP_OBJ)
-		((t_sphere *)o->data)->c = c;
-	else if (o->type == PL_OBJ)
-		((t_plane *)o->data)->c = c;
-	else
-		((t_cylinder *)o->data)->c = c;
-}
 
-t_vec	get_obj_origin(t_object *o)
-{
-	if (o->type == SP_OBJ)
-		return (((t_sphere *)o->data)->origin);
-	else if (o->type == PL_OBJ)
-		return (((t_plane *)o->data)->origin);
-	else
-		return (((t_cylinder *)o->data)->origin);
-}
+

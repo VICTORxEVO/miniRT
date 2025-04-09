@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   color2.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/09 18:09:54 by sgouzi            #+#    #+#             */
+/*   Updated: 2025/04/09 18:11:02 by sgouzi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "miniRT.h"
 
 inline t_color	zero_color(void)
@@ -37,7 +49,6 @@ inline t_color	rgb_sum(t_color amb, t_color dif, t_color spc)
 	res.r = amb.r + dif.r + spc.r;
 	res.g = amb.g + dif.g + spc.g;
 	res.b = amb.b + dif.b + spc.b;
-	// clamp_color(res);
 	return (res);
 }
 

@@ -1,22 +1,25 @@
-#ifndef miniRT_H
-# define miniRT_H
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   miniRT.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/09 17:29:02 by sgouzi            #+#    #+#             */
+/*   Updated: 2025/04/09 18:08:44 by sgouzi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef MINIRT_H
+# define MINIRT_H
 
 # include "gc.h"
-
-# define KEY_PRESS 2
-# define KEY_RELEASE 3
 
 typedef struct s_inter
 {
 	double			t1;
 	double			t2;
 }					t_inter;
-
-typedef struct s_uv
-{
-	double			u;
-	double			v;
-}					t_uv;
 
 typedef struct s_node
 {
@@ -32,34 +35,11 @@ typedef struct s_color
 	int				b;
 }					t_color;
 
-typedef struct s_pattern
-{
-	t_color			c1;
-	t_color			c2;
-	char			type;
-}					t_pattern;
-
-typedef struct s_texture
-{
-	t_color			*colors;
-	char			*img_data;
-	void			*img_ptr;
-	int				width;
-	int				height;
-	int				size_line;
-	int				bpp;
-	int				endian;
-}					t_texture;
-
 typedef struct s_object
 {
 	void			*data;
 	struct s_object	*next;
 	char			type;
-	t_vec			(*get_norm)(struct s_object *o, t_vec pt_on_sp);
-	t_vec			(*get_origin)(struct s_object *o);
-	t_color			(*get_color)(struct s_object *o);
-	void			(*set_color)(struct s_object *o, t_color new_color);
 }					t_object;
 
 typedef struct s_hit
@@ -87,14 +67,6 @@ enum				e_types
 	e_cylinder = 6,
 };
 
-/* pixel color -> ambient, diffuse, specular */
-typedef struct s_px_color
-{
-	t_color			a;
-	t_color			d;
-	t_color			s;
-}					t_px_color;
-
 typedef struct s_ambient
 {
 	t_color			c;
@@ -104,19 +76,18 @@ typedef struct s_ambient
 typedef struct s_light
 {
 	t_vec			p;
-	double brightness; // 0 -> 1
+	double			brightness;
 	t_color			c;
 }					t_light;
 
 typedef struct s_camera
 {
 	t_vec			origin;
-	t_vec forward; // normalized
-	t_vec right;   // should be calculated
-	t_vec up;      // should be calculated
+	t_vec			forward;
+	t_vec			right;
+	t_vec			up;
 	t_vec			direction;
-	unsigned		fov;
-	// field of view angle (how much of the cam we can see) when fov is small view is zoomed in
+	unsigned int	fov;
 	double			aspect;
 }					t_camera;
 
@@ -191,20 +162,13 @@ typedef struct s_calc
 	t_color			obj_clr;
 }					t_calc;
 
-/**
- * @brief Returns global raytracing engine instance
- * @return t_core* Engine instance containing scene data and render settings
- * @note Singleton pattern - single engine instance
- */
 t_core				*getengine(void);
-
-/*     >>>>>Parsing Funtions Section<<<<<     */
 void				parsing(int ac, char *filename);
 bool				starts_with(char *small, char *big);
 bool				ends_with(char *small, char *big);
-unsigned			count_args(char **args);
-bool				between(double n, double min, double max);
+unsigned int		count_args(char **args);
 double				ft_atof(const char *s, bool *err);
+bool				between(double n, double min, double max);
 void				loadline(char *line, int n_line, char *filename);
 void				readfile(int fd, char *filename);
 int					check_file(char *filename);
@@ -244,7 +208,6 @@ void				setup_cam_dir(t_camera *cam);
 bool				light_handled(t_core *d, char **args);
 bool				plane_handled(t_core *d, char **args);
 bool				cylinder_handled(t_core *d, char **args);
-bool				cone_handled(t_core *d, char **args);
 bool				sphere_handled(t_core *d, char **args);
 bool				camera_handled(t_core *d, char **args);
 bool				ambient_handled(t_core *d, char **args);
@@ -332,7 +295,5 @@ void				set_obj_color(t_object *o, t_color c);
 void				my_mlx_pixel_put(t_img *data, int x, int y, int color);
 
 t_vec				get_obj_norm(t_object *o, t_vec pt_on_sphere);
-
-/* will be deleted */
 
 #endif

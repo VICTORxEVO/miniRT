@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/09 18:10:14 by sgouzi            #+#    #+#             */
+/*   Updated: 2025/04/09 18:10:21 by sgouzi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "miniRT.h"
 
 bool	is_shadowed(t_world *w, t_vec p, t_light *light)
@@ -78,6 +90,4 @@ t_color	get_ambient(bool lighted, t_world *w, t_object *obj, t_color obj_clr)
 inline double	deg_to_rad(double deg)
 {
 	return (deg * M_PI / 180);
-	// deg -> 180
-	// rad -> PIE
 }

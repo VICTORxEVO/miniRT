@@ -1,24 +1,34 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   light.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/09 18:09:57 by sgouzi            #+#    #+#             */
+/*   Updated: 2025/04/09 18:20:22 by sgouzi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "miniRT.h"
 
 t_color	calc_diffuse(t_vec point, t_light *light, t_color obj_clr,
 		t_vec obj_norm)
 {
 	double	light_dot_norm;
-	double	light_point_dist;
 	double	light_factor;
 	t_color	diffuse_color;
+	t_vec	pt_light_vec;
+	t_vec	pt_light_vec_norm;
 
-	t_vec pt_light_vec;      // ray from point to light
-	t_vec pt_light_vec_norm; // ray from point to light
 	pt_light_vec = vec_sub(light->p, point);
 	pt_light_vec_norm = normal(pt_light_vec);
 	diffuse_color = zero_color();
 	light_dot_norm = vec_dot(obj_norm, pt_light_vec_norm);
 	if (light_dot_norm >= 0)
 	{
-		light_point_dist = vec_len(pt_light_vec);
 		light_factor = light_dot_norm * light->brightness * LIGHT_FACTOR
-			/ light_point_dist;
+			/ vec_len(pt_light_vec);
 		diffuse_color = rgb_mul(obj_clr, light->c);
 		diffuse_color = rgb_scl(diffuse_color, light_factor);
 	}
@@ -72,7 +82,7 @@ t_vec	prepare_obj_norm(t_object *hit_obj, t_vec point, t_vec pt_cam_vec_norm)
 	double	cam_ray_surf_norm_dot;
 	t_vec	obj_norm;
 
-	obj_norm = hit_obj->get_norm(hit_obj, point);
+	obj_norm = get_obj_norm(hit_obj, point);
 	cam_ray_surf_norm_dot = vec_dot(pt_cam_vec_norm, obj_norm);
 	if (cam_ray_surf_norm_dot > 0)
 		obj_norm = vec_neg(obj_norm);
@@ -87,8 +97,8 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, t_calc *calc)
 	t_color	diffuse_color;
 	t_world	*w;
 	t_vec	point;
-	t_vec pt_cam_vec_norm;
-	t_vec obj_norm;
+	t_vec	pt_cam_vec_norm;
+	t_vec	obj_norm;
 
 	w = getengine()->w;
 	ambient_color = rgb_scl(w->ambient->c, w->ambient->ratio * 0.1);
@@ -96,13 +106,13 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, t_calc *calc)
 	point = position_at(cam_ray, calc->smallest_t);
 	pt_cam_vec_norm = normal(vec_sub(point, cam_ray->origin));
 	obj_norm = prepare_obj_norm(hit_obj, point, pt_cam_vec_norm);
-	calc->obj_clr = hit_obj->get_color(hit_obj);
+	calc->obj_clr = get_obj_color(hit_obj);
 	if (is_shadowed(w, position_at(cam_ray, calc->smallest_t), calc->light))
 		return (rgb_scl(rgb_mul(calc->obj_clr, ambient_color), 0.1));
 	calc->lighted = true;
 	diffuse_color = calc_diffuse(point, calc->light, calc->obj_clr, obj_norm);
-	speclar_color = calc_specular(point, pt_cam_vec_norm, calc->light, calc->obj_clr,
-			obj_norm);
+	speclar_color = calc_specular(point, pt_cam_vec_norm, calc->light,
+			calc->obj_clr, obj_norm);
 	color = rgb_add(speclar_color, diffuse_color, false);
 	return (color);
 }

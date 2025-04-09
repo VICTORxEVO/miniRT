@@ -1,5 +1,17 @@
-#ifndef MATH_H
-# define MATH_H
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   math_libs.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/09 17:26:09 by sgouzi            #+#    #+#             */
+/*   Updated: 2025/04/09 18:01:20 by sgouzi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef MATH_LIBS_H
+# define MATH_LIBS_H
 
 # ifndef M_PI
 #  define M_PI 3.14159265358979323846
@@ -7,9 +19,9 @@
 
 typedef struct s_vec
 {
-	double x; // 1
-	double y; // 0
-	double z; // 0
+	double	x;
+	double	y;
+	double	z;
 }			t_vec;
 
 typedef struct s_ray

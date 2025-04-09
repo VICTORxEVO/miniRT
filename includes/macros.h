@@ -6,12 +6,15 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 13:40:27 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/09 13:28:21 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/09 17:29:52 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MACROS_H
 # define MACROS_H
+
+# define KEY_PRESS 2
+# define KEY_RELEASE 3
 
 # define SP_OBJ 0
 # define PL_OBJ 1
