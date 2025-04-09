@@ -1,5 +1,27 @@
 #include "miniRT.h"
-#define STB_IMAGE_WRITE_IMPLEMENTATION
+
+int	close_window(t_core *engine)
+{
+	mlx_destroy_window(engine->m.mlx, engine->m.win);
+	clear();
+	exit(0);
+	return (0);
+}
+
+void mlx_hooks()
+{
+	t_core	*engine;
+	engine = getengine();
+
+	mlx_clear_window(engine->m.mlx, engine->m.win);
+	mlx_put_image_to_window(engine->m.mlx, engine->m.win, engine->img.img, 0,
+		0);
+	mlx_hook(engine->m.win, 17, 0, close_window, engine);
+	mlx_hook(engine->m.win, KeyPress, KEY_PRESS, key_press, engine);
+	mlx_hook(engine->m.win, KeyRelease, KEY_RELEASE, key_release, engine);
+	mlx_loop(engine->m.mlx);
+}
+
 
 int	key_press(int key, t_core *engine)
 {

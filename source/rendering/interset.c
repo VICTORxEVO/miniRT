@@ -125,7 +125,6 @@ t_inter cy_intersect(t_cylinder *cy, t_ray *r)
     return it;
 }
 
-
 t_color	intersect_world(t_world *w, t_ray *cam_ray)
 {
 	t_hit	hit;
@@ -133,7 +132,6 @@ t_color	intersect_world(t_world *w, t_ray *cam_ray)
 	t_color	final;
 	t_color	ambient_color;
 	t_node	*light_node;
-	t_light	*light;
 	t_calc	calc;
 
 	light_node = w->lights;
@@ -142,8 +140,7 @@ t_color	intersect_world(t_world *w, t_ray *cam_ray)
 	calc.obj_clr = zero_color();
 	while (light_node && hit.obj)
 	{
-		light = light_node->data;
-		calc.light = light;
+		calc.light = light_node->data;
 		calc.lighted = false;
 		calc.smallest_t = hit.t1;
 		color = lighting(cam_ray, hit.obj, &calc);

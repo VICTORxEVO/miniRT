@@ -72,6 +72,7 @@ t_color	get_obj_color(t_object *o)
 	else
 		return (((t_cylinder *)o->data)->c);
 }
+
 void	set_obj_color(t_object *o, t_color c)
 {
 	if (o->type == SP_OBJ)

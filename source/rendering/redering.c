@@ -39,6 +39,26 @@ double	get_intersect_dist(t_world *w, t_ray *ray)
 	return (smallest_t);
 }
 
+t_vec get_cam_dir(double x, double y, int i)
+{
+	t_camera	*cam;
+	t_vec dir;
+	t_core	*engine;
+	double		aa_factor;
+	double		scale;
+	double		ndc_x;
+	double		ndc_y;
+
+	engine = getengine();
+	cam = engine->w->cam;
+	aa_factor = 1 / engine->rays_px;
+	scale = tan(deg_to_rad(cam->fov) / 2.f);
+	ndc_x = (2.f * ((x + ((i * aa_factor) + 0.5f)) / SCREEN_WIDTH)) - 1.f;
+	ndc_y = 1 - (2.f * (y + 0.5) / SCREEN_HEIGHT);
+	dir = generate_cam_dir(cam, scale, ndc_x, ndc_y);
+	return dir;
+}
+
 t_color	get_anti_aliased_color(double x, double y)
 {
 	t_core		*engine;
@@ -46,24 +66,16 @@ t_color	get_anti_aliased_color(double x, double y)
 	t_color		color;
 	t_camera	*cam;
 	double		i;
-	double		scale;
-	double		ndc_x;
-	double		ndc_y;
-	double		aa_factor;
 	t_ray		ray;
 
 	i = -1;
 	engine = getengine();
 	cam = engine->w->cam;
-	scale = tan(deg_to_rad(cam->fov) / 2.f);
-	aa_factor = 1 / engine->rays_px;
 	final_clr = zero_color();
 	ray.origin = cam->origin;
 	while (++i < engine->rays_px)
 	{
-		ndc_x = (2.f * ((x + ((i * aa_factor) + 0.5f)) / SCREEN_WIDTH)) - 1.f;
-		ndc_y = 1 - (2.f * (y + 0.5) / SCREEN_HEIGHT);
-		ray.direction = generate_cam_dir(cam, scale, ndc_x, ndc_y);
+		ray.direction = get_cam_dir(x, y, i);
 		color = intersect_world(engine->w, &ray);
 		final_clr = rgb_add(final_clr, color, 0);
 	}
@@ -106,11 +118,6 @@ void	rendering(void)
 		}
 		y += engine->iter;
 	}
-	mlx_clear_window(engine->m.mlx, engine->m.win);
-	mlx_put_image_to_window(engine->m.mlx, engine->m.win, engine->img.img, 0,
-		0);
-	mlx_hook(engine->m.win, KeyPress, KEY_PRESS, key_press, engine);
-	mlx_hook(engine->m.win, KeyRelease, KEY_RELEASE, key_release, engine);
-	mlx_loop(engine->m.mlx);
+	mlx_hooks();
 	return ;
 }

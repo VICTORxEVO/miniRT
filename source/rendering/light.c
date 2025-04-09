@@ -85,25 +85,23 @@ t_color	lighting(t_ray *cam_ray, t_object *hit_obj, t_calc *calc)
 	t_color	ambient_color;
 	t_color	speclar_color;
 	t_color	diffuse_color;
-	t_color	obj_clr;
 	t_world	*w;
 	t_vec	point;
+	t_vec pt_cam_vec_norm;
+	t_vec obj_norm;
 
-	t_vec pt_cam_vec_norm; // ray from camera to a point
-	t_vec obj_norm;        // ray from object origin to a point
 	w = getengine()->w;
 	ambient_color = rgb_scl(w->ambient->c, w->ambient->ratio * 0.1);
 	speclar_color = zero_color();
 	point = position_at(cam_ray, calc->smallest_t);
 	pt_cam_vec_norm = normal(vec_sub(point, cam_ray->origin));
 	obj_norm = prepare_obj_norm(hit_obj, point, pt_cam_vec_norm);
-	obj_clr = hit_obj->get_color(hit_obj);
-	calc->obj_clr = obj_clr;
+	calc->obj_clr = hit_obj->get_color(hit_obj);
 	if (is_shadowed(w, position_at(cam_ray, calc->smallest_t), calc->light))
-		return (rgb_scl(rgb_mul(obj_clr, ambient_color), 0.1));
+		return (rgb_scl(rgb_mul(calc->obj_clr, ambient_color), 0.1));
 	calc->lighted = true;
-	diffuse_color = calc_diffuse(point, calc->light, obj_clr, obj_norm);
-	speclar_color = calc_specular(point, pt_cam_vec_norm, calc->light, obj_clr,
+	diffuse_color = calc_diffuse(point, calc->light, calc->obj_clr, obj_norm);
+	speclar_color = calc_specular(point, pt_cam_vec_norm, calc->light, calc->obj_clr,
 			obj_norm);
 	color = rgb_add(speclar_color, diffuse_color, false);
 	return (color);

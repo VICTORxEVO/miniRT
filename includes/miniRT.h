@@ -178,18 +178,18 @@ typedef struct s_core
 	t_world			*w;
 	t_gc			*gc;
 	t_img			img;
-	double			rays_px;
+	int				rays_px;
 	bool			aa_on;
 	int				iter;
 }					t_core;
 
 typedef struct s_calc
 {
-	double smallest_t;
-	t_light	*light;
-	bool lighted;
-	t_color obj_clr;
-}	t_calc;
+	double			smallest_t;
+	t_light			*light;
+	bool			lighted;
+	t_color			obj_clr;
+}					t_calc;
 
 /**
  * @brief Returns global raytracing engine instance
@@ -217,7 +217,7 @@ t_hit				find_hit(t_world *w, t_ray *cam_ray);
 t_color				get_ambient(bool lighted, t_world *w, t_object *obj,
 						t_color obj_clr);
 bool				is_shadowed(t_world *w, t_vec p, t_light *light);
-t_color				lighting(t_ray *cam_ray, t_object *hit_obj, t_calc	*calc);
+t_color				lighting(t_ray *cam_ray, t_object *hit_obj, t_calc *calc);
 t_vec				generate_cam_dir(t_camera *cam, double scale, double ndcx,
 						double ndcy);
 t_inter				sp_intersect(t_sphere *s, t_ray *ray);
@@ -304,7 +304,8 @@ double				**rotate_z(double rad);
 t_ray				transform_ray(t_ray old_r, double **transformation_mx);
 t_vec				translate_mx_to_point(double **m);
 t_vec				translate_mx_to_vector(double **m);
-
+int					close_window(t_core *engine);
+void				mlx_hooks(void);
 /*     >>>>>Utils funtions section<<<<<     */
 bool				is_wspace(char *s);
 char				*err_msg(const char *filename, const int n_line);
