@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 17:29:02 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/09 18:08:44 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/09 18:49:36 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,13 @@ typedef struct s_color
 	int				g;
 	int				b;
 }					t_color;
+
+typedef struct	s_phong
+{
+	t_color	diffuse;
+	t_color	specular;
+	t_color	ambient;
+}	t_phong;
 
 typedef struct s_object
 {
@@ -295,5 +302,5 @@ void				set_obj_color(t_object *o, t_color c);
 void				my_mlx_pixel_put(t_img *data, int x, int y, int color);
 
 t_vec				get_obj_norm(t_object *o, t_vec pt_on_sphere);
-
+t_vec				prepare_obj_norm(t_object *hit_obj, t_vec point, t_vec pt_cam_vec_norm);
 #endif
