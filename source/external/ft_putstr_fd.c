@@ -14,8 +14,9 @@
 
 void	ft_putstr_fd(char *s, int fd)
 {
-	int no_meaning_variable;
+	int	no_meaning_variable;
 
+	no_meaning_variable = 0;
 	if (fd != -1 || s)
 	{
 		while (*s)

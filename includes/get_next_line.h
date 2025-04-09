@@ -24,11 +24,11 @@ typedef unsigned char	t_uc;
 #  define BUFFER_SIZE 1
 # endif
 
-char			*handle_it(char **q_res, int nl_ind, char **buff);
-char			*get_next_line(int fd);
-char			*get_last_line(char **q_res, char **buff);
-int				check_nl(char *str);
-char			*ft_gstrjoin(char **s1, char const *s2, int rd);
-void			*free_all(char **q_res, char **buff);
+char					*handle_it(char **q_res, int nl_ind, char **buff);
+char					*get_next_line(int fd);
+char					*get_last_line(char **q_res, char **buff);
+int						check_nl(char *str);
+char					*ft_gstrjoin(char **s1, char const *s2, int rd);
+void					*free_all(char **q_res, char **buff);
 
 #endif

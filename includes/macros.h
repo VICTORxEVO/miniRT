@@ -3,24 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   macros.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 13:40:27 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/05 11:12:01 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/09 13:28:21 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MACROS_H
 # define MACROS_H
 
-#define SP_OBJ 0
-#define PL_OBJ 1
-#define CY_OBJ 2
-#define CB_OBJ 3
-#define CO_OBJ 4
+# define SP_OBJ 0
+# define PL_OBJ 1
+# define CY_OBJ 2
+# define CB_OBJ 3
+# define CO_OBJ 4
 
-#define EPSILON 0.0001f
-#define SMALL_N 0.00000001f
+# define EPSILON 0.0001f
+# define SMALL_N 0.00000001f
 
 /** Program name displayed in error messages */
 # define PRGM_NAME "miniRT"
@@ -32,29 +32,27 @@
 # define NOLIGHT_ERR " there is no light!"
 # define NOCAM_ERR " there is no camera!"
 # define NOAMB_ERR " there is no ambient!"
-# define WHITESPACE     " \t\n\r\v\f"  // space, tab, newline, carriage return, vtab, formfeed
+# define WHITESPACE " \t\n\r\v\f"
 
-
-#define LIGHT_FACTOR 10
-
+# define LIGHT_FACTOR 10
 
 // #ifdef LINUX
-    #define SCREEN_WIDTH 1800.f
-    #define SCREEN_HEIGHT 1200.f
+# define SCREEN_WIDTH 1800.f
+# define SCREEN_HEIGHT 1200.f
 // #endif
 
-#define STRIPE_X_PAT 1
-#define STRIPE_Y_PAT 2
-#define STRIPE_Z_PAT 3
-#define RING_X_PAT 4
-#define RING_Y_PAT 5
-#define RING_Z_PAT 6
-#define CHECKER_PAT 7
-#define GRADIANT_Y 8
-#define SWIRL 9
+# define STRIPE_X_PAT 1
+# define STRIPE_Y_PAT 2
+# define STRIPE_Z_PAT 3
+# define RING_X_PAT 4
+# define RING_Y_PAT 5
+# define RING_Z_PAT 6
+# define CHECKER_PAT 7
+# define GRADIANT_Y 8
+# define SWIRL 9
 
-#define XK_RIGHT_CTRL 65508
-#define XK_LEFT_CTRL 65507
+# define XK_RIGHT_CTRL 65508
+# define XK_LEFT_CTRL 65507
 
 // Regular text colors
 # define BLACK "\033[0;30m"

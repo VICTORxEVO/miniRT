@@ -1,10 +1,17 @@
 #include "miniRT.h"
 
-int main(int ac, char **av)
+t_core	*getengine(void)
 {
-    getengine();
-    parsing(ac, av[1]);
-    rendering();
-    clear();
-    return 0;
+	static t_core	engine;
+
+	return (&engine);
+}
+
+int	main(int ac, char **av)
+{
+	getengine();
+	parsing(ac, av[1]);
+	rendering();
+	clear();
+	return (0);
 }

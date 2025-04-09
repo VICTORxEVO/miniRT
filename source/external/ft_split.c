@@ -13,16 +13,18 @@
 #include "ext_libs.h"
 #include "gc.h"
 
-static bool	includes(const char c, const char *set)	
+static bool	includes(const char c, const char *set)
 {
-	int i  = 0;
+	int	i;
+
+	i = 0;
 	while (set[i])
 	{
 		if (set[i] == c)
-			return true;
+			return (true);
 		i++;
 	}
-	return false;
+	return (false);
 }
 
 static int	word_num(const char *s, const char *x)

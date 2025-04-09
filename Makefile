@@ -21,14 +21,14 @@ endif
 
 # Optimization flags
 OPT_FLAGS = -O3 -march=native -ffast-math \
-             -ftree-vectorize -fopt-info-vec \
+             -ftree-vectorize  \
              -funroll-loops -flto \
              -fno-signed-zeros 
 
 OPT_FLAGS += $(SIMD_FLAGS)
 
 #cc compiler with all flags
-CCF = cc -Wall $(OPT_FLAGS) # -Wextra # -Werror 
+CCF = cc -Wall $(OPT_FLAGS)  -Wextra -Werror 
 EXTRA_LIBS = -lm
 MLX_FLG = -L ./mlx  -l mlx_Linux -l Xext -l X11 -l m -l z -O3
 USER_FLG = -D USER=\"$(USER)\"

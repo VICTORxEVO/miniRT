@@ -1,29 +1,19 @@
 #include "miniRT.h"
 
-bool between(double n, double min, double max)
+bool	between(double n, double min, double max)
 {
 	return (n >= min && n <= max);
 }
 
-inline	void swapf(double *t1, double *t2)
-{
-	double temp;
-
-	temp = *t1;
-	*t1 = *t2;
-	*t2 = temp;
-
-}
-
 double	ft_atof(const char *s, bool *err)
 {
-	double	res;
-	int		sign;
-	double	dot_pow;
+	double res;
+	int sign;
+	double dot_pow;
 	dot_pow = 0;
 	res = 0;
 	sign = 1;
-	
+
 	if (*s == '-')
 	{
 		sign *= -1;
@@ -34,18 +24,18 @@ double	ft_atof(const char *s, bool *err)
 		if (*s != '.' && (*s < '0' || *s > '9'))
 		{
 			*err = true;
-			return 0;
+			return (0);
 		}
 		if (*s == '.')
 		{
 			if (dot_pow != 0)
 			{
 				*err = true;
-				return 0;
+				return (0);
 			}
 			dot_pow++;
 			s++;
-			continue;
+			continue ;
 		}
 		if (dot_pow)
 		{
@@ -59,12 +49,12 @@ double	ft_atof(const char *s, bool *err)
 	return (res * sign);
 };
 
-unsigned count_args(char   **args)
+unsigned	count_args(char **args)
 {
-    unsigned i;
+	unsigned i;
 
-    i = 0;
-    while (args[i])
-        i++;
-    return i;
+	i = 0;
+	while (args[i])
+		i++;
+	return (i);
 }

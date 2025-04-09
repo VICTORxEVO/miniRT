@@ -14,7 +14,9 @@
 
 void	pexit(char *msg, short int exit_code)
 {
-	ft_putstr_fd(PRGM_NAME ":" " ", 2);
+	ft_putstr_fd(PRGM_NAME ":"
+							" ",
+					2);
 	if (msg[ft_strlen(msg) - 1] == '!' || msg[ft_strlen(msg) - 1] == '>')
 	{
 		(ft_putstr_fd(msg, 2), ft_putstr_fd("\n", 2));
