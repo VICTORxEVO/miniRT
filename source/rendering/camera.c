@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 18:09:48 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/09 18:09:49 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/10 11:43:58 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,4 +24,20 @@ t_vec	generate_cam_dir(t_camera *cam, double scale, double ndcx, double ndcy)
 	dir.z += (ndcx * scale * cam->aspect * cam->right.z) + (ndcy * scale
 			* cam->up.z);
 	return (normal(dir));
+}
+
+t_vec	get_cam_dir(double x, double y, int i)
+{
+	t_camera	*cam;
+	t_core		*engine;
+	double		scale;
+	double		ndc_x;
+	double		ndc_y;
+
+	engine = getengine();
+	cam = engine->w->cam;
+	scale = tan(deg_to_rad(cam->fov) / 2.f);
+	ndc_x = (2.f * ((x + ((i / engine->rays_px) + 0.5f)) / SCREEN_WIDTH)) - 1.f;
+	ndc_y = 1 - (2.f * (y + 0.5) / SCREEN_HEIGHT);
+	return (generate_cam_dir(cam, scale, ndc_x, ndc_y));
 }

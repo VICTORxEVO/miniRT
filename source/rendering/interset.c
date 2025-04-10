@@ -152,3 +152,18 @@ t_color	intersect_world(t_world *w, t_ray *cam_ray)
 	final = clamp_color(final);
 	return (final);
 }
+
+double	get_intersect_dist(t_world *w, t_ray *ray)
+{
+	t_object	*node;
+	double		smallest_t;
+
+	smallest_t = __FLT_MAX__;
+	node = w->objects;
+	while (node)
+	{
+		smallest_t = get_smallest_t(node, ray);
+		node = node->next;
+	}
+	return (smallest_t);
+}

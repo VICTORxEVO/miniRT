@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 17:29:02 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/09 18:49:36 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/10 11:43:10 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,11 +279,12 @@ void				mlx_hooks(void);
 /*     >>>>>Utils funtions section<<<<<     */
 bool				is_wspace(char *s);
 char				*err_msg(const char *filename, const int n_line);
-
+void				set_smallest_if(double *smallest, t_inter it);
+double				get_smallest_t(t_object *node, t_ray *ray);
 int					key_press(int keycode, t_core *engine);
 int					key_release(int keycode, t_core *engine);
 void				init_hooks(t_core *engine);
-
+t_vec				get_cam_dir(double x, double y, int i);
 int					get_clr_int(t_color color);
 t_vec				reflect(t_vec light, t_vec norm);
 t_vec				vec_sub(t_vec p1, t_vec p2);

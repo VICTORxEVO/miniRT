@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 18:10:14 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/09 18:10:21 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/10 11:26:47 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 bool	is_shadowed(t_world *w, t_vec p, t_light *light)
 {
 	t_ray	offseted_p;
-	t_vec	offset;
 	t_vec	to_light;
 	t_vec	to_light_norm;
 	double	inter_dist;
@@ -24,8 +23,7 @@ bool	is_shadowed(t_world *w, t_vec p, t_light *light)
 	to_light = vec_sub(light->p, p);
 	to_light_norm = normal(to_light);
 	pt_to_light_dist = vec_len(to_light);
-	offset = vec_scl(to_light_norm, EPSILON);
-	offseted_p.origin = vec_add(p, (offset));
+	offseted_p.origin = vec_add(p, (vec_scl(to_light_norm, EPSILON)));
 	offseted_p.direction = to_light_norm;
 	inter_dist = get_intersect_dist(w, &offseted_p);
 	if (inter_dist > EPSILON && inter_dist < pt_to_light_dist)
