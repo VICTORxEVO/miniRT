@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   miniRT.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 17:29:02 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/10 11:43:10 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/11 17:18:05 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,6 +168,72 @@ typedef struct s_calc
 	bool			lighted;
 	t_color			obj_clr;
 }					t_calc;
+
+typedef struct s_parse_cam
+{
+	char	**cord;
+	char	**vctr;
+	double	FOV;
+	t_vec	vec3d;
+	t_vec	pcord;
+	bool	err;
+}	t_parse_cam;
+
+typedef struct s_parse_light
+{
+	char	**clrs;
+	double	light_value;
+	t_color	light_color;
+	t_vec	light_cord;
+	t_light	*light;
+	char	**cord;
+	bool	err;
+}	t_parse_light;
+
+typedef struct s_parse_plane
+{
+	char	**clrs;
+	char	**vctr;
+	t_color	plane_color;
+	t_vec	plane_cord;
+	t_vec	plane_norm;
+	t_plane	*plane;
+	char	**cord;
+}	t_parse_plane;
+
+typedef struct s_parse_cylinder
+{
+	char		**clrs;
+	char		**vctr;
+	t_color		cylinder_color;
+	t_vec		cylinder_cord;
+	t_vec		cylinder_norm;
+	double		diameter;
+	double		height;
+	t_cylinder	*cylinder;
+	char		**cord;
+	bool		err;
+}	t_parse_cylinder;
+
+typedef struct s_parse_sphere
+{
+	char		**clrs;
+	t_color		sphere_color;
+	t_vec		sphere_cord;
+	double		diameter;
+	t_sphere	*sphere;
+	char		**cord;
+	bool		err;
+}	t_parse_sphere;
+
+typedef	struct s_utils_ambient
+{
+	char **clrs;
+	double ambient_ratio;
+	t_ambient *ambient;
+	t_color ambient_color;
+	bool err;
+}	t_utils_ambient;
 
 t_core				*getengine(void);
 void				parsing(int ac, char *filename);
