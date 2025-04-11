@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 18:10:14 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/10 11:26:47 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/11 21:53:39 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ t_color	get_ambient(bool lighted, t_world *w, t_object *obj, t_color obj_clr)
 	t_color	ambient_color;
 
 	if (obj_clr.r == 0 && obj_clr.r == 0 && obj_clr.b == 0)
+		return (zero_color());
+	if (w->ambient->ratio == 0)
 		return (zero_color());
 	if (lighted)
 		ambient_color = rgb_scl(rgb_mul(w->ambient->c, obj_clr), 0.1);
