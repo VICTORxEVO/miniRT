@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 09:39:33 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/11 17:23:48 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/11 20:50:05 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ static bool	validated_type(char *name, unsigned int args_count)
 {
 	if ((!ft_strcmp(name, "A") && args_count == e_ambient) || (!ft_strcmp(name,
 				"C") && args_count == e_color) || (!ft_strcmp(name, "L")
+			&& args_count == e_light) || (!ft_strcmp(name, "l")
 			&& args_count == e_light) || (!ft_strcmp(name, "pl")
 			&& args_count == e_plain) || (!ft_strcmp(name, "sp")
 			&& args_count == e_sphere) || (!ft_strcmp(name, "cy")

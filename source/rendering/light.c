@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 18:09:57 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/11 20:38:58 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/11 21:21:51 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,13 @@ t_color	get_specular(t_light *light, t_color obj_clr, t_vec pt_light_vec,
 	light_color = rgb_scl(light->c, light->brightness * brightness_factor);
 	specular_factor = powf(refl_dot_cam, light->brightness * pow(LIGHT_FACTOR,
 				2));
-	speclar_color = rgb_mul(light_color, obj_clr);
+	
+		speclar_color = rgb_mul(light_color, obj_clr);
 	speclar_color = rgb_scl(speclar_color, specular_factor);
+	speclar_color = clamp_color(speclar_color);
 	return (speclar_color);
 }
-
+ 
 t_color	calc_specular(t_vec point, t_vec pt_cam_vec_norm, t_light *light,
 		t_object *obj)
 {

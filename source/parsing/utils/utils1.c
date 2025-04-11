@@ -9,6 +9,8 @@ bool	elem_added(t_core *d, char **args)
 		good = ambient_handled(d, args);
 	else if (ft_strncmp(args[0], "C", -1) == 0)
 		good = camera_handled(d, args);
+	else if (ft_strncmp(args[0], "l", -1) == 0)
+		good = light_handled(d, args);
 	else if (ft_strncmp(args[0], "L", -1) == 0)
 		good = light_handled(d, args);
 	else if (ft_strncmp(args[0], "pl", -1) == 0)

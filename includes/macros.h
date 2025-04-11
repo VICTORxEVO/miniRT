@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 13:40:27 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/09 17:29:52 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/11 21:19:01 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@
 # define NOAMB_ERR " there is no ambient!"
 # define WHITESPACE " \t\n\r\v\f"
 
-# define LIGHT_FACTOR 10
+# define LIGHT_FACTOR 5
 
 // #ifdef LINUX
 # define SCREEN_WIDTH 1800.f

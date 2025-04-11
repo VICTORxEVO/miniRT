@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 18:28:12 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/11 19:00:16 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/11 20:42:35 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,10 @@ void	ft_atof_helper2(const char **s, double *res, double *dot_pow)
 
 double	ft_atof(const char *s, bool *err)
 {
-	double res;
-	int sign;
-	int flag;
-	double dot_pow;
+	double	res;
+	int		sign;
+	int		flag;
+	double	dot_pow;
 
 	dot_pow = 0;
 	res = 0;
@@ -75,11 +75,11 @@ double	ft_atof(const char *s, bool *err)
 		ft_atof_helper2(&s, &res, &dot_pow);
 	}
 	return (res * sign);
-};
+}
 
-unsigned	count_args(char **args)
+unsigned int	count_args(char **args)
 {
-	unsigned i;
+	unsigned int	i;
 
 	i = 0;
 	while (args[i])
