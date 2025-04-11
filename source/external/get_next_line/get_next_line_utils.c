@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/16 16:24:36 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/04 10:23:04 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/11 20:33:42 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,4 +32,3 @@ char	*ft_gstrjoin(char **s1, char const *s2, int rd)
 	free(*s1);
 	return (new);
 }
-

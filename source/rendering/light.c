@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 18:09:57 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/09 18:55:24 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/11 20:38:58 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,23 +58,21 @@ t_color	get_specular(t_light *light, t_color obj_clr, t_vec pt_light_vec,
 t_color	calc_specular(t_vec point, t_vec pt_cam_vec_norm, t_light *light,
 		t_object *obj)
 {
-	t_color	speclar_color;
 	double	light_dot_norm;
 	double	refl_dot_cam;
 	t_vec	pt_light_vec;
 	t_vec	light_ref;
 	t_vec	obj_norm;
 
-	speclar_color = zero_color();
 	obj_norm = prepare_obj_norm(obj, point, pt_cam_vec_norm);
 	pt_light_vec = vec_sub(light->p, point);
 	light_ref = reflect(normal(pt_light_vec), obj_norm);
 	refl_dot_cam = vec_dot(normal(light_ref), pt_cam_vec_norm);
 	light_dot_norm = vec_dot(obj_norm, normal(pt_light_vec));
 	if (light_dot_norm >= 0 && refl_dot_cam > 0 && light->brightness > 0)
-		speclar_color = get_specular(light, get_obj_color(obj), pt_light_vec,
-				refl_dot_cam);
-	return (speclar_color);
+		return (get_specular(light, get_obj_color(obj), pt_light_vec,
+				refl_dot_cam));
+	return (zero_color());
 }
 
 t_vec	prepare_obj_norm(t_object *hit_obj, t_vec point, t_vec pt_cam_vec_norm)
@@ -92,24 +90,22 @@ t_vec	prepare_obj_norm(t_object *hit_obj, t_vec point, t_vec pt_cam_vec_norm)
 t_color	lighting(t_ray *cam_ray, t_object *hit_obj, t_calc *calc)
 {
 	t_phong	phong;
-	t_color	color;
 	t_world	*w;
-	t_vec	point;
+	t_vec	p;
 	t_vec	pt_cam_vec_norm;
 	t_vec	obj_norm;
 
 	w = getengine()->w;
 	phong.ambient = rgb_scl(w->ambient->c, w->ambient->ratio * 0.1);
 	phong.specular = zero_color();
-	point = position_at(cam_ray, calc->smallest_t);
-	pt_cam_vec_norm = normal(vec_sub(point, cam_ray->origin));
-	obj_norm = prepare_obj_norm(hit_obj, point, pt_cam_vec_norm);
+	p = position_at(cam_ray, calc->smallest_t);
+	pt_cam_vec_norm = normal(vec_sub(p, cam_ray->origin));
+	obj_norm = prepare_obj_norm(hit_obj, p, pt_cam_vec_norm);
 	calc->obj_clr = get_obj_color(hit_obj);
 	if (is_shadowed(w, position_at(cam_ray, calc->smallest_t), calc->light))
 		return (rgb_scl(rgb_mul(calc->obj_clr, phong.ambient), 0.1));
 	calc->lighted = true;
-	phong.diffuse = calc_diffuse(point, calc->light, calc->obj_clr, obj_norm);
-	phong.specular = calc_specular(point, pt_cam_vec_norm, calc->light, hit_obj);
-	color = rgb_add(phong.specular, phong.diffuse, false);
-	return (color);
+	phong.diffuse = calc_diffuse(p, calc->light, calc->obj_clr, obj_norm);
+	phong.specular = calc_specular(p, pt_cam_vec_norm, calc->light, hit_obj);
+	return (rgb_add(phong.specular, phong.diffuse, false));
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 17:19:33 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/11 17:25:59 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/11 18:42:32 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,4 +70,21 @@ bool	point_struct_filled(t_vec *p, char **args)
 	if (error)
 		return (false);
 	return (true);
+}
+
+bool    vector_struct_filled(t_vec	*v, char  **args)
+{
+    bool error;
+
+    error = false;
+	v->x = ft_atof(args[0], &error);
+	if (error || !between(v->x, -1, 1))
+		return (false);
+	v->y = ft_atof(args[1], &error);
+	if (error || !between(v->y, -1, 1))
+		return (false);
+	v->z = ft_atof(args[2], &error);
+	if (error || !between(v->z, -1, 1))
+		return (false);
+    return (true);
 }
