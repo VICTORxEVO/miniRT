@@ -11,24 +11,16 @@ bool	camera_handled(t_core *d, char **args)
 
 	err = false;
 	if (d->w->cam)
-	{
 		return (printf("Error\ncant have more than 1 camera"), false);
-	}
 	cord = ft_split(args[1], ",");
 	if (count_args(cord) != 3 || !point_struct_filled(&pcord, cord))
-	{
 		return (printf("Error\nbad camera point coordinates\n"), false);
-	}
 	vctr = ft_split(args[2], ",");
 	if (count_args(vctr) != 3 || !vector_struct_filled(&vec3d, vctr))
-	{
 		return (printf("Error\nbad camera 3d vector"), false);
-	}
 	FOV = ft_atof(args[3], &err);
 	if (err || (FOV < 0 || FOV > 180))
-	{
 		return (printf("Error\nbad fov value for camera"), false);
-	}
 	d->w->cam = galloc(sizeof(t_camera));
 	d->w->cam->forward = normal(vec3d);
 	d->w->cam->origin = pcord;
@@ -91,41 +83,57 @@ bool	plane_handled(t_core *d, char **args)
 	return (true);
 }
 
-bool	cylinder_handled(t_core *d, char **args)
+static bool	cylinder_parse_params(char **args, t_vec *coords, 
+							t_vec *norm, double params[2])
 {
-	char		**clrs;
-	char		**vctr;
-	t_color		cylinder_color;
-	t_vec		cylinder_cord;
-	t_vec		cylinder_norm;
-	double		diameter;
-	double		height;
-	t_cylinder	*cylinder;
-	char		**cord;
-	bool		err;
+	char	**cord;
+	char	**vctr;
+	bool	err;
 
 	err = false;
 	cord = ft_split(args[1], ",");
-	if (count_args(cord) != 3 || !point_struct_filled(&cylinder_cord, cord))
+	if (count_args(cord) != 3 || !point_struct_filled(coords, cord))
 		return (printf("Error\ncylinder point invalid\n"), false);
 	vctr = ft_split(args[2], ",");
-	if (count_args(vctr) != 3 || !vector_struct_filled(&cylinder_norm, vctr))
+	if (count_args(vctr) != 3 || !vector_struct_filled(norm, vctr))
 		return (printf("Error\nbad cylinder 3d normal cords\n"), false);
-	diameter = ft_atof(args[3], &err);
+	params[0] = ft_atof(args[3], &err);
 	if (err)
 		return (printf("Error\ncylinder diameter invalid\n"), false);
-	height = ft_atof(args[4], &err);
+	params[1] = ft_atof(args[4], &err);
 	if (err)
 		return (printf("Error\ncylinder height invalid\n"), false);
+	return (true);
+}
+
+static bool	cylinder_parse_color(char **args, t_color *color)
+{
+	char	**clrs;
+
 	clrs = ft_split(args[5], ",");
-	if (count_args(clrs) != 3 || !color_struct_filled(&cylinder_color, clrs))
+	if (count_args(clrs) != 3 || !color_struct_filled(color, clrs))
 		return (printf("Error\ncylinder color invalid\n"), false);
+	return (true);
+}
+
+bool	cylinder_handled(t_core *d, char **args)
+{
+	t_color		cylinder_color;
+	t_vec		cylinder_cord;
+	t_vec		cylinder_norm;
+	double		params[2];
+	t_cylinder	*cylinder;
+
+	if (!cylinder_parse_params(args, &cylinder_cord, &cylinder_norm, params))
+		return (false);
+	if (!cylinder_parse_color(args, &cylinder_color))
+		return (false);
 	cylinder = galloc(sizeof(t_cylinder));
 	cylinder->c = cylinder_color;
 	cylinder->origin = cylinder_cord;
 	cylinder->normal = normal(cylinder_norm);
-	cylinder->diameter = diameter;
-	cylinder->height = height;
+	cylinder->diameter = params[0];
+	cylinder->height = params[1];
 	add_obj(&d->w->objects, cylinder, CY_OBJ);
 	return (true);
 }
@@ -133,11 +141,11 @@ bool	cylinder_handled(t_core *d, char **args)
 bool	sphere_handled(t_core *d, char **args)
 {
 	char		**clrs;
+	char		**cord;
 	t_color		sphere_color;
 	t_vec		sphere_cord;
 	double		diameter;
 	t_sphere	*sphere;
-	char		**cord;
 	bool		err;
 
 	err = false;
