@@ -1,166 +1,110 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   shapes_parse.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/11 17:11:47 by ysbai-jo          #+#    #+#             */
+/*   Updated: 2025/04/11 17:25:31 by ysbai-jo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "miniRT.h"
 
 bool	camera_handled(t_core *d, char **args)
 {
-	char	**cord;
-	char	**vctr;
-	double	FOV;
-	t_vec	vec3d;
-	t_vec	pcord;
-	bool	err;
+	t_parse_cam	p_cam;
 
-	err = false;
+	p_cam.err = false;
 	if (d->w->cam)
 		return (printf("Error\ncant have more than 1 camera"), false);
-	cord = ft_split(args[1], ",");
-	if (count_args(cord) != 3 || !point_struct_filled(&pcord, cord))
+	p_cam.cord = ft_split(args[1], ",");
+	if (count_args(p_cam.cord) != 3 || !point_struct_filled(&p_cam.pcord,
+			p_cam.cord))
 		return (printf("Error\nbad camera point coordinates\n"), false);
-	vctr = ft_split(args[2], ",");
-	if (count_args(vctr) != 3 || !vector_struct_filled(&vec3d, vctr))
+	p_cam.vctr = ft_split(args[2], ",");
+	if (count_args(p_cam.vctr) != 3 || !vector_struct_filled(&p_cam.vec3d,
+			p_cam.vctr))
 		return (printf("Error\nbad camera 3d vector"), false);
-	FOV = ft_atof(args[3], &err);
-	if (err || (FOV < 0 || FOV > 180))
+	p_cam.FOV = ft_atof(args[3], &p_cam.err);
+	if (p_cam.err || (p_cam.FOV < 0 || p_cam.FOV > 180))
 		return (printf("Error\nbad fov value for camera"), false);
 	d->w->cam = galloc(sizeof(t_camera));
-	d->w->cam->forward = normal(vec3d);
-	d->w->cam->origin = pcord;
-	d->w->cam->fov = FOV;
+	d->w->cam->forward = normal(p_cam.vec3d);
+	d->w->cam->origin = p_cam.pcord;
+	d->w->cam->fov = p_cam.FOV;
 	return (true);
 }
 
 bool	light_handled(t_core *d, char **args)
 {
-	char	**clrs;
-	double	light_value;
-	t_color	light_color;
-	t_vec	light_cord;
-	t_light	*light;
-	char	**cord;
-	bool	err;
+	t_parse_light	pl;
 
-	err = false;
-	cord = ft_split(args[1], ",");
-	if (count_args(cord) != 3 || !point_struct_filled(&light_cord, cord))
+	pl.err = false;
+	pl.cord = ft_split(args[1], ",");
+	if (count_args(pl.cord) != 3 || !point_struct_filled(&pl.light_cord,
+			pl.cord))
 		return (printf("Error\nbad light point coordinates\n"), false);
-	light_value = ft_atof(args[2], &err);
-	if (err || !between(light_value, 0, 1))
+	pl.light_value = ft_atof(args[2], &pl.err);
+	if (pl.err || !between(pl.light_value, 0, 1))
 		return (printf("Error\nlight value invalid\n"), false);
-	clrs = ft_split(args[3], ",");
-	if (count_args(clrs) != 3 || !color_struct_filled(&light_color, clrs))
+	pl.clrs = ft_split(args[3], ",");
+	if (count_args(pl.clrs) != 3 || !color_struct_filled(&pl.light_color,
+			pl.clrs))
 		return (printf("Error\nlight color invalid\n"), false);
-	light = galloc(sizeof(t_light));
-	light->brightness = light_value;
-	light->c = light_color;
-	light->p = light_cord;
-	add_node(&d->w->lights, light, e_light);
+	pl.light = galloc(sizeof(t_light));
+	pl.light->brightness = pl.light_value;
+	pl.light->c = pl.light_color;
+	pl.light->p = pl.light_cord;
+	add_node(&d->w->lights, pl.light, e_light);
 	return (true);
 }
 
 bool	plane_handled(t_core *d, char **args)
 {
-	char	**clrs;
-	char	**vctr;
-	t_color	plane_color;
-	t_vec	plane_cord;
-	t_vec	plane_norm;
-	t_plane	*plane;
-	char	**cord;
+	t_parse_plane	p_plane;
 
-	cord = ft_split(args[1], ",");
-	if (count_args(cord) != 3 || !point_struct_filled(&plane_cord, cord))
+	p_plane.cord = ft_split(args[1], ",");
+	if (count_args(p_plane.cord) != 3
+		|| !point_struct_filled(&p_plane.plane_cord, p_plane.cord))
 		return (printf("bad plane origin point\n"), false);
-	vctr = ft_split(args[2], ",");
-	if (count_args(vctr) != 3 || !vector_struct_filled(&plane_norm, vctr))
+	p_plane.vctr = ft_split(args[2], ",");
+	if (count_args(p_plane.vctr) != 3
+		|| !vector_struct_filled(&p_plane.plane_norm, p_plane.vctr))
 		return (printf("bad plane 3d vector\n"), false);
-	clrs = ft_split(args[3], ",");
-	if (count_args(clrs) != 3 || !color_struct_filled(&plane_color, clrs))
+	p_plane.clrs = ft_split(args[3], ",");
+	if (count_args(p_plane.clrs) != 3
+		|| !color_struct_filled(&p_plane.plane_color, p_plane.clrs))
 		return (printf("bad plane color\n"), false);
-	plane = galloc(sizeof(t_plane));
-	plane->c = plane_color;
-	plane->origin = plane_cord;
-	plane->normal = plane_norm;
-	add_obj(&d->w->objects, plane, PL_OBJ);
-	return (true);
-}
-
-static bool	cylinder_parse_params(char **args, t_vec *coords, 
-							t_vec *norm, double params[2])
-{
-	char	**cord;
-	char	**vctr;
-	bool	err;
-
-	err = false;
-	cord = ft_split(args[1], ",");
-	if (count_args(cord) != 3 || !point_struct_filled(coords, cord))
-		return (printf("Error\ncylinder point invalid\n"), false);
-	vctr = ft_split(args[2], ",");
-	if (count_args(vctr) != 3 || !vector_struct_filled(norm, vctr))
-		return (printf("Error\nbad cylinder 3d normal cords\n"), false);
-	params[0] = ft_atof(args[3], &err);
-	if (err)
-		return (printf("Error\ncylinder diameter invalid\n"), false);
-	params[1] = ft_atof(args[4], &err);
-	if (err)
-		return (printf("Error\ncylinder height invalid\n"), false);
-	return (true);
-}
-
-static bool	cylinder_parse_color(char **args, t_color *color)
-{
-	char	**clrs;
-
-	clrs = ft_split(args[5], ",");
-	if (count_args(clrs) != 3 || !color_struct_filled(color, clrs))
-		return (printf("Error\ncylinder color invalid\n"), false);
-	return (true);
-}
-
-bool	cylinder_handled(t_core *d, char **args)
-{
-	t_color		cylinder_color;
-	t_vec		cylinder_cord;
-	t_vec		cylinder_norm;
-	double		params[2];
-	t_cylinder	*cylinder;
-
-	if (!cylinder_parse_params(args, &cylinder_cord, &cylinder_norm, params))
-		return (false);
-	if (!cylinder_parse_color(args, &cylinder_color))
-		return (false);
-	cylinder = galloc(sizeof(t_cylinder));
-	cylinder->c = cylinder_color;
-	cylinder->origin = cylinder_cord;
-	cylinder->normal = normal(cylinder_norm);
-	cylinder->diameter = params[0];
-	cylinder->height = params[1];
-	add_obj(&d->w->objects, cylinder, CY_OBJ);
+	p_plane.plane = galloc(sizeof(t_plane));
+	p_plane.plane->c = p_plane.plane_color;
+	p_plane.plane->origin = p_plane.plane_cord;
+	p_plane.plane->normal = p_plane.plane_norm;
+	add_obj(&d->w->objects, p_plane.plane, PL_OBJ);
 	return (true);
 }
 
 bool	sphere_handled(t_core *d, char **args)
 {
-	char		**clrs;
-	char		**cord;
-	t_color		sphere_color;
-	t_vec		sphere_cord;
-	double		diameter;
-	t_sphere	*sphere;
-	bool		err;
+	t_parse_sphere	p_shpere;
 
-	err = false;
-	cord = ft_split(args[1], ",");
-	if (count_args(cord) != 3 || !point_struct_filled(&sphere_cord, cord))
+	p_shpere.err = false;
+	p_shpere.cord = ft_split(args[1], ",");
+	if (count_args(p_shpere.cord) != 3
+		|| !point_struct_filled(&p_shpere.sphere_cord, p_shpere.cord))
 		return (printf("Error\nsphere point invalid\n"), false);
-	diameter = ft_atof(args[2], &err);
-	clrs = ft_split(args[3], ",");
-	if (count_args(clrs) != 3 || !color_struct_filled(&sphere_color, clrs))
+	p_shpere.diameter = ft_atof(args[2], &p_shpere.err);
+	p_shpere.clrs = ft_split(args[3], ",");
+	if (count_args(p_shpere.clrs) != 3
+		|| !color_struct_filled(&p_shpere.sphere_color, p_shpere.clrs))
 		return (printf("Error\nsphere color invalid\n"), false);
-	sphere = galloc(sizeof(t_sphere));
-	sphere->c = sphere_color;
-	sphere->origin = sphere_cord;
-	sphere->diameter = diameter;
-	sphere->radius_squared = (diameter / 2) * (diameter / 2);
-	add_obj(&d->w->objects, sphere, SP_OBJ);
+	p_shpere.sphere = galloc(sizeof(t_sphere));
+	p_shpere.sphere->c = p_shpere.sphere_color;
+	p_shpere.sphere->origin = p_shpere.sphere_cord;
+	p_shpere.sphere->diameter = p_shpere.diameter;
+	p_shpere.sphere->radius_squared = (p_shpere.diameter / 2)
+		* (p_shpere.diameter / 2);
+	add_obj(&d->w->objects, p_shpere.sphere, SP_OBJ);
 	return (true);
 }
