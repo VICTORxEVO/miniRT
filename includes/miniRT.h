@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 17:29:02 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/10 11:43:10 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/11 18:20:42 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,14 @@ typedef struct s_plane
 	t_vec			normal;
 	t_color			c;
 }					t_plane;
+
+typedef struct s_eq
+{
+	double a;
+	double b;
+	double c;
+	double d;
+}	t_eq;
 
 typedef struct s_cylinder
 {
@@ -304,4 +312,11 @@ void				my_mlx_pixel_put(t_img *data, int x, int y, int color);
 
 t_vec				get_obj_norm(t_object *o, t_vec pt_on_sphere);
 t_vec				prepare_obj_norm(t_object *hit_obj, t_vec point, t_vec pt_cam_vec_norm);
+t_eq	calc_equation(double radius, t_cylinder *cy, t_ray *r, t_vec X);
+double	validate_body_height(t_cylinder *cy, t_ray *r, double body_hit);
+double	calculate_body_intersection(t_cylinder *cy, t_ray *r);
+double	calculate_cap_intersection(t_ray *r, t_vec center, t_vec normal,
+		double radius);
+double	find_closest_hit(t_cylinder *cy, t_ray *r, double radius, double top_hit);
+
 #endif

@@ -6,40 +6,25 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 18:09:56 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/09 18:14:22 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/11 17:42:10 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "miniRT.h"
 
-t_vec	cy_normal(t_cylinder *cy, t_vec world_point)
+static t_vec	get_cylinder_cap_normal(t_cylinder *cy, t_vec local_point,
+		bool camera_inside)
 {
-	t_vec	camera_pos;
-	t_vec	local_point;
-	t_vec	local_camera;
-	double	vector_len;
-	double	camera_dist_sq;
-	bool	camera_inside;
-	double	dist_to_top;
-	double	dist_to_bottom;
 	t_vec	norm;
 	t_vec	projected;
+	double	dist_top;
+	double	dist_bottom;
 
-	camera_pos = getengine()->w->cam->origin;
-	local_point = vec_sub(world_point, cy->origin);
-	local_camera = vec_sub(camera_pos, cy->origin);
-	// Check if camera is inside cylinder
-	vector_len = vec_len(vec_sub(local_camera, (vec_scl(cy->normal,
-						vec_dot(local_camera, cy->normal)))));
-	camera_dist_sq = vector_len * vector_len;
-	camera_inside = camera_dist_sq < (cy->diameter * cy->diameter / 4.0f);
-	// Cap distances
-	dist_to_top = vec_dot(local_point, cy->normal) - cy->height;
-	dist_to_bottom = vec_dot(local_point, cy->normal);
-	// Cap normals
-	if (fabs(dist_to_top) < EPSILON)
+	dist_top = vec_dot(local_point, cy->normal) - cy->height;
+	dist_bottom = vec_dot(local_point, cy->normal);
+	if (fabs(dist_top) < EPSILON)
 		norm = cy->normal;
-	else if (fabs(dist_to_bottom) < EPSILON)
+	else if (fabs(dist_bottom) < EPSILON)
 		norm = vec_neg(cy->normal);
 	else
 	{
@@ -49,6 +34,31 @@ t_vec	cy_normal(t_cylinder *cy, t_vec world_point)
 	if (camera_inside)
 		norm = vec_neg(norm);
 	return (norm);
+}
+
+static bool	is_camera_inside_cylinder(t_cylinder *cy, t_vec local_camera)
+{
+	double	vector_len;
+	double	camera_dist_sq;
+
+	vector_len = vec_len(vec_sub(local_camera, (vec_scl(cy->normal,
+						vec_dot(local_camera, cy->normal)))));
+	camera_dist_sq = vector_len * vector_len;
+	return (camera_dist_sq < (cy->diameter * cy->diameter / 4.0f));
+}
+
+t_vec	cy_normal(t_cylinder *cy, t_vec world_point)
+{
+	t_vec	camera_pos;
+	t_vec	local_point;
+	t_vec	local_camera;
+	bool	camera_inside;
+
+	camera_pos = getengine()->w->cam->origin;
+	local_point = vec_sub(world_point, cy->origin);
+	local_camera = vec_sub(camera_pos, cy->origin);
+	camera_inside = is_camera_inside_cylinder(cy, local_camera);
+	return (get_cylinder_cap_normal(cy, local_point, camera_inside));
 }
 
 t_vec	get_obj_norm(t_object *o, t_vec pt_on_obj)
@@ -76,6 +86,3 @@ t_color	get_obj_color(t_object *o)
 	else
 		return (((t_cylinder *)o->data)->c);
 }
-
-
-
