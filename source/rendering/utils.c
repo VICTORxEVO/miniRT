@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 18:10:14 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/11 21:53:39 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/12 16:59:01 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ t_hit	find_hit(t_world *w, t_ray *cam_ray)
 	t_inter		it;
 	t_object	*node;
 
+	it.t1 = -1;
+	it.t2 = -1;
 	hit.obj = NULL;
 	hit.t1 = __FLT_MAX__;
 	hit.t2 = __FLT_MAX__;

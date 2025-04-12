@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils1.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/12 17:10:13 by ysbai-jo          #+#    #+#             */
+/*   Updated: 2025/04/12 17:10:14 by ysbai-jo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "miniRT.h"
 
 bool	elem_added(t_core *d, char **args)
@@ -24,11 +36,11 @@ bool	elem_added(t_core *d, char **args)
 
 bool	ambient_handled(t_core *d, char **args)
 {
-	char **clrs;
-	double ambient_ratio;
-	t_ambient *ambient;
-	t_color ambient_color;
-	bool err;
+	char		**clrs;
+	double		ambient_ratio;
+	t_ambient	*ambient;
+	t_color		ambient_color;
+	bool		err;
 
 	err = false;
 	ambient_color = zero_color();
