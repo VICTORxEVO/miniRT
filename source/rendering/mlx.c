@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mlx.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 18:10:11 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/13 16:07:47 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 17:49:01 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ int	close_window(t_core *engine)
 	mlx_destroy_window(engine->m.mlx, engine->m.win);
 	mlx_destroy_image(engine->m.mlx, engine->img.img);
 	mlx_destroy_display(engine->m.mlx);
+	free(engine->m.mlx);
 	clear();
 	exit(0);
 	return (0);
@@ -253,12 +254,7 @@ int	key_press(int key, t_core *engine)
 	}
 	else if (key == XK_Escape)
 	{
-		mlx_destroy_window(engine->m.mlx, engine->m.win);
-		mlx_destroy_image(engine->m.mlx, engine->img.img);
-    	mlx_destroy_display(engine->m.mlx);
-		free(engine->m.mlx);
-		clear();
-		exit(0);
+		close_window(engine);
 	}
 	return (0);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/16 16:24:19 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/04 10:21:57 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 17:47:01 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@ char	*get_next_line(int fd)
 	int			nl_ind;
 	ssize_t		rd;
 
-	buff = malloc((size_t)BUFFER_SIZE + 1);
+	buff = galloc((size_t)BUFFER_SIZE + 1);
 	if (!buff || BUFFER_SIZE <= 0)
-		return (free_all(&q_res, &buff));
+		return (NULL);
 	rd = read(fd, buff, BUFFER_SIZE);
 	buff[rd] = 0;
 	while (rd >= 0)
@@ -36,21 +36,19 @@ char	*get_next_line(int fd)
 			return (get_last_line(&q_res, &buff));
 		rd = read(fd, buff, BUFFER_SIZE);
 	}
-	return (free_all(&q_res, &buff));
+	return (NULL);
 }
 
 char	*handle_it(char **q_res, int nl_ind, char **buff)
 {
 	char	*line;
 	char	*tmp;
-
-	free(*buff);
+	
+	(void) buff;
 	line = ft_substr(*q_res, 0, (size_t)(nl_ind));
 	tmp = ft_substr(*q_res, nl_ind, ft_strlen(*q_res + nl_ind));
-	free(*q_res);
 	if (!tmp[0])
 	{
-		free(tmp);
 		*q_res = NULL;
 		return (line);
 	}

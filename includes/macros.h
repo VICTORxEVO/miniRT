@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 13:40:27 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/11 21:19:01 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/13 17:40:50 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,8 @@
 # define LIGHT_FACTOR 5
 
 // #ifdef LINUX
-# define SCREEN_WIDTH 1800.f
-# define SCREEN_HEIGHT 1200.f
+# define SCREEN_WIDTH 180.f
+# define SCREEN_HEIGHT 120.f
 // #endif
 
 # define STRIPE_X_PAT 1
