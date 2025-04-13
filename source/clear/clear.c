@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 11:44:22 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/04 18:43:00 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 16:06:29 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,5 @@ static void	gc_lstclear(void)
 
 void	clear(void)
 {
-	return ;
 	gc_lstclear();
 }

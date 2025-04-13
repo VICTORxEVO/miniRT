@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 17:21:35 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/11 17:25:19 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 15:48:47 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ void	readfile(int fd, char *filename)
 
 	n_line = 1;
 	line = get_next_line(fd);
-	gc_add_node(line);
 	if (!line || !*line)
 		pexit(ft_strjoin(ft_strjoin(RED, filename), EMPTFILE_ERR), 3);
 	while (line)
