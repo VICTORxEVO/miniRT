@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redering.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 18:10:12 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/10 11:43:29 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/13 12:09:28 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,10 +68,8 @@ t_color	get_anti_aliased_color(double x, double y)
 
 t_color	get_px_color(double x, double y)
 {
-	t_core	*engine;
 	t_color	final_clr;
 
-	engine = getengine();
 	final_clr = get_anti_aliased_color(x, y);
 	return (final_clr);
 }
