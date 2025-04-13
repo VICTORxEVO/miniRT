@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   macros.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 13:40:27 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/13 17:40:50 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/13 19:03:57 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,8 @@
 # define LIGHT_FACTOR 5
 
 // #ifdef LINUX
-# define SCREEN_WIDTH 180.f
-# define SCREEN_HEIGHT 120.f
+# define SCREEN_WIDTH 900.f
+# define SCREEN_HEIGHT 1000.f
 // #endif
 
 # define STRIPE_X_PAT 1

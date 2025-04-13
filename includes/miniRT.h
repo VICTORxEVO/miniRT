@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   miniRT.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 17:29:02 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/11 18:26:30 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/13 19:03:08 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,12 @@ typedef struct s_color
 	int				b;
 }					t_color;
 
-typedef struct	s_phong
+typedef struct s_phong
 {
-	t_color	diffuse;
-	t_color	specular;
-	t_color	ambient;
-}	t_phong;
+	t_color			diffuse;
+	t_color			specular;
+	t_color			ambient;
+}					t_phong;
 
 typedef struct s_object
 {
@@ -128,11 +128,11 @@ typedef struct s_plane
 
 typedef struct s_eq
 {
-	double a;
-	double b;
-	double c;
-	double d;
-}	t_eq;
+	double			a;
+	double			b;
+	double			c;
+	double			d;
+}					t_eq;
 
 typedef struct s_cylinder
 {
@@ -179,69 +179,69 @@ typedef struct s_calc
 
 typedef struct s_parse_cam
 {
-	char	**cord;
-	char	**vctr;
-	double	FOV;
-	t_vec	vec3d;
-	t_vec	pcord;
-	bool	err;
-}	t_parse_cam;
+	char			**cord;
+	char			**vctr;
+	double			fov;
+	t_vec			vec3d;
+	t_vec			pcord;
+	bool			err;
+}					t_parse_cam;
 
 typedef struct s_parse_light
 {
-	char	**clrs;
-	double	light_value;
-	t_color	light_color;
-	t_vec	light_cord;
-	t_light	*light;
-	char	**cord;
-	bool	err;
-}	t_parse_light;
+	char			**clrs;
+	double			light_value;
+	t_color			light_color;
+	t_vec			light_cord;
+	t_light			*light;
+	char			**cord;
+	bool			err;
+}					t_parse_light;
 
 typedef struct s_parse_plane
 {
-	char	**clrs;
-	char	**vctr;
-	t_color	plane_color;
-	t_vec	plane_cord;
-	t_vec	plane_norm;
-	t_plane	*plane;
-	char	**cord;
-}	t_parse_plane;
+	char			**clrs;
+	char			**vctr;
+	t_color			plane_color;
+	t_vec			plane_cord;
+	t_vec			plane_norm;
+	t_plane			*plane;
+	char			**cord;
+}					t_parse_plane;
 
 typedef struct s_parse_cylinder
 {
-	char		**clrs;
-	char		**vctr;
-	t_color		cylinder_color;
-	t_vec		cylinder_cord;
-	t_vec		cylinder_norm;
-	double		diameter;
-	double		height;
-	t_cylinder	*cylinder;
-	char		**cord;
-	bool		err;
-}	t_parse_cylinder;
+	char			**clrs;
+	char			**vctr;
+	t_color			cylinder_color;
+	t_vec			cylinder_cord;
+	t_vec			cylinder_norm;
+	double			diameter;
+	double			height;
+	t_cylinder		*cylinder;
+	char			**cord;
+	bool			err;
+}					t_parse_cylinder;
 
 typedef struct s_parse_sphere
 {
-	char		**clrs;
-	t_color		sphere_color;
-	t_vec		sphere_cord;
-	double		diameter;
-	t_sphere	*sphere;
-	char		**cord;
-	bool		err;
-}	t_parse_sphere;
+	char			**clrs;
+	t_color			sphere_color;
+	t_vec			sphere_cord;
+	double			diameter;
+	t_sphere		*sphere;
+	char			**cord;
+	bool			err;
+}					t_parse_sphere;
 
-typedef	struct s_utils_ambient
+typedef struct s_utils_ambient
 {
-	char **clrs;
-	double ambient_ratio;
-	t_ambient *ambient;
-	t_color ambient_color;
-	bool err;
-}	t_utils_ambient;
+	char			**clrs;
+	double			ambient_ratio;
+	t_ambient		*ambient;
+	t_color			ambient_color;
+	bool			err;
+}					t_utils_ambient;
 
 t_core				*getengine(void);
 void				parsing(int ac, char *filename);
@@ -309,45 +309,7 @@ t_color				rgb_sum(t_color amb, t_color dif, t_color spc);
 double				get_brightness(t_color c);
 t_color				rgb_to_gray(t_color c);
 
-/* matrices */
-double				**create_matrix_2x2(double a, double b, double c, double d);
-double				**create_matrix_3x3(double a, double b, double c, double l,
-						double m, double n, double x, double y, double z);
-double				**create_matrix_4x4(double a, double b, double c, double d,
-						double e, double f, double g, double h, double i,
-						double j, double k, double l, double m, double n,
-						double o, double q);
-void				init_matrix_n(double **matrix, int n);
-void				print_matrix_n(double **matrix, int n);
-void				print_matrix_row_col(double **matrix, int row, int col);
-double				**submatrix(double **matrix, int row, int col, int n);
-double				**get_new_matrix_n(int n);
-double				**get_new_matrix_row_col(int row, int col);
-double				**mul_matrix_n(double **m1, double **m2, int n);
-double				**mul_matrix_row_col(double **m1, double **m2, int row1,
-						int col2);
-double				**get_transposed(double **m, int n);
-void				transpose(double **m, int n);
-double				get_determinant_2(double **m);
-double				get_determinant_n(double **m, int n);
-double				**get_identity_matrix_n(int n);
-double				get_minor_n(double **matrix, int row, int col, int n);
-double				get_cofactor_n(double **matrix, int row, int col, int n);
-double				**get_inverted_n(double **matrix, int n);
-double				**get_4_1_matrix(double x, double y, double z, double w);
-double				**from_n_to_4_1_matrix(double **matrix_n);
-double				**from_4_1_to_n_matrix(double **matrix_4_1);
-double				**get_translation_matrix(double x, double y, double z);
-double				**get_scaling_matrix(double x, double y, double z,
-						double w);
 double				deg_to_rad(double deg);
-double				rad_to_deg(double rad);
-double				**rotate_x(double rad);
-double				**rotate_y(double rad);
-double				**rotate_z(double rad);
-t_ray				transform_ray(t_ray old_r, double **transformation_mx);
-t_vec				translate_mx_to_point(double **m);
-t_vec				translate_mx_to_vector(double **m);
 int					close_window(t_core *engine);
 void				mlx_hooks(void);
 /*     >>>>>Utils funtions section<<<<<     */
@@ -357,7 +319,6 @@ void				set_smallest_if(double *smallest, t_inter it);
 double				get_smallest_t(t_object *node, t_ray *ray);
 int					key_press(int keycode, t_core *engine);
 int					key_release(int keycode, t_core *engine);
-void				init_hooks(t_core *engine);
 t_vec				get_cam_dir(double x, double y, int i);
 int					get_clr_int(t_color color);
 t_vec				reflect(t_vec light, t_vec norm);
@@ -377,12 +338,16 @@ void				set_obj_color(t_object *o, t_color c);
 void				my_mlx_pixel_put(t_img *data, int x, int y, int color);
 
 t_vec				get_obj_norm(t_object *o, t_vec pt_on_sphere);
-t_vec				prepare_obj_norm(t_object *hit_obj, t_vec point, t_vec pt_cam_vec_norm);
-t_eq	calc_equation(double radius, t_cylinder *cy, t_ray *r, t_vec X);
-double	validate_body_height(t_cylinder *cy, t_ray *r, double body_hit);
-double	calculate_body_intersection(t_cylinder *cy, t_ray *r);
-double	calculate_cap_intersection(t_ray *r, t_vec center, t_vec normal,
-		double radius);
-double	find_closest_hit(t_cylinder *cy, t_ray *r, double radius, double top_hit);
+t_vec				prepare_obj_norm(t_object *hit_obj, t_vec point,
+						t_vec pt_cam_vec_norm);
+t_eq				calc_equation(double radius, t_cylinder *cy, t_ray *r,
+						t_vec X);
+double				validate_body_height(t_cylinder *cy, t_ray *r,
+						double body_hit);
+double				calculate_body_intersection(t_cylinder *cy, t_ray *r);
+double				calculate_cap_intersection(t_ray *r, t_vec center,
+						t_vec normal, double radius);
+double				find_closest_hit(t_cylinder *cy, t_ray *r, double radius,
+						double top_hit);
 
 #endif

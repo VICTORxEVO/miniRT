@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/16 16:24:19 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/13 18:21:20 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/13 18:52:38 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ char	*handle_it(char **q_res, int nl_ind)
 {
 	char	*line;
 	char	*tmp;
-	
+
 	line = ft_substr(*q_res, 0, (size_t)(nl_ind));
 	tmp = ft_substr(*q_res, nl_ind, ft_strlen(*q_res + nl_ind));
 	if (!tmp[0])

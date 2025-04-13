@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 09:54:30 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/13 15:47:14 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 18:53:01 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	parsing(int ac, char *filename)
 	if (!engine->m.mlx)
 		(clear(), exit(1));
 	engine->m.win = mlx_new_window(engine->m.mlx, SCREEN_WIDTH, SCREEN_HEIGHT,
-		"miniRT");
+			"miniRT");
 	if (!engine->m.win)
 		(clear(), exit(1));
 	engine->m.ctrl_pressed = false;

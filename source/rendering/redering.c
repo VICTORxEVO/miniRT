@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 18:10:12 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/13 12:09:28 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 18:54:10 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,6 @@ void	rendering(void)
 	t_color	px_color;
 
 	engine = getengine();
-	init_hooks(engine);
 	engine->img.img = mlx_new_image(engine->m.mlx, SCREEN_WIDTH, SCREEN_HEIGHT);
 	engine->img.addr = mlx_get_data_addr(engine->img.img,
 			&engine->img.bits_per_pixel, &engine->img.line_length,

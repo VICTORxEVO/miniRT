@@ -6,7 +6,7 @@
 /*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 17:11:47 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/11 17:25:31 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 18:56:49 by ysbai-jo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,13 @@ bool	camera_handled(t_core *d, char **args)
 	if (count_args(p_cam.vctr) != 3 || !vector_struct_filled(&p_cam.vec3d,
 			p_cam.vctr))
 		return (printf("Error\nbad camera 3d vector"), false);
-	p_cam.FOV = ft_atof(args[3], &p_cam.err);
-	if (p_cam.err || (p_cam.FOV < 0 || p_cam.FOV > 180))
+	p_cam.fov = ft_atof(args[3], &p_cam.err);
+	if (p_cam.err || (p_cam.fov < 0 || p_cam.fov > 180))
 		return (printf("Error\nbad fov value for camera"), false);
 	d->w->cam = galloc(sizeof(t_camera));
 	d->w->cam->forward = normal(p_cam.vec3d);
 	d->w->cam->origin = p_cam.pcord;
-	d->w->cam->fov = p_cam.FOV;
+	d->w->cam->fov = p_cam.fov;
 	return (true);
 }
 
