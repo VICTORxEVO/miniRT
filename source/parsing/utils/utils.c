@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 17:19:33 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/12 17:10:02 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 21:13:34 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,14 +43,14 @@ bool	color_struct_filled(t_color *c, char **args)
 	bool	error;
 
 	error = false;
-	c->r = ft_atof(args[0], &error);
-	if (error || !between(c->r, 0, 255))
+	c->r = ft_atoi(args[0], &error);
+	if (error || !between(c->r, 0, 255) || (c->r - (int)c->r) > 0)
 		return (false);
-	c->g = ft_atof(args[1], &error);
-	if (error || !between(c->g, 0, 255))
+	c->g = ft_atoi(args[1], &error);
+	if (error || !between(c->g, 0, 255) || (c->g - (int)c->g) > 0)
 		return (false);
-	c->b = ft_atof(args[2], &error);
-	if (error || !between(c->b, 0, 255))
+	c->b = ft_atoi(args[2], &error);
+	if (error || !between(c->b, 0, 255) || (c->b - (int)c->b) > 0)
 		return (false);
 	return (true);
 }

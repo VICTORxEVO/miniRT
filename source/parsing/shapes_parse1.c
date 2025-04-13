@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 17:12:58 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/11 18:40:33 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/13 20:59:14 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,21 +29,21 @@ bool	cylinder_handled(t_core *d, char **args)
 	pc.cord = ft_split(args[1], ",");
 	if (count_args(pc.cord) != 3 || !point_struct_filled(&pc.cylinder_cord,
 			pc.cord))
-		return (printf("Error\ncylinder point invalid\n"), false);
+		return (pexit("Error\ncylinder point invalid!", 1), false);
 	pc.vctr = ft_split(args[2], ",");
 	if (count_args(pc.vctr) != 3 || !vector_struct_filled(&pc.cylinder_norm,
 			pc.vctr))
-		return (printf("Error\nbad cylinder 3d normal cords\n"), false);
+		return (pexit("Error\nbad cylinder 3d normal cords!", 1), false);
 	pc.diameter = ft_atof(args[3], &pc.err);
 	if (pc.err)
-		return (printf("Error\ncylinder diameter invalid\n"), false);
+		return (pexit("Error\ncylinder diameter invalid!", 1), false);
 	pc.height = ft_atof(args[4], &pc.err);
 	if (pc.err)
-		return (printf("Error\ncylinder height invalid\n"), false);
+		return (pexit("Error\ncylinder height invalid!", 1), false);
 	pc.clrs = ft_split(args[5], ",");
 	if (count_args(pc.clrs) != 3 || !color_struct_filled(&pc.cylinder_color,
 			pc.clrs))
-		return (printf("Error\ncylinder color invalid\n"), false);
+		return (pexit("Error\ncylinder color invalid!", 1), false);
 	pc.cylinder = galloc(sizeof(t_cylinder));
 	cylinder_helper(&pc);
 	add_obj(&d->w->objects, pc.cylinder, CY_OBJ);

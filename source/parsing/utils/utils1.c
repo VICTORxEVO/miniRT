@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils1.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 17:10:13 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/12 17:10:14 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 20:59:27 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,14 +45,14 @@ bool	ambient_handled(t_core *d, char **args)
 	err = false;
 	ambient_color = zero_color();
 	if (d->w->ambient)
-		return (printf("Error\nambient already exists\n"), false);
+		return (pexit("Error\nambient already exists!", 1), false);
 	ambient_ratio = ft_atof(args[1], &err);
 	if (err || !between(ambient_ratio, 0, 1))
-		return (printf("Error\nambient ratio invalid\n"), false);
+		return (pexit("Error\nambient ratio invalid!", 1), false);
 	clrs = ft_split(args[2], ",");
 	if (count_args(clrs) != 3 || !color_struct_filled(&ambient_color, clrs))
 	{
-		return (printf("Error\nambient color invalid\n"), false);
+		return (pexit("Error\nambient color invalid!", 1), false);
 	}
 	ambient = galloc(sizeof(t_ambient));
 	ambient->ratio = ambient_ratio;

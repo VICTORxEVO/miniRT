@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mlx.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 18:10:11 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/13 18:54:18 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 20:48:32 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 int	close_window(t_core *engine)
 {
-	printf("here\n");
 	mlx_destroy_window(engine->m.mlx, engine->m.win);
 	mlx_destroy_image(engine->m.mlx, engine->img.img);
 	mlx_destroy_display(engine->m.mlx);

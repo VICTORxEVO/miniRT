@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   macros.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 13:40:27 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/13 19:03:57 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 22:19:58 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,13 @@
 # define USAGE_WARN "usage: miniRT <map_path>"
 # define FILEEXT_ER "file extention must me '.rt' !"
 # define EMPTFILE_ERR " is empty !"
-# define NOLIGHT_ERR " there is no light!"
-# define NOCAM_ERR " there is no camera!"
-# define NOAMB_ERR " there is no ambient!"
+# define LIGHT_ERR "Error\nthere is no light!"
+# define CAM_ERR "Error\nthere is no camera!"
+# define AMB_ERR "Error\nthere is no ambient!"
 # define WHITESPACE " \t\n\r\v\f"
 
 # define LIGHT_FACTOR 5
-
+# define RAYS_PX -1
 // #ifdef LINUX
 # define SCREEN_WIDTH 900.f
 # define SCREEN_HEIGHT 1000.f

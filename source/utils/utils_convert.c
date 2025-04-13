@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 18:28:12 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/11 20:42:35 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/13 21:26:33 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,15 +38,22 @@ int	ft_atof_helper1(const char **s, bool *err, double *dot_pow)
 	return (2);
 }
 
-void	ft_atof_helper2(const char **s, double *res, double *dot_pow)
+void	ft_atof_helper2(const char **s, double *res, double *dot_pow, bool *err)
 {
+	double	prev;
+
+	prev = *res;
 	if (*dot_pow)
 	{
 		*res = *res + ((**s) - '0') / powf(10.f, *dot_pow);
 		(*dot_pow)++;
 	}
 	else
+	{
 		*res = (*res * 10) + ((**s) - '0');
+		if (*res < prev)
+			*err = true;
+	}
 	(*s)++;
 }
 
@@ -72,7 +79,7 @@ double	ft_atof(const char *s, bool *err)
 			continue ;
 		else if (flag == 0)
 			return (0);
-		ft_atof_helper2(&s, &res, &dot_pow);
+		ft_atof_helper2(&s, &res, &dot_pow, err);
 	}
 	return (res * sign);
 }

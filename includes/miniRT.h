@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   miniRT.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 17:29:02 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/13 19:03:08 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 22:19:13 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,8 +165,6 @@ typedef struct s_core
 	t_gc			*gc;
 	t_img			img;
 	int				rays_px;
-	bool			aa_on;
-	int				iter;
 }					t_core;
 
 typedef struct s_calc
@@ -316,6 +314,7 @@ void				mlx_hooks(void);
 bool				is_wspace(char *s);
 char				*err_msg(const char *filename, const int n_line);
 void				set_smallest_if(double *smallest, t_inter it);
+t_color				get_px_color(double x, double y);
 double				get_smallest_t(t_object *node, t_ray *ray);
 int					key_press(int keycode, t_core *engine);
 int					key_release(int keycode, t_core *engine);

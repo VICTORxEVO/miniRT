@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 17:21:35 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/13 15:48:47 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 21:16:13 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ void	readfile(int fd, char *filename)
 	n_line = 1;
 	line = get_next_line(fd);
 	if (!line || !*line)
-		pexit(ft_strjoin(ft_strjoin(RED, filename), EMPTFILE_ERR), 3);
+		pexit(ft_strjoin(ft_strjoin(RED, ft_strjoin("Error\n", filename)),
+				EMPTFILE_ERR), 3);
 	while (line)
 	{
 		if (line[ft_strlen(line) - 1] == '\n')
@@ -31,17 +32,19 @@ void	readfile(int fd, char *filename)
 		n_line++;
 	}
 	if (!getengine()->w->lights)
-		pexit(ft_strjoin(ft_strjoin(RED, filename), NOLIGHT_ERR), 4);
+		pexit(ft_strjoin(ft_strjoin(RED, filename), LIGHT_ERR), 4);
 	if (!getengine()->w->cam)
-		pexit(ft_strjoin(ft_strjoin(RED, filename), NOCAM_ERR), 5);
+		pexit(ft_strjoin(ft_strjoin(RED, filename), CAM_ERR), 5);
 	if (!getengine()->w->ambient)
-		pexit(ft_strjoin(ft_strjoin(RED, filename), NOAMB_ERR), 6);
+		pexit(ft_strjoin(ft_strjoin(RED, filename), AMB_ERR), 6);
 }
 
 int	check_file(char *filename)
 {
 	int	fd;
 
+	if (!ends_with(".rt", filename))
+		pexit(RED "file must be ending with .rt!", 1);
 	fd = open(filename, O_RDONLY);
 	return (fd);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redering.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 18:10:12 by sgouzi            #+#    #+#             */
-/*   Updated: 2025/04/13 18:54:10 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 22:19:27 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,29 @@ void	set_smallest_if(double *smallest, t_inter it)
 {
 	if (it.t1 < *smallest && it.t1 > 0)
 		*smallest = it.t1;
+}
+
+t_color	get_anti_aliased_color(double x, double y)
+{
+	t_color		final;
+	int			i;
+	t_ray		ray;
+	double		offset_x;
+	double		offset_y;
+
+	final = zero_color();
+	ray.origin = getengine()->w->cam->origin;
+	i = 0;
+	while (i < RAYS_PX)
+	{
+		offset_x = (double)rand() / RAND_MAX - 0.5;
+		offset_y = (double)rand() / RAND_MAX - 0.5;
+		ray.direction = get_cam_dir(x + offset_x, y + offset_y, i);
+		final = rgb_add(final, intersect_world(getengine()->w, &ray), 0);
+		i++;
+	}
+	final = rgb_scl(final, 1.0 / RAYS_PX);
+	return (final);
 }
 
 double	get_smallest_t(t_object *node, t_ray *ray)
@@ -44,60 +67,31 @@ double	get_smallest_t(t_object *node, t_ray *ray)
 	return (smallest_t);
 }
 
-t_color	get_anti_aliased_color(double x, double y)
+t_color	get_nonanti_aliased_color(double x, double y)
 {
 	t_core		*engine;
 	t_color		final_clr;
 	t_camera	*cam;
-	double		i;
 	t_ray		ray;
 
-	i = -1;
 	engine = getengine();
 	cam = engine->w->cam;
 	final_clr = zero_color();
 	ray.origin = cam->origin;
-	while (++i < engine->rays_px)
-	{
-		ray.direction = get_cam_dir(x, y, i);
-		final_clr = rgb_add(final_clr, intersect_world(engine->w, &ray), 0);
-	}
-	final_clr = rgb_scl(final_clr, 1 / i);
+	ray.direction = get_cam_dir(x, y, 0);
+	final_clr = rgb_add(final_clr, intersect_world(engine->w, &ray), 0);
 	return (final_clr);
 }
 
 t_color	get_px_color(double x, double y)
 {
 	t_color	final_clr;
-
-	final_clr = get_anti_aliased_color(x, y);
-	return (final_clr);
-}
-
-void	rendering(void)
-{
 	t_core	*engine;
-	int		x;
-	int		y;
-	t_color	px_color;
 
 	engine = getengine();
-	engine->img.img = mlx_new_image(engine->m.mlx, SCREEN_WIDTH, SCREEN_HEIGHT);
-	engine->img.addr = mlx_get_data_addr(engine->img.img,
-			&engine->img.bits_per_pixel, &engine->img.line_length,
-			&engine->img.endian);
-	y = 0;
-	while (y < SCREEN_HEIGHT)
-	{
-		x = 0;
-		while (x < SCREEN_WIDTH)
-		{
-			px_color = get_px_color(x, y);
-			my_mlx_pixel_put(&engine->img, x, y, get_clr_int(px_color));
-			x += engine->iter;
-		}
-		y += engine->iter;
-	}
-	mlx_hooks();
-	return ;
+	if (RAYS_PX < 2)
+		final_clr = get_nonanti_aliased_color(x, y);
+	else
+		final_clr = get_anti_aliased_color(x, y);
+	return (final_clr);
 }

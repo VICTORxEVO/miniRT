@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   shapes_parse.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 17:11:47 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/13 18:56:49 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 20:59:00 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,18 +18,18 @@ bool	camera_handled(t_core *d, char **args)
 
 	p_cam.err = false;
 	if (d->w->cam)
-		return (printf("Error\ncant have more than 1 camera"), false);
+		return (pexit("Error\ncant have more than 1 camera!", 1), false);
 	p_cam.cord = ft_split(args[1], ",");
 	if (count_args(p_cam.cord) != 3 || !point_struct_filled(&p_cam.pcord,
 			p_cam.cord))
-		return (printf("Error\nbad camera point coordinates\n"), false);
+		return (pexit("Error\nbad camera point coordinates\n!", 1), false);
 	p_cam.vctr = ft_split(args[2], ",");
 	if (count_args(p_cam.vctr) != 3 || !vector_struct_filled(&p_cam.vec3d,
 			p_cam.vctr))
-		return (printf("Error\nbad camera 3d vector"), false);
+		return (pexit("Error\nbad camera 3d vector!", 1), false);
 	p_cam.fov = ft_atof(args[3], &p_cam.err);
 	if (p_cam.err || (p_cam.fov < 0 || p_cam.fov > 180))
-		return (printf("Error\nbad fov value for camera"), false);
+		return (pexit("Error\nbad fov value for camera!", 1), false);
 	d->w->cam = galloc(sizeof(t_camera));
 	d->w->cam->forward = normal(p_cam.vec3d);
 	d->w->cam->origin = p_cam.pcord;
@@ -45,14 +45,14 @@ bool	light_handled(t_core *d, char **args)
 	pl.cord = ft_split(args[1], ",");
 	if (count_args(pl.cord) != 3 || !point_struct_filled(&pl.light_cord,
 			pl.cord))
-		return (printf("Error\nbad light point coordinates\n"), false);
+		return (pexit("Error\nbad light point coordinates!", 1), false);
 	pl.light_value = ft_atof(args[2], &pl.err);
 	if (pl.err || !between(pl.light_value, 0, 1))
-		return (printf("Error\nlight value invalid\n"), false);
+		return (pexit("Error\nlight value invalid!", 1), false);
 	pl.clrs = ft_split(args[3], ",");
 	if (count_args(pl.clrs) != 3 || !color_struct_filled(&pl.light_color,
 			pl.clrs))
-		return (printf("Error\nlight color invalid\n"), false);
+		return (pexit("Error\nlight color invalid!", 1), false);
 	pl.light = galloc(sizeof(t_light));
 	pl.light->brightness = pl.light_value;
 	pl.light->c = pl.light_color;
@@ -68,15 +68,15 @@ bool	plane_handled(t_core *d, char **args)
 	p_plane.cord = ft_split(args[1], ",");
 	if (count_args(p_plane.cord) != 3
 		|| !point_struct_filled(&p_plane.plane_cord, p_plane.cord))
-		return (printf("bad plane origin point\n"), false);
+		return (pexit("bad plane origin point!", 1), false);
 	p_plane.vctr = ft_split(args[2], ",");
 	if (count_args(p_plane.vctr) != 3
 		|| !vector_struct_filled(&p_plane.plane_norm, p_plane.vctr))
-		return (printf("bad plane 3d vector\n"), false);
+		return (pexit("bad plane 3d vector!", 1), false);
 	p_plane.clrs = ft_split(args[3], ",");
 	if (count_args(p_plane.clrs) != 3
 		|| !color_struct_filled(&p_plane.plane_color, p_plane.clrs))
-		return (printf("bad plane color\n"), false);
+		return (pexit("bad plane color!", 1), false);
 	p_plane.plane = galloc(sizeof(t_plane));
 	p_plane.plane->c = p_plane.plane_color;
 	p_plane.plane->origin = p_plane.plane_cord;
@@ -93,12 +93,12 @@ bool	sphere_handled(t_core *d, char **args)
 	p_shpere.cord = ft_split(args[1], ",");
 	if (count_args(p_shpere.cord) != 3
 		|| !point_struct_filled(&p_shpere.sphere_cord, p_shpere.cord))
-		return (printf("Error\nsphere point invalid\n"), false);
+		return (pexit("Error\nsphere point invalid!", 1), false);
 	p_shpere.diameter = ft_atof(args[2], &p_shpere.err);
 	p_shpere.clrs = ft_split(args[3], ",");
 	if (count_args(p_shpere.clrs) != 3
 		|| !color_struct_filled(&p_shpere.sphere_color, p_shpere.clrs))
-		return (printf("Error\nsphere color invalid\n"), false);
+		return (pexit("Error\nsphere color invalid!", 1), false);
 	p_shpere.sphere = galloc(sizeof(t_sphere));
 	p_shpere.sphere->c = p_shpere.sphere_color;
 	p_shpere.sphere->origin = p_shpere.sphere_cord;

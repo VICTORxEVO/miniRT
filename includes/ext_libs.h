@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 13:43:37 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/09 18:03:36 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/13 21:08:18 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ int						ft_isascii(int x);
 int						ft_isalpha(int x);
 int						ft_isalnum(int x);
 void					ft_bzero(void *s, size_t n);
-long					ft_atoi(const char *str);
+long					ft_atoi(const char *str, bool *err);
 void					ft_putstr_fd(char *s, int fd);
 int						ft_isprint(int c);
 void					*ft_calloc(size_t n, size_t size);
