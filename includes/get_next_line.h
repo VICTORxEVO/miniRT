@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysbai-jo <ysbai-jo@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/16 16:24:57 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/01/04 10:21:34 by ysbai-jo         ###   ########.fr       */
+/*   Updated: 2025/04/13 18:21:11 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,9 @@ typedef unsigned char	t_uc;
 #  define BUFFER_SIZE 1
 # endif
 
-char					*handle_it(char **q_res, int nl_ind, char **buff);
+char					*handle_it(char **q_res, int nl_ind);
 char					*get_next_line(int fd);
-char					*get_last_line(char **q_res, char **buff);
+char					*get_last_line(char **q_res);
 int						check_nl(char *str);
 char					*ft_gstrjoin(char **s1, char const *s2, int rd);
 void					*free_all(char **q_res, char **buff);

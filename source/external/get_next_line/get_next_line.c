@@ -6,7 +6,7 @@
 /*   By: sgouzi <sgouzi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/16 16:24:19 by ysbai-jo          #+#    #+#             */
-/*   Updated: 2025/04/13 17:47:01 by sgouzi           ###   ########.fr       */
+/*   Updated: 2025/04/13 18:21:20 by sgouzi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,22 +29,21 @@ char	*get_next_line(int fd)
 		q_res = ft_gstrjoin(&q_res, buff, rd);
 		nl_ind = check_nl(q_res);
 		if (nl_ind != -1)
-			return (handle_it(&q_res, nl_ind + 1, &buff));
+			return (handle_it(&q_res, nl_ind + 1));
 		if (!q_res || (!rd && !(*q_res)))
 			break ;
 		if (!rd)
-			return (get_last_line(&q_res, &buff));
+			return (get_last_line(&q_res));
 		rd = read(fd, buff, BUFFER_SIZE);
 	}
 	return (NULL);
 }
 
-char	*handle_it(char **q_res, int nl_ind, char **buff)
+char	*handle_it(char **q_res, int nl_ind)
 {
 	char	*line;
 	char	*tmp;
 	
-	(void) buff;
 	line = ft_substr(*q_res, 0, (size_t)(nl_ind));
 	tmp = ft_substr(*q_res, nl_ind, ft_strlen(*q_res + nl_ind));
 	if (!tmp[0])
@@ -56,13 +55,11 @@ char	*handle_it(char **q_res, int nl_ind, char **buff)
 	return (line);
 }
 
-char	*get_last_line(char **q_res, char **buff)
+char	*get_last_line(char **q_res)
 {
 	char	*line;
 
 	line = ft_substr(*q_res, 0, ft_strlen(*q_res));
-	free(*q_res);
-	free(*buff);
 	*q_res = NULL;
 	return (line);
 }
